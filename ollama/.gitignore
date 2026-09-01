@@ -1,0 +1,9 @@
+# 모델 파일 (수십~수백 GB)
+models/
+
+# 측정 결과 원본 (필요한 표만 골라서 커밋하세요)
+results/*
+!results/.gitkeep
+
+__pycache__/
+*.pyc

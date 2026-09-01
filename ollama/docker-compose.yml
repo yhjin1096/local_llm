@@ -1,0 +1,83 @@
+# ─────────────────────────────────────────────────────────────
+# Phase 1 (커리큘럼 2~3단계) 실행 환경
+#   ollama : 모델 서빙 (공식 이미지 — Dockerfile 불필요)
+#   eval   : 평가 하네스 (MMLU Pro / HumanEval) — 여기만 Dockerfile 사용
+#
+# 사용법:
+#   docker compose up -d ollama          # 서버만 띄우기
+#   docker compose exec ollama ollama pull qwen3:8b
+#   docker compose run --rm eval bash    # 평가 컨테이너 진입
+# ─────────────────────────────────────────────────────────────
+
+services:
+  ollama:
+    image: ollama/ollama:${OLLAMA_IMAGE_TAG:-latest}
+    container_name: ollama
+    restart: unless-stopped
+
+    ports:
+      # 호스트 11434 → 컨테이너 11434
+      # 호스트의 opencode 등은 http://localhost:11434/v1 로 접근합니다.
+      - "${OLLAMA_PORT:-11434}:11434"
+
+    volumes:
+      # 모델 저장소. bind mount 이므로 호스트에서 직접 용량 확인이 됩니다:
+      #   du -sh ./models
+      - ${OLLAMA_MODELS_DIR:-./models}:/root/.ollama
+
+    environment:
+      # 컨테이너 내부 전체 인터페이스에 바인딩 (포트 매핑이 동작하려면 필수)
+      OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_CONTEXT_LENGTH: ${OLLAMA_CONTEXT_LENGTH:-8192}
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:--1}
+      OLLAMA_MAX_LOADED_MODELS: ${OLLAMA_MAX_LOADED_MODELS:-2}
+      OLLAMA_NUM_PARALLEL: ${OLLAMA_NUM_PARALLEL:-1}
+      OLLAMA_FLASH_ATTENTION: ${OLLAMA_FLASH_ATTENTION:-1}
+      OLLAMA_KV_CACHE_TYPE: ${OLLAMA_KV_CACHE_TYPE:-f16}
+      OLLAMA_DEBUG: ${OLLAMA_DEBUG:-0}
+      NVIDIA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES:-0}
+
+    # GPU 할당.
+    #   Compose v2.30+ 는 top-level `gpus: all` 도 지원하지만,
+    #   deploy 방식이 호환 범위가 넓어 이걸 씁니다.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ── 평가 하네스 ──────────────────────────────────────────────
+  # 커리큘럼 2단계에서 "측정 도구를 먼저 손에 쥔다"에 해당합니다.
+  # GPU 불필요: Ollama의 HTTP API만 호출하므로 CPU 컨테이너로 충분합니다.
+  eval:
+    build:
+      context: ./eval
+    container_name: ollama-eval
+    depends_on:
+      ollama:
+        condition: service_healthy
+    volumes:
+      - ./results:/work/results      # 측정 결과 (호스트에 남습니다)
+      - ./eval/scripts:/work/scripts # 직접 작성한 스크립트
+      - hf_cache:/root/.cache/huggingface  # 벤치마크 데이터셋 캐시
+    environment:
+      # 같은 compose network 안이므로 서비스명으로 접근합니다.
+      # (호스트에서 실행할 때는 localhost:11434 를 쓰세요)
+      OPENAI_BASE_URL: http://ollama:11434/v1
+      OPENAI_API_KEY: dummy   # Ollama는 검사하지 않지만 SDK가 요구합니다
+      HF_HOME: /root/.cache/huggingface
+    working_dir: /work
+    # 바로 종료되지 않게. `docker compose run --rm eval bash` 로 들어가 쓰세요.
+    entrypoint: ["sleep", "infinity"]
+
+volumes:
+  hf_cache:

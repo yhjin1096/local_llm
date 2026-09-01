@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$if(title)$$title$$else$스터디 자료$endif$</title>
+$if(description)$<meta name="description" content="$description$">$endif$
+$if(highlighting-css)$
+<style>
+$highlighting-css$
+</style>
+$endif$
+$for(header-includes)$
+$header-includes$
+$endfor$
+</head>
+<body>
+
+<button id="theme-toggle" type="button" aria-label="라이트/다크 테마 전환" title="테마 전환">◐</button>
+
+<div class="wrap">
+
+  <header class="doc-head">
+    $if(eyebrow)$<p class="eyebrow">$eyebrow$</p>$endif$
+    <h1>$if(title)$$title$$else$스터디 자료$endif$</h1>
+    $if(subtitle)$<p class="subtitle">$subtitle$</p>$endif$
+    $if(meta)$
+    <div class="meta">
+      $for(meta)$<span>$meta$</span>$endfor$
+    </div>
+    $endif$
+  </header>
+
+$if(toc)$
+  <nav id="TOC" role="doc-toc">
+$table-of-contents$
+  </nav>
+$endif$
+
+  <main>
+$body$
+  </main>
+
+$if(footer)$
+  <footer class="doc-foot">
+    $for(footer)$<p>$footer$</p>$endfor$
+  </footer>
+$endif$
+
+</div>
+
+<script>
+// 테마 토글: localStorage 에 기억, 없으면 OS 설정을 따릅니다.
+(function () {
+  var root = document.documentElement;
+  var KEY = 'study-theme';
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+
+  document.getElementById('theme-toggle').addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme');
+    if (!cur) {
+      cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,455 @@
+/* ============================================================
+   로컬 LLM 스터디 자료 공통 스타일
+   - study/build/build.sh 가 HTML 안으로 인라인 삽입합니다
+   - 라이트/다크 테마 모두 지원 (prefers-color-scheme + 수동 토글)
+   ============================================================ */
+
+/* ---------- 색상 토큰 ---------- */
+:root {
+  --bg:          #ffffff;
+  --bg-soft:     #f6f7f9;
+  --bg-code:     #f4f5f7;
+  --fg:          #1f2328;
+  --fg-soft:     #57606a;
+  --fg-faint:    #8b949e;
+  --border:      #d8dee4;
+  --border-soft: #eaeef2;
+  --link:        #0550ae;
+
+  --accent-note:  #0969da;  /* 개념 보충 */
+  --accent-key:   #8250df;  /* 핵심 */
+  --accent-calc:  #1a7f37;  /* 어림셈 */
+  --accent-warn:  #bc4c00;  /* 주의 */
+  --accent-later: #6e7781;  /* 뒤 단계 위임 */
+  --accent-quote: #656d76;  /* 원문 인용 */
+  --accent-quiz:  #bf3989;  /* 확인 문제 */
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+               "Noto Sans KR", "Malgun Gothic", "맑은 고딕", sans-serif;
+  --font-mono: "JetBrains Mono", "D2Coding", "Cascadia Mono", "Consolas",
+               "DejaVu Sans Mono", monospace;
+  --maxw: 52rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:          #0d1117;
+    --bg-soft:     #161b22;
+    --bg-code:     #161b22;
+    --fg:          #e6edf3;
+    --fg-soft:     #9198a1;
+    --fg-faint:    #6e7681;
+    --border:      #30363d;
+    --border-soft: #21262d;
+    --link:        #4493f8;
+
+    --accent-note:  #4493f8;
+    --accent-key:   #ab7df8;
+    --accent-calc:  #3fb950;
+    --accent-warn:  #d29922;
+    --accent-later: #8b949e;
+    --accent-quote: #8b949e;
+    --accent-quiz:  #db61a2;
+  }
+}
+
+/* 수동 토글이 자동 감지를 이깁니다 */
+:root[data-theme="light"] {
+  --bg: #ffffff; --bg-soft: #f6f7f9; --bg-code: #f4f5f7;
+  --fg: #1f2328; --fg-soft: #57606a; --fg-faint: #8b949e;
+  --border: #d8dee4; --border-soft: #eaeef2; --link: #0550ae;
+  --accent-note: #0969da; --accent-key: #8250df; --accent-calc: #1a7f37;
+  --accent-warn: #bc4c00; --accent-later: #6e7781; --accent-quote: #656d76;
+  --accent-quiz: #bf3989;
+}
+:root[data-theme="dark"] {
+  --bg: #0d1117; --bg-soft: #161b22; --bg-code: #161b22;
+  --fg: #e6edf3; --fg-soft: #9198a1; --fg-faint: #6e7681;
+  --border: #30363d; --border-soft: #21262d; --link: #4493f8;
+  --accent-note: #4493f8; --accent-key: #ab7df8; --accent-calc: #3fb950;
+  --accent-warn: #d29922; --accent-later: #8b949e; --accent-quote: #8b949e;
+  --accent-quiz: #db61a2;
+}
+
+/* ---------- 기본 ---------- */
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 16.5px;
+  line-height: 1.85;
+  word-break: keep-all;      /* 한글 단어 중간 줄바꿈 방지 */
+  overflow-wrap: break-word;
+  -webkit-text-size-adjust: 100%;
+}
+
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 3rem 1.25rem 6rem;
+}
+
+/* ---------- 문서 머리말 ---------- */
+.doc-head {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+}
+.doc-head .eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-note);
+  margin: 0 0 0.5rem;
+}
+.doc-head h1 {
+  margin: 0 0 0.6rem;
+  font-size: 2.1rem;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  border: 0;
+  padding: 0;
+}
+.doc-head .subtitle {
+  margin: 0;
+  color: var(--fg-soft);
+  font-size: 1rem;
+}
+.doc-head .meta {
+  margin: 1rem 0 0;
+  font-size: 0.82rem;
+  color: var(--fg-faint);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+}
+
+/* ---------- 제목 ---------- */
+h1, h2, h3, h4 {
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 1.5rem;
+}
+h2 {
+  margin: 3.5rem 0 1.2rem;
+  font-size: 1.55rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--border);
+}
+h3 { margin: 2.5rem 0 0.9rem; font-size: 1.22rem; }
+h4 { margin: 1.9rem 0 0.7rem; font-size: 1.03rem; color: var(--fg-soft); }
+
+/* 제목 앵커 링크 */
+.anchor {
+  float: left;
+  margin-left: -1.1em;
+  padding-right: 0.35em;
+  color: var(--fg-faint);
+  text-decoration: none;
+  opacity: 0;
+  font-weight: 400;
+}
+h2:hover .anchor, h3:hover .anchor { opacity: 1; }
+
+p { margin: 0 0 1.15rem; }
+
+a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+strong { font-weight: 700; }
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 3rem 0;
+}
+
+/* ---------- 목차 ---------- */
+#TOC {
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin: 0 0 3rem;
+  font-size: 0.92rem;
+}
+#TOC::before {
+  content: "목차";
+  display: block;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  margin-bottom: 0.7rem;
+}
+#TOC ul { list-style: none; margin: 0; padding-left: 0; }
+#TOC ul ul { padding-left: 1.1rem; margin: 0.2rem 0; }
+#TOC li { margin: 0.22rem 0; line-height: 1.6; }
+#TOC a { color: var(--fg-soft); text-decoration: none; }
+#TOC a:hover { color: var(--link); text-decoration: underline; }
+#TOC > ul > li > a { color: var(--fg); font-weight: 600; }
+
+/* ---------- 목록 ---------- */
+ul, ol { margin: 0 0 1.15rem; padding-left: 1.5rem; }
+li { margin: 0.3rem 0; }
+li > ul, li > ol { margin: 0.3rem 0; }
+
+/* ---------- 코드 ---------- */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--bg-code);
+  border: 1px solid var(--border-soft);
+  border-radius: 5px;
+  padding: 0.12em 0.38em;
+  word-break: break-all;
+}
+pre {
+  background: var(--bg-code);
+  border: 1px solid var(--border-soft);
+  border-radius: 9px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;          /* 페이지 본문은 절대 가로 스크롤되지 않게 */
+  margin: 0 0 1.4rem;
+  line-height: 1.62;
+  font-size: 0.855rem;
+}
+pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  word-break: normal;
+  white-space: pre;
+}
+
+/* ---------- 표 ---------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.52rem 0.8rem;
+  text-align: left;
+  vertical-align: top;
+}
+th { background: var(--bg-soft); font-weight: 700; white-space: nowrap; }
+tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--bg-soft) 45%, transparent); }
+caption { caption-side: bottom; padding-top: 0.6rem; font-size: 0.82rem; color: var(--fg-faint); text-align: left; }
+
+/* ---------- 인용 ---------- */
+blockquote {
+  margin: 0 0 1.4rem;
+  padding: 0.15rem 0 0.15rem 1.1rem;
+  border-left: 3px solid var(--border);
+  color: var(--fg-soft);
+}
+blockquote > :last-child { margin-bottom: 0; }
+
+/* ============================================================
+   콜아웃 (pandoc fenced_divs → div.note / .key / ...)
+   ============================================================ */
+.note, .key, .calc, .warn, .later, .quote, .quiz {
+  --c: var(--fg-soft);
+  position: relative;
+  margin: 1.8rem 0;
+  padding: 1.1rem 1.25rem 1.15rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--c);
+  border-radius: 0 9px 9px 0;
+  background: color-mix(in srgb, var(--c) 5%, var(--bg));
+  font-size: 0.965rem;
+}
+.note::before, .key::before, .calc::before, .warn::before,
+.later::before, .quote::before, .quiz::before {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  color: var(--c);
+  margin-bottom: 0.55rem;
+}
+.note  { --c: var(--accent-note); }
+.key   { --c: var(--accent-key); }
+.calc  { --c: var(--accent-calc); }
+.warn  { --c: var(--accent-warn); }
+.later { --c: var(--accent-later); }
+.quote { --c: var(--accent-quote); }
+.quiz  { --c: var(--accent-quiz); }
+
+.note::before  { content: "개념 보충"; }
+.key::before   { content: "핵심"; }
+.calc::before  { content: "어림셈"; }
+.warn::before  { content: "주의"; }
+.later::before { content: "여기까지 — 이후는 뒤 단계"; }
+.quote::before { content: "원문 인용"; }
+.quiz::before  { content: "확인 문제"; }
+
+/* data-label 로 개별 재정의 가능 */
+.note[data-label]::before, .key[data-label]::before, .calc[data-label]::before,
+.warn[data-label]::before, .later[data-label]::before,
+.quote[data-label]::before, .quiz[data-label]::before { content: attr(data-label); }
+
+.note > :last-child, .key > :last-child, .calc > :last-child,
+.warn > :last-child, .later > :last-child,
+.quote > :last-child, .quiz > :last-child { margin-bottom: 0; }
+
+.quote { font-style: normal; }
+.quote p { color: var(--fg-soft); }
+
+/* 콜아웃 안의 코드블록은 배경을 한 단계 더 대비 */
+.note pre, .key pre, .calc pre, .warn pre, .later pre, .quiz pre {
+  background: var(--bg);
+}
+
+/* ---------- 확인 문제 (details) ---------- */
+.quiz ol { padding-left: 1.35rem; }
+.quiz li { margin: 0.75rem 0; }
+details {
+  margin: 0.5rem 0 0;
+  border: 1px dashed var(--border);
+  border-radius: 7px;
+  padding: 0 0.9rem;
+  background: var(--bg);
+}
+details[open] { padding-bottom: 0.6rem; }
+summary {
+  cursor: pointer;
+  padding: 0.55rem 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--fg-soft);
+  list-style: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before { content: "▸ "; color: var(--fg-faint); }
+details[open] summary::before { content: "▾ "; }
+/* pandoc 이 <summary> 안의 텍스트를 <p> 로 감쌉니다 → 인라인으로 되돌립니다 */
+summary > p { display: inline; margin: 0; }
+details > :not(summary) { font-size: 0.94rem; }
+details > :last-child { margin-bottom: 0; }
+
+/* ---------- 그림 / SVG ---------- */
+figure {
+  margin: 2rem 0;
+  padding: 0;
+}
+figure > .svg-scroll { overflow-x: auto; }
+figure svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.84rem;
+  color: var(--fg-faint);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* SVG 안에서 쓸 테마 연동 클래스
+   — SVG 에 색을 하드코딩하지 말고 이 클래스만 쓰세요 (GUIDE.md 8절) */
+svg text      { font-family: var(--font-sans); }
+svg .mono     { font-family: var(--font-mono); }
+
+/* 텍스트 */
+svg .s-fg     { fill: var(--fg); }
+svg .s-soft   { fill: var(--fg-soft); }
+svg .s-faint  { fill: var(--fg-faint); }
+
+/* 선 */
+svg .s-line   { stroke: var(--border); fill: none; }
+svg .s-strong { stroke: var(--fg-faint); fill: none; }
+svg .s-dash   { stroke: var(--border); fill: none; stroke-dasharray: 4 3; }
+svg .s-arrow  { fill: var(--fg-faint); stroke: none; }
+
+/* 상자 */
+svg .s-box    { fill: var(--bg-soft); stroke: var(--border); }
+svg .s-plain  { fill: none; stroke: var(--border); }
+svg .s-accent { fill: var(--accent-note); }
+
+/* 색 채움 — 옅은 배경 + 진한 테두리. 위에 s-fg 텍스트를 얹어도 두 테마에서 읽힙니다 */
+svg .s-f1 { fill: var(--accent-note);  fill-opacity: 0.16; stroke: var(--accent-note); }
+svg .s-f2 { fill: var(--accent-key);   fill-opacity: 0.16; stroke: var(--accent-key); }
+svg .s-f3 { fill: var(--accent-calc);  fill-opacity: 0.16; stroke: var(--accent-calc); }
+svg .s-f4 { fill: var(--accent-warn);  fill-opacity: 0.16; stroke: var(--accent-warn); }
+svg .s-f5 { fill: var(--fg-faint);     fill-opacity: 0.14; stroke: var(--fg-faint); }
+
+/* 색 텍스트 — 위 채움과 짝 */
+svg .s-t1 { fill: var(--accent-note); }
+svg .s-t2 { fill: var(--accent-key); }
+svg .s-t3 { fill: var(--accent-calc); }
+svg .s-t4 { fill: var(--accent-warn); }
+svg .s-t5 { fill: var(--fg-faint); }
+
+/* ---------- 배지 (깊이 표시 [완전]/[씨앗]) ---------- */
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.1em 0.5em;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  vertical-align: 0.12em;
+  margin-left: 0.3em;
+}
+.badge.full  { color: var(--accent-key); }
+.badge.seed  { color: var(--accent-later); }
+
+/* ---------- 테마 토글 버튼 ---------- */
+#theme-toggle {
+  position: fixed;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 50;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--fg-soft);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+#theme-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
+
+/* ---------- 꼬리말 ---------- */
+.doc-foot {
+  margin-top: 5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.84rem;
+  color: var(--fg-faint);
+}
+
+/* ---------- 반응형 ---------- */
+@media (max-width: 640px) {
+  body { font-size: 16px; line-height: 1.8; }
+  .wrap { padding: 2rem 1rem 4rem; }
+  .doc-head h1 { font-size: 1.65rem; }
+  h2 { font-size: 1.35rem; margin-top: 2.8rem; }
+  h3 { font-size: 1.12rem; }
+  .anchor { display: none; }
+}
+
+/* ---------- 인쇄 ---------- */
+@media print {
+  :root { --bg: #fff; --fg: #000; }
+  #theme-toggle, #TOC { display: none; }
+  .wrap { max-width: none; padding: 0; }
+  pre, table, figure, .note, .key, .calc, .warn, .later, .quiz { break-inside: avoid; }
+}

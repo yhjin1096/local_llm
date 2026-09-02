@@ -29,6 +29,8 @@
   --font-mono: "JetBrains Mono", "D2Coding", "Cascadia Mono", "Consolas",
                "DejaVu Sans Mono", monospace;
   --maxw: 52rem;
+  --sidebar-w: 19rem;
+  --sidebar-break: 1100px;   /* 이 아래에서는 사이드바가 드로어로 접힙니다 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -169,31 +171,106 @@ hr {
   margin: 3rem 0;
 }
 
-/* ---------- 목차 ---------- */
-#TOC {
+/* ---------- 사이드바 목차 ---------- */
+/* 넓은 화면: 왼쪽에 고정. 좁은 화면: 아래 반응형 절에서 드로어로 바뀝니다 */
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w);
+  z-index: 60;
+  box-sizing: border-box;
+  padding: 1.6rem 0.6rem 3rem 1.1rem;
   background: var(--bg-soft);
-  border: 1px solid var(--border-soft);
-  border-radius: 10px;
-  padding: 1.25rem 1.5rem;
-  margin: 0 0 3rem;
-  font-size: 0.92rem;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  font-size: 0.86rem;
+  line-height: 1.5;
 }
+
+.sidebar-head {
+  padding: 0 0.55rem 0.9rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+.sidebar-head .side-eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-note);
+}
+.sidebar-head .side-title {
+  display: block;
+  color: var(--fg);
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  text-decoration: none;
+}
+.sidebar-head .side-title:hover { color: var(--link); }
+
 #TOC::before {
   content: "목차";
   display: block;
+  padding-left: 0.55rem;
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--fg-faint);
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.5rem;
 }
 #TOC ul { list-style: none; margin: 0; padding-left: 0; }
-#TOC ul ul { padding-left: 1.1rem; margin: 0.2rem 0; }
-#TOC li { margin: 0.22rem 0; line-height: 1.6; }
-#TOC a { color: var(--fg-soft); text-decoration: none; }
-#TOC a:hover { color: var(--link); text-decoration: underline; }
-#TOC > ul > li > a { color: var(--fg); font-weight: 600; }
+#TOC ul ul { padding-left: 0.7rem; margin: 0.1rem 0 0.4rem; }
+#TOC li { margin: 0; }
+#TOC a {
+  display: block;
+  padding: 0.26rem 0.55rem;
+  border-left: 2px solid transparent;
+  border-radius: 0 6px 6px 0;
+  color: var(--fg-soft);
+  text-decoration: none;
+}
+#TOC a:hover { background: var(--bg); color: var(--link); }
+#TOC > ul > li > a { color: var(--fg); font-weight: 600; margin-top: 0.35rem; }
+/* 현재 읽고 있는 절 (template.html 의 스크립트가 붙입니다) */
+#TOC a.active {
+  color: var(--link);
+  background: var(--bg);
+  border-left-color: var(--link);
+  font-weight: 700;
+}
+#TOC .badge { font-size: 0.6rem; border: 0; padding: 0; margin-left: 0.25em; opacity: 0.85; }
+
+/* 드로어일 때 뒤를 덮는 막 */
+#nav-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* 목차 열기 버튼 — 넓은 화면에서는 숨습니다 */
+#nav-toggle {
+  position: fixed;
+  top: 0.9rem;
+  left: 0.9rem;
+  z-index: 70;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--fg-soft);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+#nav-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
 
 /* ---------- 목록 ---------- */
 ul, ol { margin: 0 0 1.15rem; padding-left: 1.5rem; }
@@ -437,9 +514,36 @@ svg .s-t5 { fill: var(--fg-faint); }
 }
 
 /* ---------- 반응형 ---------- */
+
+/* 넓은 화면 — 사이드바가 자리를 차지하고 본문은 남은 폭 가운데에 놓입니다 */
+@media (min-width: 1100px) {
+  body { padding-left: var(--sidebar-w); }
+  #nav-toggle, #nav-backdrop { display: none; }
+}
+
+/* 좁은 화면 — 사이드바를 왼쪽 바깥으로 밀어두고 ☰ 로 꺼냅니다 */
+@media (max-width: 1099.98px) {
+  #sidebar {
+    width: min(19rem, 84vw);
+    transform: translateX(-102%);
+    transition: transform 0.22s ease, visibility 0.22s;
+    box-shadow: 0 0 2rem rgba(0, 0, 0, 0.25);
+  }
+  body.nav-open #sidebar { transform: none; }
+  /* ☰ 버튼이 사이드바 머리말을 가리지 않도록 위를 비웁니다 */
+  #sidebar { padding-top: 4rem; }
+  body:not(.nav-open) #sidebar { visibility: hidden; }
+  body.nav-open { overflow: hidden; }
+  .wrap { padding-top: 4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sidebar { transition: none; }
+}
+
 @media (max-width: 640px) {
   body { font-size: 16px; line-height: 1.8; }
-  .wrap { padding: 2rem 1rem 4rem; }
+  .wrap { padding: 4rem 1rem 4rem; }
   .doc-head h1 { font-size: 1.65rem; }
   h2 { font-size: 1.35rem; margin-top: 2.8rem; }
   h3 { font-size: 1.12rem; }
@@ -449,7 +553,8 @@ svg .s-t5 { fill: var(--fg-faint); }
 /* ---------- 인쇄 ---------- */
 @media print {
   :root { --bg: #fff; --fg: #000; }
-  #theme-toggle, #TOC { display: none; }
+  #theme-toggle, #nav-toggle, #sidebar, #nav-backdrop { display: none !important; }
+  body { padding-left: 0; }
   .wrap { max-width: none; padding: 0; }
   pre, table, figure, .note, .key, .calc, .warn, .later, .quiz { break-inside: avoid; }
 }

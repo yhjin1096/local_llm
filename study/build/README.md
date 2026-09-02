@@ -8,9 +8,9 @@
 | 파일 | 역할 |
 |---|---|
 | `build.sh` | 빌드 진입점. pandoc 을 호출합니다 |
-| `template.html` | HTML 골격 (머리말 / 목차 / 본문 / 테마 토글) |
-| `style.css` | 공통 스타일. 라이트·다크 테마, 콜아웃, 표, SVG |
-| `filter.lua` | pandoc Lua 필터. 표 스크롤 래핑, 제목 앵커, 깊이 배지, SVG 래핑 |
+| `template.html` | HTML 골격 (머리말 / 사이드바 목차 / 본문 / 테마 토글) + 목차 스크립트 |
+| `style.css` | 공통 스타일. 라이트·다크 테마, 사이드바, 콜아웃, 표, SVG |
+| `filter.lua` | pandoc Lua 필터. 표 스크롤 래핑, 깊이 배지 |
 
 ## 요구사항
 
@@ -18,7 +18,15 @@
 pandoc --version    # 3.x 필요 (fenced_divs, raw_html 사용)
 ```
 
-없으면 `sudo apt install pandoc`.
+**Ubuntu 20.04 의 `apt install pandoc` 은 2.5 가 설치되어 쓸 수 없습니다.**
+[pandoc 릴리스](https://github.com/jgm/pandoc/releases)에서 정적 바이너리를 받아 `PATH` 에 두세요.
+
+```bash
+curl -sL -o /tmp/pandoc.tar.gz \
+  https://github.com/jgm/pandoc/releases/download/3.1.11.1/pandoc-3.1.11.1-linux-amd64.tar.gz
+tar xzf /tmp/pandoc.tar.gz -C /tmp
+install -m755 /tmp/pandoc-3.1.11.1/bin/pandoc ~/.local/bin/pandoc   # PATH 에 ~/.local/bin 이 있어야 합니다
+```
 
 ## 사용법
 
@@ -35,6 +43,9 @@ cd study
 
 - **완전 self-contained** — CSS 가 `<style>` 로 인라인됩니다. 외부 요청이 0건이므로
   네트워크 없이, 파일 하나만 복사해도 열립니다
+- **사이드바 목차** — 왼쪽에 고정된 목차가 항상 떠 있고, 항목을 누르면 그 절로 이동합니다.
+  스크롤에 따라 **지금 읽고 있는 절이 자동으로 표시**됩니다.
+  화면이 1100px 보다 좁아지면 목차가 접히고 좌측 상단 `☰` 버튼으로 여닫습니다
 - **테마 대응** — OS 의 라이트/다크 설정을 따르고, 우측 상단 버튼으로 수동 전환합니다
   (선택은 `localStorage` 에 기억됩니다)
 - **반응형** — 넓은 표와 SVG 는 자기 영역 안에서만 가로 스크롤되고,
@@ -59,6 +70,21 @@ cd study
 
 사용 가능한 종류: `note` `key` `calc` `warn` `later` `quote` `quiz`
 `data-label` 속성으로 머리 라벨을 개별 재정의할 수 있습니다.
+
+### 목차 — 자동 생성
+
+목차는 `build.sh` 의 `--toc --toc-depth=3` 이 **문서의 `##` / `###` 제목에서 자동으로 만듭니다.**
+마크다운에 목차를 직접 쓰지 마세요. 문서 쪽에서 해야 할 일은 제목 계층을 지키는 것뿐입니다.
+
+| 마크다운 | 목차에서 |
+|---|---|
+| `## 2.3 메모리 계층과 VRAM` | 굵은 상위 항목 |
+| `### VRAM은 늘릴 수 없다` | 그 아래 들여쓴 항목 |
+| `#### …` | 나오지 않음 (깊이 3 까지만) |
+
+제목 옆 `#` 앵커와 목차의 현재 위치 표시는 `template.html` 의 스크립트가 붙입니다.
+**Lua 필터로 제목에 앵커를 넣으면 안 됩니다** — pandoc 이 제목 내용을 목차에도 복사하므로
+`<a>` 안에 `<a>` 가 중첩되어 브라우저가 목차 링크를 끊습니다.
 
 ### 깊이 배지
 
@@ -122,3 +148,5 @@ footer:
 | SVG 가 안 보임 | ` ```{=html} ` 펜스로 감쌌는지 확인. 펜스 없이 쓰면 조용히 깨집니다 |
 | 화살표가 엉킴 | 여러 SVG 가 같은 `marker id` 를 씀. `ar1`, `ar2` 처럼 유일하게 |
 | CSS 가 안 먹음 | `style.css` 를 고친 뒤 다시 빌드해야 반영됩니다 (HTML 에 복사되므로) |
+| 목차가 비어 있음 | 문서에 `##` 제목이 없음. 제목 계층을 확인하세요 |
+| 목차 항목이 링크로 안 잡힘 | 필터가 제목에 `<a>` 를 넣고 있는지 확인 (위 "목차 — 자동 생성") |

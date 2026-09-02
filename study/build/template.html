@@ -16,11 +16,26 @@ $endfor$
 </head>
 <body>
 
+<button id="nav-toggle" type="button" aria-label="목차 열기/닫기" aria-expanded="false" aria-controls="sidebar" title="목차">☰</button>
 <button id="theme-toggle" type="button" aria-label="라이트/다크 테마 전환" title="테마 전환">◐</button>
+
+$if(toc)$
+<div id="nav-backdrop" hidden></div>
+
+<aside id="sidebar">
+  <div class="sidebar-head">
+    $if(eyebrow)$<p class="side-eyebrow">$eyebrow$</p>$endif$
+    <a class="side-title" href="#top">$if(title)$$title$$else$스터디 자료$endif$</a>
+  </div>
+  <nav id="TOC" role="doc-toc" aria-label="목차">
+$table-of-contents$
+  </nav>
+</aside>
+$endif$
 
 <div class="wrap">
 
-  <header class="doc-head">
+  <header class="doc-head" id="top">
     $if(eyebrow)$<p class="eyebrow">$eyebrow$</p>$endif$
     <h1>$if(title)$$title$$else$스터디 자료$endif$</h1>
     $if(subtitle)$<p class="subtitle">$subtitle$</p>$endif$
@@ -30,12 +45,6 @@ $endfor$
     </div>
     $endif$
   </header>
-
-$if(toc)$
-  <nav id="TOC" role="doc-toc">
-$table-of-contents$
-  </nav>
-$endif$
 
   <main>
 $body$
@@ -50,7 +59,9 @@ $endif$
 </div>
 
 <script>
-// 테마 토글: localStorage 에 기억, 없으면 OS 설정을 따릅니다.
+// ------------------------------------------------------------
+// ① 테마 토글: localStorage 에 기억, 없으면 OS 설정을 따릅니다.
+// ------------------------------------------------------------
 (function () {
   var root = document.documentElement;
   var KEY = 'study-theme';
@@ -67,6 +78,106 @@ $endif$
     root.setAttribute('data-theme', next);
     try { localStorage.setItem(KEY, next); } catch (e) {}
   });
+})();
+
+// ------------------------------------------------------------
+// ② 제목 앵커(#): 본문 h2/h3 에만 붙입니다.
+//    Lua 필터가 아니라 여기서 붙이는 이유 —
+//    필터로 제목 내용에 <a> 를 넣으면 pandoc 이 그 내용을 목차에도
+//    복사해 <a> 안에 <a> 가 중첩되고, 브라우저가 목차 링크를 끊습니다.
+// ------------------------------------------------------------
+(function () {
+  var main = document.querySelector('main');
+  if (!main) return;
+  main.querySelectorAll('h2[id], h3[id]').forEach(function (h) {
+    var a = document.createElement('a');
+    a.className = 'anchor';
+    a.href = '#' + h.id;
+    a.setAttribute('aria-hidden', 'true');
+    a.setAttribute('tabindex', '-1');
+    a.textContent = '#';
+    h.insertBefore(a, h.firstChild);
+  });
+})();
+
+// ------------------------------------------------------------
+// ③ 사이드바 목차: 모바일 드로어 + 현재 위치 표시(scrollspy)
+// ------------------------------------------------------------
+(function () {
+  var sidebar = document.getElementById('sidebar');
+  var toggle  = document.getElementById('nav-toggle');
+  var backdrop = document.getElementById('nav-backdrop');
+  if (!sidebar || !toggle) { if (toggle) toggle.hidden = true; return; }
+
+  // --- 드로어 열고 닫기 (좁은 화면에서만 의미가 있습니다) ---
+  function setOpen(open) {
+    document.body.classList.toggle('nav-open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.textContent = open ? '✕' : '☰';
+    toggle.setAttribute('title', open ? '목차 닫기' : '목차');
+    if (backdrop) backdrop.hidden = !open;
+  }
+  toggle.addEventListener('click', function () {
+    setOpen(!document.body.classList.contains('nav-open'));
+  });
+  if (backdrop) backdrop.addEventListener('click', function () { setOpen(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setOpen(false);
+  });
+
+  // 사이드바 안의 링크를 누르면 드로어를 닫습니다 (좁은 화면)
+  sidebar.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function () { setOpen(false); });
+  });
+
+  // --- 목차 링크 ↔ 제목 요소 짝짓기 ---
+  //     (사이드바 머리말의 문서 제목 링크는 제외 — 현재 위치 표시 대상이 아닙니다)
+  var links = Array.prototype.slice.call(document.querySelectorAll('#TOC a[href^="#"]'));
+  var items = [];
+  links.forEach(function (a) {
+    var raw = a.getAttribute('href').slice(1);
+    var id = raw;
+    try { id = decodeURIComponent(raw); } catch (e) {}
+    var el = document.getElementById(id) || document.getElementById(raw);
+    if (el) items.push({ link: a, el: el });
+  });
+  if (!items.length) return;
+
+  // --- 현재 읽고 있는 절 표시 ---
+  var current = null;
+  function sync() {
+    var line = 120;                       // 화면 상단에서 이 높이를 지난 마지막 제목이 '현재'
+    var found = items[0];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].el.getBoundingClientRect().top <= line) found = items[i];
+      else break;
+    }
+    // 문서 맨 아래에 닿으면 마지막 항목을 현재로
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) {
+      found = items[items.length - 1];
+    }
+    if (found === current) return;
+    if (current) current.link.classList.remove('active');
+    found.link.classList.add('active');
+    current = found;
+
+    // 활성 항목이 사이드바 밖으로 밀려나면 보이는 위치로
+    var r = found.link.getBoundingClientRect();
+    var s = sidebar.getBoundingClientRect();
+    if (r.top < s.top + 8 || r.bottom > s.bottom - 8) {
+      sidebar.scrollTop += r.top - s.top - sidebar.clientHeight / 3;
+    }
+  }
+
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () { ticking = false; sync(); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  sync();
 })();
 </script>
 

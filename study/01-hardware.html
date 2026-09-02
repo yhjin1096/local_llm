@@ -30,6 +30,8 @@
 --font-mono: "JetBrains Mono", "D2Coding", "Cascadia Mono", "Consolas",
 "DejaVu Sans Mono", monospace;
 --maxw: 52rem;
+--sidebar-w: 19rem;
+--sidebar-break: 1100px; 
 }
 @media (prefers-color-scheme: dark) {
 :root {
@@ -156,30 +158,101 @@ border-top: 1px solid var(--border);
 margin: 3rem 0;
 }
 
-#TOC {
+
+#sidebar {
+position: fixed;
+top: 0;
+left: 0;
+bottom: 0;
+width: var(--sidebar-w);
+z-index: 60;
+box-sizing: border-box;
+padding: 1.6rem 0.6rem 3rem 1.1rem;
 background: var(--bg-soft);
-border: 1px solid var(--border-soft);
-border-radius: 10px;
-padding: 1.25rem 1.5rem;
-margin: 0 0 3rem;
-font-size: 0.92rem;
+border-right: 1px solid var(--border);
+overflow-y: auto;
+overscroll-behavior: contain;
+font-size: 0.86rem;
+line-height: 1.5;
 }
+.sidebar-head {
+padding: 0 0.55rem 0.9rem;
+margin-bottom: 0.9rem;
+border-bottom: 1px solid var(--border-soft);
+}
+.sidebar-head .side-eyebrow {
+margin: 0 0 0.25rem;
+font-size: 0.68rem;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--accent-note);
+}
+.sidebar-head .side-title {
+display: block;
+color: var(--fg);
+font-weight: 700;
+font-size: 0.95rem;
+line-height: 1.4;
+text-decoration: none;
+}
+.sidebar-head .side-title:hover { color: var(--link); }
 #TOC::before {
 content: "목차";
 display: block;
+padding-left: 0.55rem;
 font-weight: 700;
-font-size: 0.78rem;
+font-size: 0.7rem;
 letter-spacing: 0.08em;
 text-transform: uppercase;
 color: var(--fg-faint);
-margin-bottom: 0.7rem;
+margin-bottom: 0.5rem;
 }
 #TOC ul { list-style: none; margin: 0; padding-left: 0; }
-#TOC ul ul { padding-left: 1.1rem; margin: 0.2rem 0; }
-#TOC li { margin: 0.22rem 0; line-height: 1.6; }
-#TOC a { color: var(--fg-soft); text-decoration: none; }
-#TOC a:hover { color: var(--link); text-decoration: underline; }
-#TOC > ul > li > a { color: var(--fg); font-weight: 600; }
+#TOC ul ul { padding-left: 0.7rem; margin: 0.1rem 0 0.4rem; }
+#TOC li { margin: 0; }
+#TOC a {
+display: block;
+padding: 0.26rem 0.55rem;
+border-left: 2px solid transparent;
+border-radius: 0 6px 6px 0;
+color: var(--fg-soft);
+text-decoration: none;
+}
+#TOC a:hover { background: var(--bg); color: var(--link); }
+#TOC > ul > li > a { color: var(--fg); font-weight: 600; margin-top: 0.35rem; }
+
+#TOC a.active {
+color: var(--link);
+background: var(--bg);
+border-left-color: var(--link);
+font-weight: 700;
+}
+#TOC .badge { font-size: 0.6rem; border: 0; padding: 0; margin-left: 0.25em; opacity: 0.85; }
+
+#nav-backdrop {
+position: fixed;
+inset: 0;
+z-index: 55;
+background: rgba(0, 0, 0, 0.45);
+}
+
+#nav-toggle {
+position: fixed;
+top: 0.9rem;
+left: 0.9rem;
+z-index: 70;
+width: 2.3rem;
+height: 2.3rem;
+border-radius: 50%;
+border: 1px solid var(--border);
+background: var(--bg-soft);
+color: var(--fg-soft);
+font-size: 1rem;
+line-height: 1;
+cursor: pointer;
+}
+#nav-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
 
 ul, ol { margin: 0 0 1.15rem; padding-left: 1.5rem; }
 li { margin: 0.3rem 0; }
@@ -410,9 +483,36 @@ svg .s-t5 { fill: var(--fg-faint); }
 }
 
 /* ---------- 반응형 ---------- */
+
+/* 넓은 화면 — 사이드바가 자리를 차지하고 본문은 남은 폭 가운데에 놓입니다 */
+@media (min-width: 1100px) {
+  body { padding-left: var(--sidebar-w); }
+  #nav-toggle, #nav-backdrop { display: none; }
+}
+
+/* 좁은 화면 — 사이드바를 왼쪽 바깥으로 밀어두고 ☰ 로 꺼냅니다 */
+@media (max-width: 1099.98px) {
+  #sidebar {
+    width: min(19rem, 84vw);
+    transform: translateX(-102%);
+    transition: transform 0.22s ease, visibility 0.22s;
+    box-shadow: 0 0 2rem rgba(0, 0, 0, 0.25);
+  }
+  body.nav-open #sidebar { transform: none; }
+  /* ☰ 버튼이 사이드바 머리말을 가리지 않도록 위를 비웁니다 */
+  #sidebar { padding-top: 4rem; }
+  body:not(.nav-open) #sidebar { visibility: hidden; }
+  body.nav-open { overflow: hidden; }
+  .wrap { padding-top: 4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sidebar { transition: none; }
+}
+
 @media (max-width: 640px) {
   body { font-size: 16px; line-height: 1.8; }
-  .wrap { padding: 2rem 1rem 4rem; }
+  .wrap { padding: 4rem 1rem 4rem; }
   .doc-head h1 { font-size: 1.65rem; }
   h2 { font-size: 1.35rem; margin-top: 2.8rem; }
   h3 { font-size: 1.12rem; }
@@ -422,7 +522,8 @@ svg .s-t5 { fill: var(--fg-faint); }
 /* ---------- 인쇄 ---------- */
 @media print {
   :root { --bg: #fff; --fg: #000; }
-  #theme-toggle, #TOC { display: none; }
+  #theme-toggle, #nav-toggle, #sidebar, #nav-backdrop { display: none !important; }
+  body { padding-left: 0; }
   .wrap { max-width: none; padding: 0; }
   pre, table, figure, .note, .key, .calc, .warn, .later, .quiz { break-inside: avoid; }
 }
@@ -430,11 +531,105 @@ svg .s-t5 { fill: var(--fg-faint); }
 </head>
 <body>
 
+<button id="nav-toggle" type="button" aria-label="목차 열기/닫기" aria-expanded="false" aria-controls="sidebar" title="목차">☰</button>
 <button id="theme-toggle" type="button" aria-label="라이트/다크 테마 전환" title="테마 전환">◐</button>
+
+<div id="nav-backdrop" hidden></div>
+
+<aside id="sidebar">
+  <div class="sidebar-head">
+    <p class="side-eyebrow">PHASE 0 · 준비</p>
+    <a class="side-title" href="#top">1단계 — 내 장비 파악하기</a>
+  </div>
+  <nav id="TOC" role="doc-toc" aria-label="목차">
+<ul>
+<li><a href="#이-단계는-무엇인가" id="toc-이-단계는-무엇인가">1. 이 단계는 무엇인가</a>
+<ul>
+<li><a href="#원문의-요지" id="toc-원문의-요지">원문의 요지</a></li>
+<li><a href="#내-상황에서의-재해석" id="toc-내-상황에서의-재해석">내 상황에서의 재해석</a></li>
+<li><a href="#이-문서를-읽고-나면-답할-수-있는-질문" id="toc-이-문서를-읽고-나면-답할-수-있는-질문">이 문서를 읽고 나면 답할 수 있는 질문</a></li>
+</ul></li>
+<li><a href="#개념" id="toc-개념">2. 개념</a></li>
+<li><a href="#출발점-모델을-돌린다는-것-완전" id="toc-출발점-모델을-돌린다는-것-완전">2.1 출발점 — “모델을 돌린다”는 것 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#모델은-프로그램이-아니라-숫자-덩어리다" id="toc-모델은-프로그램이-아니라-숫자-덩어리다">모델은 프로그램이 아니라 숫자 덩어리다</a></li>
+<li><a href="#학습과-추론은-요구량이-자릿수로-다르다" id="toc-학습과-추론은-요구량이-자릿수로-다르다">학습과 추론은 요구량이 자릿수로 다르다</a></li>
+<li><a href="#token-모든-단위의-기준-씨앗" id="toc-token-모든-단위의-기준-씨앗">token — 모든 단위의 기준 <span class="badge seed">씨앗</span></a></li>
+<li><a href="#추론의-실제-동작-여기가-핵심-씨앗" id="toc-추론의-실제-동작-여기가-핵심-씨앗">추론의 실제 동작 — 여기가 핵심 <span class="badge seed">씨앗</span></a></li>
+</ul></li>
+<li><a href="#숫자를-저장하는-방법-precision-완전" id="toc-숫자를-저장하는-방법-precision-완전">2.2 숫자를 저장하는 방법 — precision <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#부동소수점의-구조" id="toc-부동소수점의-구조">부동소수점의 구조</a></li>
+<li><a href="#정수-표현-int8-int4" id="toc-정수-표현-int8-int4">정수 표현 — INT8, INT4</a></li>
+<li><a href="#파라미터당-바이트-수" id="toc-파라미터당-바이트-수">파라미터당 바이트 수</a></li>
+<li><a href="#quantization-씨앗" id="toc-quantization-씨앗">quantization <span class="badge seed">씨앗</span></a></li>
+</ul></li>
+<li><a href="#메모리-계층과-vram-완전" id="toc-메모리-계층과-vram-완전">2.3 메모리 계층과 VRAM <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#왜-gpu인가-씨앗" id="toc-왜-gpu인가-씨앗">왜 GPU인가 <span class="badge seed">씨앗</span></a></li>
+<li><a href="#메모리-계층-위로-갈수록-빠르고-작다" id="toc-메모리-계층-위로-갈수록-빠르고-작다">메모리 계층 — 위로 갈수록 빠르고 작다</a></li>
+<li><a href="#vram은-늘릴-수-없다" id="toc-vram은-늘릴-수-없다">VRAM은 늘릴 수 없다</a></li>
+<li><a href="#vram에-안-들어가면-못-돌아간다의-정확한-의미" id="toc-vram에-안-들어가면-못-돌아간다의-정확한-의미">“VRAM에 안 들어가면 못 돌아간다”의 정확한 의미</a></li>
+<li><a href="#통합-메모리는-다른-구조다" id="toc-통합-메모리는-다른-구조다">통합 메모리는 다른 구조다</a></li>
+</ul></li>
+<li><a href="#성능의-두-축-연산-성능과-메모리-대역폭-완전" id="toc-성능의-두-축-연산-성능과-메모리-대역폭-완전">2.4 성능의 두 축 — 연산 성능과 메모리 대역폭 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#두-가지-서로-다른-빠름" id="toc-두-가지-서로-다른-빠름">두 가지 서로 다른 “빠름”</a></li>
+<li><a href="#세대별-실제-스펙" id="toc-세대별-실제-스펙">세대별 실제 스펙</a></li>
+<li><a href="#원문의-판단을-검증하면" id="toc-원문의-판단을-검증하면">원문의 판단을 검증하면</a></li>
+<li><a href="#토큰-생성-속도의-이론적-천장" id="toc-토큰-생성-속도의-이론적-천장">토큰 생성 속도의 이론적 천장</a></li>
+</ul></li>
+<li><a href="#vram-예산-32gb를-무엇이-나눠-쓰는가-완전" id="toc-vram-예산-32gb를-무엇이-나눠-쓰는가-완전">2.5 VRAM 예산 — 32GB를 무엇이 나눠 쓰는가 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#예산의-네-항목" id="toc-예산의-네-항목">예산의 네 항목</a></li>
+<li><a href="#kv-cache-예산의-진짜-변수-씨앗" id="toc-kv-cache-예산의-진짜-변수-씨앗">② KV cache — 예산의 진짜 변수 <span class="badge seed">씨앗</span></a></li>
+<li><a href="#내-32gb-대입-무엇이-되는가" id="toc-내-32gb-대입-무엇이-되는가">내 32GB 대입 — 무엇이 되는가</a></li>
+</ul></li>
+<li><a href="#아키텍처-세대와-소프트웨어-스택-완전" id="toc-아키텍처-세대와-소프트웨어-스택-완전">2.6 아키텍처 세대와 소프트웨어 스택 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#세대는-이름표가-아니라-능력이다" id="toc-세대는-이름표가-아니라-능력이다">세대는 이름표가 아니라 능력이다</a></li>
+<li><a href="#cuda는-칩이-아니라-소프트웨어다" id="toc-cuda는-칩이-아니라-소프트웨어다">CUDA는 칩이 아니라 소프트웨어다</a></li>
+<li><a href="#소프트웨어-스택의-층위-가장-많이-헤매는-지점" id="toc-소프트웨어-스택의-층위-가장-많이-헤매는-지점">소프트웨어 스택의 층위 — 가장 많이 헤매는 지점</a></li>
+<li><a href="#대안-스택에서는-무엇이-막히는가-씨앗" id="toc-대안-스택에서는-무엇이-막히는가-씨앗">대안 스택에서는 무엇이 막히는가 <span class="badge seed">씨앗</span></a></li>
+</ul></li>
+<li><a href="#gpu-두-대는-정말-두-배인가-씨앗" id="toc-gpu-두-대는-정말-두-배인가-씨앗">2.7 GPU 두 대는 정말 두 배인가 <span class="badge seed">씨앗</span></a>
+<ul>
+<li><a href="#vram-합산이라는-표현의-함정" id="toc-vram-합산이라는-표현의-함정">“VRAM 합산”이라는 표현의 함정</a></li>
+<li><a href="#그래서-gpu-간-통로가-중요하다" id="toc-그래서-gpu-간-통로가-중요하다">그래서 GPU 간 통로가 중요하다</a></li>
+</ul></li>
+<li><a href="#물리적-요건-전력과-열-완전" id="toc-물리적-요건-전력과-열-완전">2.8 물리적 요건 — 전력과 열 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#전력" id="toc-전력">전력</a></li>
+<li><a href="#열-코어-온도만-보면-안-된다" id="toc-열-코어-온도만-보면-안-된다">열 — 코어 온도만 보면 안 된다</a></li>
+</ul></li>
+<li><a href="#무엇을-보고-판단하는가-완전" id="toc-무엇을-보고-판단하는가-완전">2.9 무엇을 보고 판단하는가 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#nvidia-smi가-보여주는-것" id="toc-nvidia-smi가-보여주는-것">nvidia-smi가 보여주는 것</a></li>
+<li><a href="#그-외에-볼-것" id="toc-그-외에-볼-것">그 외에 볼 것</a></li>
+<li><a href="#단계의-체크포인트" id="toc-단계의-체크포인트">1단계의 체크포인트</a></li>
+</ul></li>
+<li><a href="#대안-하드웨어-씨앗" id="toc-대안-하드웨어-씨앗">2.10 대안 하드웨어 <span class="badge seed">씨앗</span></a>
+<ul>
+<li><a href="#gpu가-한-대라서-못-하는-것의-대안-완전" id="toc-gpu가-한-대라서-못-하는-것의-대안-완전">GPU가 한 대라서 못 하는 것의 대안 <span class="badge full">완전</span></a></li>
+</ul></li>
+<li><a href="#내-장비-기준-정리" id="toc-내-장비-기준-정리">3. 내 장비 기준 정리</a>
+<ul>
+<li><a href="#무엇이-되고-무엇이-안-되는가" id="toc-무엇이-되고-무엇이-안-되는가">3.1 무엇이 되고 무엇이 안 되는가</a></li>
+<li><a href="#원문-전제와의-차이" id="toc-원문-전제와의-차이">3.2 원문 전제와의 차이</a></li>
+</ul></li>
+<li><a href="#확인-문제" id="toc-확인-문제">4. 확인 문제</a></li>
+<li><a href="#다음-단계로" id="toc-다음-단계로">5. 다음 단계로</a>
+<ul>
+<li><a href="#단계로-넘어가기-전에" id="toc-단계로-넘어가기-전에">2단계로 넘어가기 전에</a></li>
+</ul></li>
+<li><a href="#용어표" id="toc-용어표">6. 용어표</a></li>
+</ul>
+  </nav>
+</aside>
 
 <div class="wrap">
 
-  <header class="doc-head">
+  <header class="doc-head" id="top">
     <p class="eyebrow">PHASE 0 · 준비</p>
     <h1>1단계 — 내 장비 파악하기</h1>
     <p class="subtitle">RTX 5090 32GB 한 대로 무엇이 되고, 무엇이 안 되는가</p>
@@ -443,94 +638,9 @@ svg .s-t5 { fill: var(--fg-faint); }
     </div>
       </header>
 
-  <nav id="TOC" role="doc-toc">
-<ul>
-<li><a href="#이-단계는-무엇인가" id="toc-이-단계는-무엇인가"><a class="anchor" href="#이-단계는-무엇인가" aria-hidden="true">#</a>1. 이 단계는 무엇인가</a>
-<ul>
-<li><a href="#원문의-요지" id="toc-원문의-요지"><a class="anchor" href="#원문의-요지" aria-hidden="true">#</a>원문의 요지</a></li>
-<li><a href="#내-상황에서의-재해석" id="toc-내-상황에서의-재해석"><a class="anchor" href="#내-상황에서의-재해석" aria-hidden="true">#</a>내 상황에서의 재해석</a></li>
-<li><a href="#이-문서를-읽고-나면-답할-수-있는-질문" id="toc-이-문서를-읽고-나면-답할-수-있는-질문"><a class="anchor" href="#이-문서를-읽고-나면-답할-수-있는-질문" aria-hidden="true">#</a>이 문서를 읽고 나면 답할 수 있는 질문</a></li>
-</ul></li>
-<li><a href="#개념" id="toc-개념"><a class="anchor" href="#개념" aria-hidden="true">#</a>2. 개념</a></li>
-<li><a href="#출발점-모델을-돌린다는-것-완전" id="toc-출발점-모델을-돌린다는-것-완전"><a class="anchor" href="#출발점-모델을-돌린다는-것-완전" aria-hidden="true">#</a>2.1 출발점 — “모델을 돌린다”는 것 <span class="badge full">완전</span></a>
-<ul>
-<li><a href="#모델은-프로그램이-아니라-숫자-덩어리다" id="toc-모델은-프로그램이-아니라-숫자-덩어리다"><a class="anchor" href="#모델은-프로그램이-아니라-숫자-덩어리다" aria-hidden="true">#</a>모델은 프로그램이 아니라 숫자 덩어리다</a></li>
-<li><a href="#학습과-추론은-요구량이-자릿수로-다르다" id="toc-학습과-추론은-요구량이-자릿수로-다르다"><a class="anchor" href="#학습과-추론은-요구량이-자릿수로-다르다" aria-hidden="true">#</a>학습과 추론은 요구량이 자릿수로 다르다</a></li>
-<li><a href="#token-모든-단위의-기준-씨앗" id="toc-token-모든-단위의-기준-씨앗"><a class="anchor" href="#token-모든-단위의-기준-씨앗" aria-hidden="true">#</a>token — 모든 단위의 기준 <span class="badge seed">씨앗</span></a></li>
-<li><a href="#추론의-실제-동작-여기가-핵심-씨앗" id="toc-추론의-실제-동작-여기가-핵심-씨앗"><a class="anchor" href="#추론의-실제-동작-여기가-핵심-씨앗" aria-hidden="true">#</a>추론의 실제 동작 — 여기가 핵심 <span class="badge seed">씨앗</span></a></li>
-</ul></li>
-<li><a href="#숫자를-저장하는-방법-precision-완전" id="toc-숫자를-저장하는-방법-precision-완전"><a class="anchor" href="#숫자를-저장하는-방법-precision-완전" aria-hidden="true">#</a>2.2 숫자를 저장하는 방법 — precision <span class="badge full">완전</span></a>
-<ul>
-<li><a href="#부동소수점의-구조" id="toc-부동소수점의-구조"><a class="anchor" href="#부동소수점의-구조" aria-hidden="true">#</a>부동소수점의 구조</a></li>
-<li><a href="#정수-표현-int8-int4" id="toc-정수-표현-int8-int4"><a class="anchor" href="#정수-표현-int8-int4" aria-hidden="true">#</a>정수 표현 — INT8, INT4</a></li>
-<li><a href="#파라미터당-바이트-수" id="toc-파라미터당-바이트-수"><a class="anchor" href="#파라미터당-바이트-수" aria-hidden="true">#</a>파라미터당 바이트 수</a></li>
-<li><a href="#quantization-씨앗" id="toc-quantization-씨앗"><a class="anchor" href="#quantization-씨앗" aria-hidden="true">#</a>quantization <span class="badge seed">씨앗</span></a></li>
-</ul></li>
-<li><a href="#메모리-계층과-vram-완전" id="toc-메모리-계층과-vram-완전"><a class="anchor" href="#메모리-계층과-vram-완전" aria-hidden="true">#</a>2.3 메모리 계층과 VRAM <span class="badge full">완전</span></a>
-<ul>
-<li><a href="#왜-gpu인가-씨앗" id="toc-왜-gpu인가-씨앗"><a class="anchor" href="#왜-gpu인가-씨앗" aria-hidden="true">#</a>왜 GPU인가 <span class="badge seed">씨앗</span></a></li>
-<li><a href="#메모리-계층-위로-갈수록-빠르고-작다" id="toc-메모리-계층-위로-갈수록-빠르고-작다"><a class="anchor" href="#메모리-계층-위로-갈수록-빠르고-작다" aria-hidden="true">#</a>메모리 계층 — 위로 갈수록 빠르고 작다</a></li>
-<li><a href="#vram은-늘릴-수-없다" id="toc-vram은-늘릴-수-없다"><a class="anchor" href="#vram은-늘릴-수-없다" aria-hidden="true">#</a>VRAM은 늘릴 수 없다</a></li>
-<li><a href="#vram에-안-들어가면-못-돌아간다의-정확한-의미" id="toc-vram에-안-들어가면-못-돌아간다의-정확한-의미"><a class="anchor" href="#vram에-안-들어가면-못-돌아간다의-정확한-의미" aria-hidden="true">#</a>“VRAM에 안 들어가면 못 돌아간다”의 정확한 의미</a></li>
-<li><a href="#통합-메모리는-다른-구조다" id="toc-통합-메모리는-다른-구조다"><a class="anchor" href="#통합-메모리는-다른-구조다" aria-hidden="true">#</a>통합 메모리는 다른 구조다</a></li>
-</ul></li>
-<li><a href="#성능의-두-축-연산-성능과-메모리-대역폭-완전" id="toc-성능의-두-축-연산-성능과-메모리-대역폭-완전"><a class="anchor" href="#성능의-두-축-연산-성능과-메모리-대역폭-완전" aria-hidden="true">#</a>2.4 성능의 두 축 — 연산 성능과 메모리 대역폭 <span class="badge full">완전</span></a>
-<ul>
-<li><a href="#두-가지-서로-다른-빠름" id="toc-두-가지-서로-다른-빠름"><a class="anchor" href="#두-가지-서로-다른-빠름" aria-hidden="true">#</a>두 가지 서로 다른 “빠름”</a></li>
-<li><a href="#세대별-실제-스펙" id="toc-세대별-실제-스펙"><a class="anchor" href="#세대별-실제-스펙" aria-hidden="true">#</a>세대별 실제 스펙</a></li>
-<li><a href="#원문의-판단을-검증하면" id="toc-원문의-판단을-검증하면"><a class="anchor" href="#원문의-판단을-검증하면" aria-hidden="true">#</a>원문의 판단을 검증하면</a></li>
-<li><a href="#토큰-생성-속도의-이론적-천장" id="toc-토큰-생성-속도의-이론적-천장"><a class="anchor" href="#토큰-생성-속도의-이론적-천장" aria-hidden="true">#</a>토큰 생성 속도의 이론적 천장</a></li>
-</ul></li>
-<li><a href="#vram-예산-32gb를-무엇이-나눠-쓰는가-완전" id="toc-vram-예산-32gb를-무엇이-나눠-쓰는가-완전"><a class="anchor" href="#vram-예산-32gb를-무엇이-나눠-쓰는가-완전" aria-hidden="true">#</a>2.5 VRAM 예산 — 32GB를 무엇이 나눠 쓰는가 <span class="badge full">완전</span></a>
-<ul>
-<li><a href="#예산의-네-항목" id="toc-예산의-네-항목"><a class="anchor" href="#예산의-네-항목" aria-hidden="true">#</a>예산의 네 항목</a></li>
-<li><a href="#kv-cache-예산의-진짜-변수-씨앗" id="toc-kv-cache-예산의-진짜-변수-씨앗"><a class="anchor" href="#kv-cache-예산의-진짜-변수-씨앗" aria-hidden="true">#</a>② KV cache — 예산의 진짜 변수 <span class="badge seed">씨앗</span></a></li>
-<li><a href="#내-32gb-대입-무엇이-되는가" id="toc-내-32gb-대입-무엇이-되는가"><a class="anchor" href="#내-32gb-대입-무엇이-되는가" aria-hidden="true">#</a>내 32GB 대입 — 무엇이 되는가</a></li>
-</ul></li>
-<li><a href="#아키텍처-세대와-소프트웨어-스택-완전" id="toc-아키텍처-세대와-소프트웨어-스택-완전"><a class="anchor" href="#아키텍처-세대와-소프트웨어-스택-완전" aria-hidden="true">#</a>2.6 아키텍처 세대와 소프트웨어 스택 <span class="badge full">완전</span></a>
-<ul>
-<li><a href="#세대는-이름표가-아니라-능력이다" id="toc-세대는-이름표가-아니라-능력이다"><a class="anchor" href="#세대는-이름표가-아니라-능력이다" aria-hidden="true">#</a>세대는 이름표가 아니라 능력이다</a></li>
-<li><a href="#cuda는-칩이-아니라-소프트웨어다" id="toc-cuda는-칩이-아니라-소프트웨어다"><a class="anchor" href="#cuda는-칩이-아니라-소프트웨어다" aria-hidden="true">#</a>CUDA는 칩이 아니라 소프트웨어다</a></li>
-<li><a href="#소프트웨어-스택의-층위-가장-많이-헤매는-지점" id="toc-소프트웨어-스택의-층위-가장-많이-헤매는-지점"><a class="anchor" href="#소프트웨어-스택의-층위-가장-많이-헤매는-지점" aria-hidden="true">#</a>소프트웨어 스택의 층위 — 가장 많이 헤매는 지점</a></li>
-<li><a href="#대안-스택에서는-무엇이-막히는가-씨앗" id="toc-대안-스택에서는-무엇이-막히는가-씨앗"><a class="anchor" href="#대안-스택에서는-무엇이-막히는가-씨앗" aria-hidden="true">#</a>대안 스택에서는 무엇이 막히는가 <span class="badge seed">씨앗</span></a></li>
-</ul></li>
-<li><a href="#gpu-두-대는-정말-두-배인가-씨앗" id="toc-gpu-두-대는-정말-두-배인가-씨앗"><a class="anchor" href="#gpu-두-대는-정말-두-배인가-씨앗" aria-hidden="true">#</a>2.7 GPU 두 대는 정말 두 배인가 <span class="badge seed">씨앗</span></a>
-<ul>
-<li><a href="#vram-합산이라는-표현의-함정" id="toc-vram-합산이라는-표현의-함정"><a class="anchor" href="#vram-합산이라는-표현의-함정" aria-hidden="true">#</a>“VRAM 합산”이라는 표현의 함정</a></li>
-<li><a href="#그래서-gpu-간-통로가-중요하다" id="toc-그래서-gpu-간-통로가-중요하다"><a class="anchor" href="#그래서-gpu-간-통로가-중요하다" aria-hidden="true">#</a>그래서 GPU 간 통로가 중요하다</a></li>
-</ul></li>
-<li><a href="#물리적-요건-전력과-열-완전" id="toc-물리적-요건-전력과-열-완전"><a class="anchor" href="#물리적-요건-전력과-열-완전" aria-hidden="true">#</a>2.8 물리적 요건 — 전력과 열 <span class="badge full">완전</span></a>
-<ul>
-<li><a href="#전력" id="toc-전력"><a class="anchor" href="#전력" aria-hidden="true">#</a>전력</a></li>
-<li><a href="#열-코어-온도만-보면-안-된다" id="toc-열-코어-온도만-보면-안-된다"><a class="anchor" href="#열-코어-온도만-보면-안-된다" aria-hidden="true">#</a>열 — 코어 온도만 보면 안 된다</a></li>
-</ul></li>
-<li><a href="#무엇을-보고-판단하는가-완전" id="toc-무엇을-보고-판단하는가-완전"><a class="anchor" href="#무엇을-보고-판단하는가-완전" aria-hidden="true">#</a>2.9 무엇을 보고 판단하는가 <span class="badge full">완전</span></a>
-<ul>
-<li><a href="#nvidia-smi가-보여주는-것" id="toc-nvidia-smi가-보여주는-것"><a class="anchor" href="#nvidia-smi가-보여주는-것" aria-hidden="true">#</a>nvidia-smi가 보여주는 것</a></li>
-<li><a href="#그-외에-볼-것" id="toc-그-외에-볼-것"><a class="anchor" href="#그-외에-볼-것" aria-hidden="true">#</a>그 외에 볼 것</a></li>
-<li><a href="#단계의-체크포인트" id="toc-단계의-체크포인트"><a class="anchor" href="#단계의-체크포인트" aria-hidden="true">#</a>1단계의 체크포인트</a></li>
-</ul></li>
-<li><a href="#대안-하드웨어-씨앗" id="toc-대안-하드웨어-씨앗"><a class="anchor" href="#대안-하드웨어-씨앗" aria-hidden="true">#</a>2.10 대안 하드웨어 <span class="badge seed">씨앗</span></a>
-<ul>
-<li><a href="#gpu가-한-대라서-못-하는-것의-대안-완전" id="toc-gpu가-한-대라서-못-하는-것의-대안-완전"><a class="anchor" href="#gpu가-한-대라서-못-하는-것의-대안-완전" aria-hidden="true">#</a>GPU가 한 대라서 못 하는 것의 대안 <span class="badge full">완전</span></a></li>
-</ul></li>
-<li><a href="#내-장비-기준-정리" id="toc-내-장비-기준-정리"><a class="anchor" href="#내-장비-기준-정리" aria-hidden="true">#</a>3. 내 장비 기준 정리</a>
-<ul>
-<li><a href="#무엇이-되고-무엇이-안-되는가" id="toc-무엇이-되고-무엇이-안-되는가"><a class="anchor" href="#무엇이-되고-무엇이-안-되는가" aria-hidden="true">#</a>3.1 무엇이 되고 무엇이 안 되는가</a></li>
-<li><a href="#원문-전제와의-차이" id="toc-원문-전제와의-차이"><a class="anchor" href="#원문-전제와의-차이" aria-hidden="true">#</a>3.2 원문 전제와의 차이</a></li>
-</ul></li>
-<li><a href="#확인-문제" id="toc-확인-문제"><a class="anchor" href="#확인-문제" aria-hidden="true">#</a>4. 확인 문제</a></li>
-<li><a href="#다음-단계로" id="toc-다음-단계로"><a class="anchor" href="#다음-단계로" aria-hidden="true">#</a>5. 다음 단계로</a>
-<ul>
-<li><a href="#단계로-넘어가기-전에" id="toc-단계로-넘어가기-전에"><a class="anchor" href="#단계로-넘어가기-전에" aria-hidden="true">#</a>2단계로 넘어가기 전에</a></li>
-</ul></li>
-<li><a href="#용어표" id="toc-용어표"><a class="anchor" href="#용어표" aria-hidden="true">#</a>6. 용어표</a></li>
-</ul>
-  </nav>
-
   <main>
-<h2 id="이-단계는-무엇인가"><a class="anchor" href="#이-단계는-무엇인가" aria-hidden="true">#</a>1. 이 단계는 무엇인가</h2>
-<h3 id="원문의-요지"><a class="anchor" href="#원문의-요지" aria-hidden="true">#</a>원문의 요지</h3>
+<h2 id="이-단계는-무엇인가">1. 이 단계는 무엇인가</h2>
+<h3 id="원문의-요지">원문의 요지</h3>
 <div class="quote" data-label="원문 (1단계) — AI 가속기 장비를 구매합니다">
 <ul>
 <li><strong>맥미니 사지 마세요.</strong> 저렴하긴 하지만, 로컬 AI를 처음 공부하는 사람이 MLX 커널을 다룰 리가 없습니다.</li>
@@ -544,7 +654,7 @@ svg .s-t5 { fill: var(--fg-faint); }
 <blockquote>
 <p>“우리는 지금 속도를 쫓는 게 아니라, 공부를 할 수 있을 만큼의 VRAM을 쫓아야 합니다.”</p>
 </blockquote>
-<h3 id="내-상황에서의-재해석"><a class="anchor" href="#내-상황에서의-재해석" aria-hidden="true">#</a>내 상황에서의 재해석</h3>
+<h3 id="내-상황에서의-재해석">내 상황에서의 재해석</h3>
 <p>이 저장소의 장비는 <strong>이미 RTX 5090 32GB 한 대</strong>입니다. 살지 말지 고민할 단계가 아닙니다.</p>
 <p>그래서 1단계를 <strong>“내 장비의 능력과 한계를 정확히 파악하는 단계”</strong> 로 바꿔 읽습니다.
 목적은 두 가지입니다.</p>
@@ -556,7 +666,7 @@ svg .s-t5 { fill: var(--fg-faint); }
 <p>1단계의 산출물은 물건이 아니라 <strong>계산 능력</strong>입니다.
 “이 모델이 내 GPU에 들어가는가”, “얼마나 빠를 수 있는가”를 손으로 어림셈할 수 있으면 이 단계는 끝납니다.</p>
 </div>
-<h3 id="이-문서를-읽고-나면-답할-수-있는-질문"><a class="anchor" href="#이-문서를-읽고-나면-답할-수-있는-질문" aria-hidden="true">#</a>이 문서를 읽고 나면 답할 수 있는 질문</h3>
+<h3 id="이-문서를-읽고-나면-답할-수-있는-질문">이 문서를 읽고 나면 답할 수 있는 질문</h3>
 <ol type="1">
 <li>내 32GB로 어떤 크기의 모델이 되고, 어떤 것이 안 되는가?</li>
 <li>내 GPU가 낼 수 있는 <strong>토큰 생성 속도의 이론적 천장</strong>은 얼마인가?</li>
@@ -566,15 +676,15 @@ svg .s-t5 { fill: var(--fg-faint); }
 </ol>
 <p>4절 확인 문제가 이 다섯 가지를 다시 묻습니다.</p>
 <hr />
-<h2 id="개념"><a class="anchor" href="#개념" aria-hidden="true">#</a>2. 개념</h2>
-<h2 id="출발점-모델을-돌린다는-것-완전"><a class="anchor" href="#출발점-모델을-돌린다는-것-완전" aria-hidden="true">#</a>2.1 출발점 — “모델을 돌린다”는 것 <span class="badge full">완전</span></h2>
-<h3 id="모델은-프로그램이-아니라-숫자-덩어리다"><a class="anchor" href="#모델은-프로그램이-아니라-숫자-덩어리다" aria-hidden="true">#</a>모델은 프로그램이 아니라 숫자 덩어리다</h3>
+<h2 id="개념">2. 개념</h2>
+<h2 id="출발점-모델을-돌린다는-것-완전">2.1 출발점 — “모델을 돌린다”는 것 <span class="badge full">완전</span></h2>
+<h3 id="모델은-프로그램이-아니라-숫자-덩어리다">모델은 프로그램이 아니라 숫자 덩어리다</h3>
 <p>LLM(Large Language Model)을 처음 접하면 “AI 프로그램”으로 상상하게 됩니다. 실제로는 다릅니다.</p>
 <p>모델의 실체는 <strong>parameter(파라미터, 가중치)라는 숫자의 거대한 목록</strong>입니다.
 <code>Qwen3-8B</code> 의 <code>8B</code> 는 그 숫자가 <strong>80억 개</strong>라는 뜻입니다(B = billion).</p>
 <p>파일로 존재하고, 실행하려면 그 숫자들을 <strong>메모리에 올려야</strong> 합니다.
 이 한 문장이 1단계 전체의 출발점입니다. 하드웨어 판단이 전부 여기서 파생됩니다.</p>
-<h3 id="학습과-추론은-요구량이-자릿수로-다르다"><a class="anchor" href="#학습과-추론은-요구량이-자릿수로-다르다" aria-hidden="true">#</a>학습과 추론은 요구량이 자릿수로 다르다</h3>
+<h3 id="학습과-추론은-요구량이-자릿수로-다르다">학습과 추론은 요구량이 자릿수로 다르다</h3>
 <div class="table-scroll">
 <table>
 <thead>
@@ -612,7 +722,7 @@ svg .s-t5 { fill: var(--fg-faint); }
 <p>커리큘럼의 거의 전부가 <strong>추론</strong>입니다. 그래서 1단계의 VRAM 계산도 추론 기준입니다.
 10단계(LoRA / QLoRA 파인튜닝)에서만 학습 쪽 계산이 필요하고, 그때 100GB 넘는 숫자가 나오는 이유가 위 표의 “5~6배”입니다.</p>
 </div>
-<h3 id="token-모든-단위의-기준-씨앗"><a class="anchor" href="#token-모든-단위의-기준-씨앗" aria-hidden="true">#</a>token — 모든 단위의 기준 <span class="badge seed">씨앗</span></h3>
+<h3 id="token-모든-단위의-기준-씨앗">token — 모든 단위의 기준 <span class="badge seed">씨앗</span></h3>
 <p>LLM은 글자 단위로도, 단어 단위로도 텍스트를 다루지 않습니다.
 <strong>token(토큰)</strong> 이라는 중간 크기 조각으로 자릅니다. 대략 “글자보다 크고 단어보다 작거나 같은 조각”입니다.</p>
 <p>지금 이걸 알아야 하는 이유는 하나입니다. <strong>이후 나오는 거의 모든 단위가 토큰 기준</strong>입니다.</p>
@@ -625,7 +735,7 @@ svg .s-t5 { fill: var(--fg-faint); }
 <p>토큰을 나누는 방식(tokenizer, BPE(Byte Pair Encoding) 등)은 이 커리큘럼에서 깊이 다루지 않습니다.
 1단계에서는 <strong>“토큰이 단위다”</strong> 까지 알면 충분합니다.</p>
 </div>
-<h3 id="추론의-실제-동작-여기가-핵심-씨앗"><a class="anchor" href="#추론의-실제-동작-여기가-핵심-씨앗" aria-hidden="true">#</a>추론의 실제 동작 — 여기가 핵심 <span class="badge seed">씨앗</span></h3>
+<h3 id="추론의-실제-동작-여기가-핵심-씨앗">추론의 실제 동작 — 여기가 핵심 <span class="badge seed">씨앗</span></h3>
 <p>토큰 하나를 만들 때 GPU 안에서 무슨 일이 벌어지는지, 딱 한 가지만 붙잡으면 됩니다.</p>
 <blockquote>
 <p>도서관에서 한 문장을 쓰기 위해, 서가에 있는 <strong>책 전권을 처음부터 끝까지 훑어야</strong> 하는 사서를 생각해보세요.
@@ -642,11 +752,11 @@ svg .s-t5 { fill: var(--fg-faint); }
 1단계에서는 <strong>“토큰마다 가중치 전체를 읽는다”</strong> 까지면 충분합니다.</p>
 </div>
 <hr />
-<h2 id="숫자를-저장하는-방법-precision-완전"><a class="anchor" href="#숫자를-저장하는-방법-precision-완전" aria-hidden="true">#</a>2.2 숫자를 저장하는 방법 — precision <span class="badge full">완전</span></h2>
+<h2 id="숫자를-저장하는-방법-precision-완전">2.2 숫자를 저장하는 방법 — precision <span class="badge full">완전</span></h2>
 <p>가중치가 숫자 목록이라면, 다음 질문은 자연히 이것입니다.
 <strong>숫자 하나를 몇 바이트로 저장하는가?</strong></p>
 <p>이걸 precision(정밀도)이라고 합니다. 1단계에서 가장 실용적인 개념입니다.</p>
-<h3 id="부동소수점의-구조"><a class="anchor" href="#부동소수점의-구조" aria-hidden="true">#</a>부동소수점의 구조</h3>
+<h3 id="부동소수점의-구조">부동소수점의 구조</h3>
 <p>컴퓨터가 소수를 저장하는 방식이 floating point(부동소수점)입니다. 비트를 세 구역으로 나눠 씁니다.</p>
 <div class="table-scroll">
 <table>
@@ -685,37 +795,37 @@ svg .s-t5 { fill: var(--fg-faint); }
 <div class="svg-scroll">
 <svg viewBox="0 0 720 235" role="img" aria-label="FP32, FP16, BF16의 비트 배분 비교. FP32는 지수 8비트 가수 23비트, FP16은 지수 5비트 가수 10비트, BF16은 지수 8비트 가수 7비트.">
   <g font-size="11">
-    <rect class="s-f4" x="110" y="14" width="12" height="12" rx="2"></rect>
+    <rect class="s-f4" x="110" y="14" width="12" height="12" rx="2" />
     <text class="s-soft" x="128" y="24">sign</text>
-    <rect class="s-f1" x="172" y="14" width="12" height="12" rx="2"></rect>
+    <rect class="s-f1" x="172" y="14" width="12" height="12" rx="2" />
     <text class="s-soft" x="190" y="24">exponent — 표현 범위</text>
-    <rect class="s-f3" x="330" y="14" width="12" height="12" rx="2"></rect>
+    <rect class="s-f3" x="330" y="14" width="12" height="12" rx="2" />
     <text class="s-soft" x="348" y="24">mantissa — 정밀도</text>
   </g>
   <g font-size="12">
     <text class="s-fg mono" x="100" y="66" text-anchor="end">FP32</text>
-    <rect class="s-f4" x="110" y="48" width="15" height="26"></rect>
-    <rect class="s-f1" x="125" y="48" width="120" height="26"></rect>
-    <rect class="s-f3" x="245" y="48" width="345" height="26"></rect>
+    <rect class="s-f4" x="110" y="48" width="15" height="26" />
+    <rect class="s-f1" x="125" y="48" width="120" height="26" />
+    <rect class="s-f3" x="245" y="48" width="345" height="26" />
     <text class="s-soft mono" x="600" y="66" font-size="11">4 bytes</text>
     <text class="s-t1" x="185" y="66" text-anchor="middle" font-size="10">8</text>
     <text class="s-t3" x="417" y="66" text-anchor="middle" font-size="10">23</text>
     <text class="s-fg mono" x="100" y="111" text-anchor="end">FP16</text>
-    <rect class="s-f4" x="110" y="93" width="15" height="26"></rect>
-    <rect class="s-f1" x="125" y="93" width="75" height="26"></rect>
-    <rect class="s-f3" x="200" y="93" width="150" height="26"></rect>
+    <rect class="s-f4" x="110" y="93" width="15" height="26" />
+    <rect class="s-f1" x="125" y="93" width="75" height="26" />
+    <rect class="s-f3" x="200" y="93" width="150" height="26" />
     <text class="s-soft mono" x="360" y="111" font-size="11">2 bytes</text>
     <text class="s-t1" x="162" y="111" text-anchor="middle" font-size="10">5</text>
     <text class="s-t3" x="275" y="111" text-anchor="middle" font-size="10">10</text>
     <text class="s-fg mono" x="100" y="156" text-anchor="end">BF16</text>
-    <rect class="s-f4" x="110" y="138" width="15" height="26"></rect>
-    <rect class="s-f1" x="125" y="138" width="120" height="26"></rect>
-    <rect class="s-f3" x="245" y="138" width="105" height="26"></rect>
+    <rect class="s-f4" x="110" y="138" width="15" height="26" />
+    <rect class="s-f1" x="125" y="138" width="120" height="26" />
+    <rect class="s-f3" x="245" y="138" width="105" height="26" />
     <text class="s-soft mono" x="360" y="156" font-size="11">2 bytes</text>
     <text class="s-t1" x="185" y="156" text-anchor="middle" font-size="10">8</text>
     <text class="s-t3" x="297" y="156" text-anchor="middle" font-size="10">7</text>
   </g>
-  <path class="s-dash" d="M245 74 V138"></path>
+  <path class="s-dash" d="M245 74 V138" />
   <text class="s-faint" x="252" y="190" font-size="11">BF16의 지수부는 FP32와 같습니다 — 표현 범위를 지키고 정밀도만 내줍니다.</text>
   <text class="s-faint" x="252" y="208" font-size="11">그래서 학습에서 값이 발산하지 않습니다.</text>
 </svg>
@@ -725,10 +835,10 @@ svg .s-t5 { fill: var(--fg-faint); }
 <p>FP16(Floating Point 16)과 BF16(Brain Floating Point 16)은 <strong>둘 다 2바이트인데 성격이 반대</strong>입니다.
 FP16은 정밀도를 챙기고 범위를 좁혔고, BF16은 범위를 챙기고 정밀도를 내줬습니다.</p>
 <p>이 자료에서 계속 BF16이 기준으로 등장하는 이유는, 최근 모델이 대부분 BF16으로 학습·배포되기 때문입니다.</p>
-<h3 id="정수-표현-int8-int4"><a class="anchor" href="#정수-표현-int8-int4" aria-hidden="true">#</a>정수 표현 — INT8, INT4</h3>
+<h3 id="정수-표현-int8-int4">정수 표현 — INT8, INT4</h3>
 <p>부동소수점 대신 정수로 저장하는 방법도 있습니다. INT8(8-bit Integer)은 1바이트, INT4는 0.5바이트입니다.
 소수를 정수로 어떻게 담느냐면, <strong>“실제 값 = 정수 × 배율(scale)”</strong> 형태로 배율을 따로 저장합니다.</p>
-<h3 id="파라미터당-바이트-수"><a class="anchor" href="#파라미터당-바이트-수" aria-hidden="true">#</a>파라미터당 바이트 수</h3>
+<h3 id="파라미터당-바이트-수">파라미터당 바이트 수</h3>
 <p>여기까지가 1단계에서 필요한 전부입니다. 결론은 이 표입니다.</p>
 <div class="table-scroll">
 <table>
@@ -787,7 +897,7 @@ Qwen3-14B, BF16  → 14 × 2.0  = 28 GB      ← 가중치만으로 예산 소�
 <li><strong>양자화 포맷별 실제 크기</strong> — <code>0.6</code> 은 대표값입니다. 실제 파일 크기를 확인하는 게 정확합니다</li>
 </ul>
 </div>
-<h3 id="quantization-씨앗"><a class="anchor" href="#quantization-씨앗" aria-hidden="true">#</a>quantization <span class="badge seed">씨앗</span></h3>
+<h3 id="quantization-씨앗">quantization <span class="badge seed">씨앗</span></h3>
 <p>precision을 낮춰 용량을 줄이는 것을 quantization(양자화)이라고 합니다.
 위 표에서 <code>8B → 16GB</code> 를 <code>8B → 5GB</code> 로 만드는 게 바로 그것입니다.</p>
 <p>공짜가 아닙니다. <strong>숫자를 뭉개는 것이므로 모델이 조금 멍청해집니다.</strong></p>
@@ -802,8 +912,8 @@ LLM은 추론 사슬 중간에서 한 번 틀리면 답 전체가 무너질 수 
 1단계에서는 <strong>“정밀도를 낮추면 용량이 줄고 정확도를 내준다”</strong> 와 위 바이트 표까지면 충분합니다.</p>
 </div>
 <hr />
-<h2 id="메모리-계층과-vram-완전"><a class="anchor" href="#메모리-계층과-vram-완전" aria-hidden="true">#</a>2.3 메모리 계층과 VRAM <span class="badge full">완전</span></h2>
-<h3 id="왜-gpu인가-씨앗"><a class="anchor" href="#왜-gpu인가-씨앗" aria-hidden="true">#</a>왜 GPU인가 <span class="badge seed">씨앗</span></h3>
+<h2 id="메모리-계층과-vram-완전">2.3 메모리 계층과 VRAM <span class="badge full">완전</span></h2>
+<h3 id="왜-gpu인가-씨앗">왜 GPU인가 <span class="badge seed">씨앗</span></h3>
 <p>CPU(Central Processing Unit)와 GPU(Graphics Processing Unit)는 설계 철학이 반대입니다.</p>
 <div class="table-scroll">
 <table>
@@ -834,7 +944,7 @@ GPU의 구조와 정확히 맞습니다. 그래서 GPU를 씁니다.</p>
 <p>GPU 내부의 실행 모델(SM, warp, thread)은 <strong>14·17단계</strong>에서 커널을 다룰 때 필요해집니다.
 1단계에서는 <strong>“같은 연산을 대량 병렬로 한다”</strong> 까지면 충분합니다.</p>
 </div>
-<h3 id="메모리-계층-위로-갈수록-빠르고-작다"><a class="anchor" href="#메모리-계층-위로-갈수록-빠르고-작다" aria-hidden="true">#</a>메모리 계층 — 위로 갈수록 빠르고 작다</h3>
+<h3 id="메모리-계층-위로-갈수록-빠르고-작다">메모리 계층 — 위로 갈수록 빠르고 작다</h3>
 <p>컴퓨터의 메모리는 하나가 아니라 계층입니다. 그리고 계층마다 <strong>속도 차이가 자릿수 단위</strong>입니다.</p>
 <p>VRAM(Video Random Access Memory)은 <strong>GPU 기판에 직접 붙어 있는 전용 메모리</strong>입니다.
 5090의 경우 GDDR7(Graphics Double Data Rate 7) 32GB입니다.</p>
@@ -845,33 +955,33 @@ PCIe(Peripheral Component Interconnect Express)는 CPU와 GPU를 잇는 표준 �
 <svg viewBox="0 0 720 300" role="img" aria-label="GPU 내부의 VRAM과 연산 유닛은 1792 GB/s로 연결되지만, GPU와 호스트 시스템 메모리 사이의 PCIe 5.0 x16은 약 64 GB/s로 28배 느리다.">
   <defs>
     <marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path class="s-arrow" d="M0 0 L10 5 L0 10 z"></path>
+      <path class="s-arrow" d="M0 0 L10 5 L0 10 z" />
     </marker>
   </defs>
-  <rect class="s-plain" x="16" y="34" width="312" height="240" rx="10"></rect>
+  <rect class="s-plain" x="16" y="34" width="312" height="240" rx="10" />
   <text class="s-soft" x="28" y="26" font-size="12">GPU — RTX 5090</text>
-  <rect class="s-f1" x="40" y="56" width="264" height="52" rx="7"></rect>
+  <rect class="s-f1" x="40" y="56" width="264" height="52" rx="7" />
   <text class="s-fg" x="172" y="80" text-anchor="middle" font-size="13">연산 유닛 + 레지스터 / SRAM</text>
   <text class="s-faint" x="172" y="98" text-anchor="middle" font-size="10.5">수 MB · 수십 TB/s</text>
-  <path class="s-strong" d="M172 108 V168" marker-end="url(#ar1)"></path>
-  <path class="s-strong" d="M172 168 V112" marker-end="url(#ar1)"></path>
+  <path class="s-strong" d="M172 108 V168" marker-end="url(#ar1)" />
+  <path class="s-strong" d="M172 168 V112" marker-end="url(#ar1)" />
   <text class="s-t1 mono" x="184" y="134" font-size="12">1,792 GB/s</text>
   <text class="s-faint" x="184" y="150" font-size="10.5">여기가 추론의 병목</text>
-  <rect class="s-f3" x="40" y="176" width="264" height="60" rx="7"></rect>
+  <rect class="s-f3" x="40" y="176" width="264" height="60" rx="7" />
   <text class="s-fg" x="172" y="202" text-anchor="middle" font-size="13">VRAM — GDDR7 32 GB</text>
   <text class="s-faint" x="172" y="221" text-anchor="middle" font-size="10.5">모델 가중치가 여기 올라갑니다</text>
   <text class="s-faint" x="172" y="258" text-anchor="middle" font-size="10.5">늘릴 수 없음 — 이 32GB가 모든 제약의 근원</text>
-  <rect class="s-plain" x="452" y="34" width="252" height="240" rx="10"></rect>
+  <rect class="s-plain" x="452" y="34" width="252" height="240" rx="10" />
   <text class="s-soft" x="464" y="26" font-size="12">호스트 (CPU 측)</text>
-  <rect class="s-f5" x="474" y="56" width="208" height="52" rx="7"></rect>
+  <rect class="s-f5" x="474" y="56" width="208" height="52" rx="7" />
   <text class="s-fg" x="578" y="80" text-anchor="middle" font-size="13">시스템 RAM</text>
   <text class="s-faint" x="578" y="98" text-anchor="middle" font-size="10.5">수십~수백 GB · 약 100 GB/s</text>
-  <path class="s-dash" d="M578 108 V176"></path>
-  <rect class="s-f5" x="474" y="176" width="208" height="60" rx="7"></rect>
+  <path class="s-dash" d="M578 108 V176" />
+  <rect class="s-f5" x="474" y="176" width="208" height="60" rx="7" />
   <text class="s-fg" x="578" y="202" text-anchor="middle" font-size="13">SSD</text>
   <text class="s-faint" x="578" y="221" text-anchor="middle" font-size="10.5">TB 단위 · 약 7 GB/s</text>
-  <path class="s-strong" d="M330 148 H448" marker-end="url(#ar1)"></path>
-  <path class="s-strong" d="M448 160 H332" marker-end="url(#ar1)"></path>
+  <path class="s-strong" d="M330 148 H448" marker-end="url(#ar1)" />
+  <path class="s-strong" d="M448 160 H332" marker-end="url(#ar1)" />
   <text class="s-t4" x="389" y="122" text-anchor="middle" font-size="11.5">PCIe 5.0 x16</text>
   <text class="s-t4 mono" x="389" y="138" text-anchor="middle" font-size="12">약 64 GB/s</text>
   <text class="s-t4" x="389" y="186" text-anchor="middle" font-size="11.5">28배 느림</text>
@@ -879,10 +989,10 @@ PCIe(Peripheral Component Interconnect Express)는 CPU와 GPU를 잇는 표준 �
 </div>
 <figcaption>VRAM 안에서의 이동과 VRAM 밖으로의 이동은 속도가 28배 다릅니다</figcaption>
 </figure>
-<h3 id="vram은-늘릴-수-없다"><a class="anchor" href="#vram은-늘릴-수-없다" aria-hidden="true">#</a>VRAM은 늘릴 수 없다</h3>
+<h3 id="vram은-늘릴-수-없다">VRAM은 늘릴 수 없다</h3>
 <p>시스템 RAM은 모듈을 더 꽂으면 늘어납니다. <strong>VRAM은 GPU 기판에 납땜되어 있어 불가능합니다.</strong>
 GPU를 고를 때 VRAM 용량이 그토록 중요한 이유가 이것입니다. <strong>나중에 고칠 수 없는 유일한 사양</strong>입니다.</p>
-<h3 id="vram에-안-들어가면-못-돌아간다의-정확한-의미"><a class="anchor" href="#vram에-안-들어가면-못-돌아간다의-정확한-의미" aria-hidden="true">#</a>“VRAM에 안 들어가면 못 돌아간다”의 정확한 의미</h3>
+<h3 id="vram에-안-들어가면-못-돌아간다의-정확한-의미">“VRAM에 안 들어가면 못 돌아간다”의 정확한 의미</h3>
 <p>원문과 커리큘럼이 반복하는 이 문장은, 엄밀히 말하면 틀렸습니다.
 <strong>못 돌아가는 게 아니라, 못 쓸 만큼 느려집니다.</strong></p>
 <p>모델이 VRAM보다 크면 offloading(오프로딩)이라는 방법이 있습니다.
@@ -897,16 +1007,16 @@ GPU를 고를 때 VRAM 용량이 그토록 중요한 이유가 이것입니다. 
 <p>“VRAM에 안 들어가면 못 돌아간다”는 <strong>이진적 제약처럼 취급해야 하는 실용적 진실</strong>입니다.
 기술적으로는 연속적(조금씩 느려짐)이지만, 실제로는 절벽입니다.</p>
 </div>
-<h3 id="통합-메모리는-다른-구조다"><a class="anchor" href="#통합-메모리는-다른-구조다" aria-hidden="true">#</a>통합 메모리는 다른 구조다</h3>
+<h3 id="통합-메모리는-다른-구조다">통합 메모리는 다른 구조다</h3>
 <p>Apple Silicon은 CPU와 GPU가 <strong>같은 메모리를 공유</strong>합니다. unified memory(통합 메모리)라고 합니다.
 “64GB 통합 메모리”라면 GPU가 그 64GB를 거의 다 쓸 수 있습니다. PCIe 병목이 없습니다.</p>
 <p>이건 진짜 장점입니다. 용량 면에서는 5090 32GB보다 유리합니다.
 다만 <strong>대역폭이 낮고, 소프트웨어 생태계가 다릅니다.</strong> 뒤 2.6절과 2.10절에서 다룹니다.</p>
 <hr />
-<h2 id="성능의-두-축-연산-성능과-메모리-대역폭-완전"><a class="anchor" href="#성능의-두-축-연산-성능과-메모리-대역폭-완전" aria-hidden="true">#</a>2.4 성능의 두 축 — 연산 성능과 메모리 대역폭 <span class="badge full">완전</span></h2>
+<h2 id="성능의-두-축-연산-성능과-메모리-대역폭-완전">2.4 성능의 두 축 — 연산 성능과 메모리 대역폭 <span class="badge full">완전</span></h2>
 <p>여기가 1단계의 논증이 완성되는 지점입니다.
 <strong>“속도를 쫓지 말고 VRAM을 쫓으라”</strong> 는 원문의 주장이 왜 성립하는지가 여기서 나옵니다.</p>
-<h3 id="두-가지-서로-다른-빠름"><a class="anchor" href="#두-가지-서로-다른-빠름" aria-hidden="true">#</a>두 가지 서로 다른 “빠름”</h3>
+<h3 id="두-가지-서로-다른-빠름">두 가지 서로 다른 “빠름”</h3>
 <div class="table-scroll">
 <table>
 <colgroup>
@@ -948,7 +1058,7 @@ GPU를 고를 때 VRAM 용량이 그토록 중요한 이유가 이것입니다. 
 <p>어떤 연산이 연산 성능에 막히고(compute-bound) 어떤 연산이 대역폭에 막히는지(memory-bound), 그리고 왜 입력 처리와 출력 생성이 정반대 성격인지는 <strong>5단계</strong>의 핵심 주제입니다.
 1단계에서는 <strong>“토큰 생성은 대역폭 게임이다”</strong> 까지면 충분합니다.</p>
 </div>
-<h3 id="세대별-실제-스펙"><a class="anchor" href="#세대별-실제-스펙" aria-hidden="true">#</a>세대별 실제 스펙</h3>
+<h3 id="세대별-실제-스펙">세대별 실제 스펙</h3>
 <p>원문의 판단(“4090은 무시, 5090은 패스”)을 숫자로 검증해봅니다.</p>
 <div class="table-scroll">
 <table>
@@ -1028,7 +1138,7 @@ GPU를 고를 때 VRAM 용량이 그토록 중요한 이유가 이것입니다. 
 <p>연산 성능 수치는 자료마다 다릅니다. 누산 정밀도(FP16 누산 vs FP32 누산)와 sparsity 적용 여부에 따라 2배씩 차이가 납니다.
 <strong>절대값보다 세대 간 비율</strong>을 보는 용도로만 쓰세요.</p>
 </div>
-<h3 id="원문의-판단을-검증하면"><a class="anchor" href="#원문의-판단을-검증하면" aria-hidden="true">#</a>원문의 판단을 검증하면</h3>
+<h3 id="원문의-판단을-검증하면">원문의 판단을 검증하면</h3>
 <p><strong>“4090은 24GB의 동일 VRAM이니 무시”</strong> — 이 표로 확인됩니다.
 4090은 3090보다 연산 성능이 2배 넘게 높지만, <strong>VRAM은 똑같이 24GB</strong>입니다.
 “돌아가는가 아닌가”는 VRAM이 결정하므로, <strong>돌릴 수 있는 모델의 목록이 같습니다.</strong>
@@ -1064,7 +1174,7 @@ GPU를 고를 때 VRAM 용량이 그토록 중요한 이유가 이것입니다. 
 </div>
 <p>연산 성능은 2~3배 올랐는데 대역폭은 8%, 91%만 올랐습니다.
 토큰 생성이 대역폭 게임이므로, <strong>체감 속도는 연산 성능 배율만큼 오르지 않습니다.</strong></p>
-<h3 id="토큰-생성-속도의-이론적-천장"><a class="anchor" href="#토큰-생성-속도의-이론적-천장" aria-hidden="true">#</a>토큰 생성 속도의 이론적 천장</h3>
+<h3 id="토큰-생성-속도의-이론적-천장">토큰 생성 속도의 이론적 천장</h3>
 <div class="calc">
 <p><strong>토큰 생성 속도 어림셈 (동시 요청 1개 기준)</strong></p>
 <pre><code>tok/s 천장  ≈  메모리 대역폭(GB/s)  ÷  가중치 크기(GB)</code></pre>
@@ -1089,41 +1199,41 @@ GPU를 고를 때 VRAM 용량이 그토록 중요한 이유가 이것입니다. 
 기준선 없이 실측만 보면 그 숫자가 좋은지 나쁜지 알 수 없습니다.</p>
 </div>
 <hr />
-<h2 id="vram-예산-32gb를-무엇이-나눠-쓰는가-완전"><a class="anchor" href="#vram-예산-32gb를-무엇이-나눠-쓰는가-완전" aria-hidden="true">#</a>2.5 VRAM 예산 — 32GB를 무엇이 나눠 쓰는가 <span class="badge full">완전</span></h2>
+<h2 id="vram-예산-32gb를-무엇이-나눠-쓰는가-완전">2.5 VRAM 예산 — 32GB를 무엇이 나눠 쓰는가 <span class="badge full">완전</span></h2>
 <p>가중치 계산법을 알았으니 다음 질문은 이것입니다.
 <strong>32GB에서 가중치가 16GB를 쓰면 16GB가 남는가?</strong> 아닙니다.</p>
 <figure>
 <div class="svg-scroll">
 <svg viewBox="0 0 720 265" role="img" aria-label="32GB VRAM 예산 분해. 8B BF16은 가중치 16GB를 쓰고 약 14GB가 남지만, 14B BF16은 가중치 28GB로 약 2GB만 남아 KV 캐시 공간이 없다.">
   <g font-size="11">
-    <rect class="s-f5" x="96" y="10" width="12" height="12" rx="2"></rect>
+    <rect class="s-f5" x="96" y="10" width="12" height="12" rx="2" />
     <text class="s-soft" x="114" y="20">CUDA 컨텍스트</text>
-    <rect class="s-f1" x="216" y="10" width="12" height="12" rx="2"></rect>
+    <rect class="s-f1" x="216" y="10" width="12" height="12" rx="2" />
     <text class="s-soft" x="234" y="20">모델 가중치</text>
-    <rect class="s-f4" x="322" y="10" width="12" height="12" rx="2"></rect>
+    <rect class="s-f4" x="322" y="10" width="12" height="12" rx="2" />
     <text class="s-soft" x="340" y="20">작업 버퍼</text>
-    <rect class="s-f3" x="422" y="10" width="12" height="12" rx="2"></rect>
+    <rect class="s-f3" x="422" y="10" width="12" height="12" rx="2" />
     <text class="s-soft" x="440" y="20">남는 공간 — KV cache 가 쓸 자리</text>
   </g>
   <text class="s-fg mono" x="86" y="62" text-anchor="end" font-size="12">8B BF16</text>
-  <rect class="s-f5" x="96" y="42" width="19" height="34"></rect>
-  <rect class="s-f1" x="115" y="42" width="300" height="34"></rect>
-  <rect class="s-f4" x="415" y="42" width="19" height="34"></rect>
-  <rect class="s-f3" x="434" y="42" width="262" height="34"></rect>
+  <rect class="s-f5" x="96" y="42" width="19" height="34" />
+  <rect class="s-f1" x="115" y="42" width="300" height="34" />
+  <rect class="s-f4" x="415" y="42" width="19" height="34" />
+  <rect class="s-f3" x="434" y="42" width="262" height="34" />
   <text class="s-fg mono" x="265" y="64" text-anchor="middle" font-size="12">16 GB</text>
   <text class="s-fg mono" x="565" y="64" text-anchor="middle" font-size="12">약 14 GB</text>
   <text class="s-t3" x="565" y="94" text-anchor="middle" font-size="11">여유 있음 — 긴 컨텍스트와 동시 요청 가능</text>
   <text class="s-fg mono" x="86" y="146" text-anchor="end" font-size="12">14B BF16</text>
-  <rect class="s-f5" x="96" y="126" width="19" height="34"></rect>
-  <rect class="s-f1" x="115" y="126" width="525" height="34"></rect>
-  <rect class="s-f4" x="640" y="126" width="19" height="34"></rect>
-  <rect class="s-f3" x="659" y="126" width="37" height="34"></rect>
+  <rect class="s-f5" x="96" y="126" width="19" height="34" />
+  <rect class="s-f1" x="115" y="126" width="525" height="34" />
+  <rect class="s-f4" x="640" y="126" width="19" height="34" />
+  <rect class="s-f3" x="659" y="126" width="37" height="34" />
   <text class="s-fg mono" x="377" y="148" text-anchor="middle" font-size="12">28 GB</text>
-  <path class="s-dash" d="M677 160 V182"></path>
+  <path class="s-dash" d="M677 160 V182" />
   <text class="s-t4" x="672" y="196" text-anchor="end" font-size="11">약 2 GB — KV cache 자리가 없어 실질적으로 못 씀</text>
-  <path class="s-line" d="M96 216 H696"></path>
+  <path class="s-line" d="M96 216 H696" />
   <g class="s-faint mono" font-size="10.5" text-anchor="middle">
-    <path class="s-line" d="M96 216 V222 M246 216 V222 M396 216 V222 M546 216 V222 M696 216 V222"></path>
+    <path class="s-line" d="M96 216 V222 M246 216 V222 M396 216 V222 M546 216 V222 M696 216 V222" />
     <text x="96" y="238">0</text>
     <text x="246" y="238">8</text>
     <text x="396" y="238">16</text>
@@ -1134,7 +1244,7 @@ GPU를 고를 때 VRAM 용량이 그토록 중요한 이유가 이것입니다. 
 </div>
 <figcaption>같은 32GB인데 결과가 갈리는 이유 — 가중치는 예산의 일부일 뿐입니다</figcaption>
 </figure>
-<h3 id="예산의-네-항목"><a class="anchor" href="#예산의-네-항목" aria-hidden="true">#</a>예산의 네 항목</h3>
+<h3 id="예산의-네-항목">예산의 네 항목</h3>
 <pre><code>필요 VRAM = ① 가중치  +  ② KV cache  +  ③ 작업 버퍼  +  ④ CUDA 컨텍스트
               고정        상황에 따라 변함    수백MB~2GB      약 0.5~1GB</code></pre>
 <p><strong>① 가중치</strong> — 2.2절에서 계산한 값입니다. 한번 올리면 변하지 않습니다.</p>
@@ -1142,7 +1252,7 @@ GPU를 고를 때 VRAM 용량이 그토록 중요한 이유가 이것입니다. 
 <p><strong>④ CUDA 컨텍스트</strong> — 아무 모델도 올리지 않아도 사라지는 공간입니다.
 CUDA 런타임이 GPU와 통신하기 위해 잡아두는 자리로, 0.5~1GB 정도입니다.
 <strong>32GB 카드의 실사용 예산을 약 30GB로 봐야 하는 이유</strong>입니다.</p>
-<h3 id="kv-cache-예산의-진짜-변수-씨앗"><a class="anchor" href="#kv-cache-예산의-진짜-변수-씨앗" aria-hidden="true">#</a>② KV cache — 예산의 진짜 변수 <span class="badge seed">씨앗</span></h3>
+<h3 id="kv-cache-예산의-진짜-변수-씨앗">② KV cache — 예산의 진짜 변수 <span class="badge seed">씨앗</span></h3>
 <p>가중치는 크지만 <strong>고정</strong>입니다. 그런데 VRAM을 먹는 항목 중 하나는 고정이 아니라 <strong>상황에 따라 늘어납니다.</strong>
 KV cache(Key-Value cache)입니다.</p>
 <p>왜 필요한지는 비유로 잡을 수 있습니다.</p>
@@ -1165,7 +1275,7 @@ KV cache  ∝ 컨텍스트 길이 × 동시 요청 수            ← 곱셈으�
 컨텍스트 길이를 늘리면 어떻게 되는지는 <strong>8단계</strong>입니다.
 1단계에서는 <strong>“VRAM 예산을 세울 때 가중치만 세면 틀린다”</strong> 까지면 충분합니다.</p>
 </div>
-<h3 id="내-32gb-대입-무엇이-되는가"><a class="anchor" href="#내-32gb-대입-무엇이-되는가" aria-hidden="true">#</a>내 32GB 대입 — 무엇이 되는가</h3>
+<h3 id="내-32gb-대입-무엇이-되는가">내 32GB 대입 — 무엇이 되는가</h3>
 <p>실사용 예산을 <strong>약 30GB</strong>(CUDA 컨텍스트와 작업 버퍼 제외)로 잡고, KV cache 자리를 <strong>최소 4GB 이상</strong> 남기는 기준으로 판정합니다.</p>
 <div class="table-scroll">
 <table>
@@ -1237,9 +1347,9 @@ KV cache  ∝ 컨텍스트 길이 × 동시 요청 수            ← 곱셈으�
 원문이 24GB가 아니라 48GB를 노리라고 한 이유가 바로 이것이고, 32GB 한 대로도 8B 급에서는 그 조건이 충족됩니다.</p>
 </div>
 <hr />
-<h2 id="아키텍처-세대와-소프트웨어-스택-완전"><a class="anchor" href="#아키텍처-세대와-소프트웨어-스택-완전" aria-hidden="true">#</a>2.6 아키텍처 세대와 소프트웨어 스택 <span class="badge full">완전</span></h2>
+<h2 id="아키텍처-세대와-소프트웨어-스택-완전">2.6 아키텍처 세대와 소프트웨어 스택 <span class="badge full">완전</span></h2>
 <p>원문의 <strong>“맥미니 사지 마세요”</strong> 는 성능 이야기가 아닙니다. 이 절이 그 이유입니다.</p>
-<h3 id="세대는-이름표가-아니라-능력이다"><a class="anchor" href="#세대는-이름표가-아니라-능력이다" aria-hidden="true">#</a>세대는 이름표가 아니라 능력이다</h3>
+<h3 id="세대는-이름표가-아니라-능력이다">세대는 이름표가 아니라 능력이다</h3>
 <p>GPU 아키텍처 세대는 마케팅 이름이 아니라, <strong>어떤 명령어를 쓸 수 있는지</strong>를 결정합니다.
 그리고 그것을 나타내는 값이 Compute Capability입니다. <code>sm_86</code>, <code>sm_120</code> 같은 표기입니다.</p>
 <p>Tensor Core는 <strong>행렬 곱셈 전용 연산 유닛</strong>입니다. 일반 코어보다 훨씬 빠르지만,
@@ -1261,23 +1371,23 @@ KV cache  ∝ 컨텍스트 길이 × 동시 요청 수            ← 곱셈으�
     <text x="530" y="46">sm_90 · H100</text>
     <text x="662" y="46">sm_120 · 5090</text>
   </g>
-  <path class="s-line" d="M96 58 H700"></path>
-  <path class="s-line" d="M110 58 V64 M250 58 V64 M390 58 V64 M530 58 V64 M662 58 V64"></path>
-  <rect class="s-dash" x="606" y="18" width="112" height="36" rx="6"></rect>
+  <path class="s-line" d="M96 58 H700" />
+  <path class="s-line" d="M110 58 V64 M250 58 V64 M390 58 V64 M530 58 V64 M662 58 V64" />
+  <rect class="s-dash" x="606" y="18" width="112" height="36" rx="6" />
   <g font-size="11.5">
     <text class="s-fg mono" x="90" y="92" text-anchor="end">FP16 · INT8</text>
-    <rect class="s-f5" x="98" y="78" width="602" height="20" rx="4"></rect>
+    <rect class="s-f5" x="98" y="78" width="602" height="20" rx="4" />
     <text class="s-fg mono" x="90" y="122" text-anchor="end">BF16</text>
-    <rect class="s-f5" x="240" y="108" width="460" height="20" rx="4"></rect>
+    <rect class="s-f5" x="240" y="108" width="460" height="20" rx="4" />
     <text class="s-fg mono" x="90" y="152" text-anchor="end">FP8</text>
-    <rect class="s-f1" x="380" y="138" width="320" height="20" rx="4"></rect>
+    <rect class="s-f1" x="380" y="138" width="320" height="20" rx="4" />
     <text class="s-fg mono" x="90" y="182" text-anchor="end">FP4 · NVFP4</text>
-    <rect class="s-f3" x="646" y="168" width="54" height="20" rx="4"></rect>
+    <rect class="s-f3" x="646" y="168" width="54" height="20" rx="4" />
   </g>
   <text class="s-t4" x="240" y="216" font-size="11">3090 은 여기까지 — FP8 부터 하드웨어 가속이 없습니다</text>
-  <path class="s-dash" d="M250 128 V204"></path>
+  <path class="s-dash" d="M250 128 V204" />
   <text class="s-t3" x="700" y="216" text-anchor="end" font-size="11">내 장비는 FP4 까지 가속됩니다</text>
-  <path class="s-dash" d="M662 188 V204"></path>
+  <path class="s-dash" d="M662 188 V204" />
 </svg>
 </div>
 <figcaption>같은 FP8 코드가 3090에서는 느리고 5090에서는 빠른 이유</figcaption>
@@ -1292,11 +1402,11 @@ KV cache  ∝ 컨텍스트 길이 × 동시 요청 수            ← 곱셈으�
 <code>sm_120</code> 은 CUDA 12.8 이상을 요구하고, 그 이전 버전으로 빌드된 라이브러리는 이 GPU에서 동작하지 않습니다.
 <code>ollama/README.md</code> 에 적힌 <code>no kernel image is available for execution</code> 에러가 정확히 이 상황입니다.</p>
 </div>
-<h3 id="cuda는-칩이-아니라-소프트웨어다"><a class="anchor" href="#cuda는-칩이-아니라-소프트웨어다" aria-hidden="true">#</a>CUDA는 칩이 아니라 소프트웨어다</h3>
+<h3 id="cuda는-칩이-아니라-소프트웨어다">CUDA는 칩이 아니라 소프트웨어다</h3>
 <p>CUDA(Compute Unified Device Architecture)는 하드웨어가 아니라 <strong>NVIDIA GPU용 프로그래밍 플랫폼과 라이브러리 생태계</strong>입니다.</p>
 <p>NVIDIA의 실질적인 진입장벽은 칩 성능이 아니라 이쪽입니다.
 vLLM, PyTorch, Triton, bitsandbytes, Flash Attention — 이 커리큘럼에서 쓰는 도구가 거의 전부 CUDA를 전제로 만들어졌습니다.</p>
-<h3 id="소프트웨어-스택의-층위-가장-많이-헤매는-지점"><a class="anchor" href="#소프트웨어-스택의-층위-가장-많이-헤매는-지점" aria-hidden="true">#</a>소프트웨어 스택의 층위 — 가장 많이 헤매는 지점</h3>
+<h3 id="소프트웨어-스택의-층위-가장-많이-헤매는-지점">소프트웨어 스택의 층위 — 가장 많이 헤매는 지점</h3>
 <p>“CUDA를 설치했는데 안 된다”는 상황이 자주 생깁니다.
 원인은 대부분 <strong>여러 층이 각자 다른 버전을 요구하는데 그걸 하나로 착각</strong>하기 때문입니다.</p>
 <figure>
@@ -1304,40 +1414,40 @@ vLLM, PyTorch, Triton, bitsandbytes, Flash Attention — 이 커리큘럼에서 
 <svg viewBox="0 0 720 372" role="img" aria-label="GPU 소프트웨어 스택의 6개 층위. 아래에서 위로 GPU 하드웨어, NVIDIA 드라이버, CUDA Toolkit, cuDNN/cuBLAS/NCCL, PyTorch, vLLM/Ollama. 드라이버와 하드웨어는 호스트에 남고 나머지는 컨테이너 이미지 안에 들어갑니다.">
   <defs>
     <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-      <path class="s-arrow" d="M0 0 L10 5 L0 10 z"></path>
+      <path class="s-arrow" d="M0 0 L10 5 L0 10 z" />
     </marker>
   </defs>
   <g font-size="12.5">
-    <rect class="s-f1" x="150" y="20" width="300" height="48" rx="7"></rect>
+    <rect class="s-f1" x="150" y="20" width="300" height="48" rx="7" />
     <text class="s-fg" x="300" y="41" text-anchor="middle">vLLM · Ollama · llama.cpp</text>
     <text class="s-faint" x="300" y="58" text-anchor="middle" font-size="10.5">추론 엔진 — 우리가 직접 만지는 층</text>
     <text class="s-soft" x="466" y="41" font-size="10.5">모델 미지원 / 플래그 오류</text>
-    <rect class="s-f1" x="150" y="76" width="300" height="48" rx="7"></rect>
+    <rect class="s-f1" x="150" y="76" width="300" height="48" rx="7" />
     <text class="s-fg" x="300" y="97" text-anchor="middle">PyTorch</text>
     <text class="s-faint" x="300" y="114" text-anchor="middle" font-size="10.5">자체 CUDA 빌드를 내장 — 이게 혼란의 주범</text>
     <text class="s-soft" x="466" y="97" font-size="10.5">sm_120 is not compatible</text>
-    <rect class="s-f5" x="150" y="132" width="300" height="48" rx="7"></rect>
+    <rect class="s-f5" x="150" y="132" width="300" height="48" rx="7" />
     <text class="s-fg" x="300" y="153" text-anchor="middle">cuDNN · cuBLAS · NCCL</text>
     <text class="s-faint" x="300" y="170" text-anchor="middle" font-size="10.5">연산 라이브러리</text>
     <text class="s-soft" x="466" y="153" font-size="10.5">라이브러리 로드 실패</text>
-    <rect class="s-f5" x="150" y="188" width="300" height="48" rx="7"></rect>
+    <rect class="s-f5" x="150" y="188" width="300" height="48" rx="7" />
     <text class="s-fg" x="300" y="209" text-anchor="middle">CUDA Toolkit</text>
     <text class="s-faint" x="300" y="226" text-anchor="middle" font-size="10.5">nvcc 컴파일러 + 런타임</text>
     <text class="s-soft" x="466" y="209" font-size="10.5">nvcc 없음 / 컴파일 실패</text>
-    <rect class="s-f4" x="150" y="252" width="300" height="48" rx="7"></rect>
+    <rect class="s-f4" x="150" y="252" width="300" height="48" rx="7" />
     <text class="s-fg" x="300" y="273" text-anchor="middle">NVIDIA 드라이버</text>
     <text class="s-faint" x="300" y="290" text-anchor="middle" font-size="10.5">580.173.02 — nvidia-smi 가 보여주는 층</text>
     <text class="s-soft" x="466" y="273" font-size="10.5">no kernel image is available</text>
-    <rect class="s-f3" x="150" y="308" width="300" height="48" rx="7"></rect>
+    <rect class="s-f3" x="150" y="308" width="300" height="48" rx="7" />
     <text class="s-fg" x="300" y="329" text-anchor="middle">GPU 하드웨어</text>
     <text class="s-faint" x="300" y="346" text-anchor="middle" font-size="10.5">RTX 5090 · sm_120 — 고정</text>
   </g>
-  <path class="s-strong" d="M138 22 H126 V234 H138" marker-end="url(#ar2)"></path>
+  <path class="s-strong" d="M138 22 H126 V234 H138" marker-end="url(#ar2)" />
   <text class="s-t1" x="120" y="112" text-anchor="end" font-size="11">컨테이너</text>
   <text class="s-t1" x="120" y="128" text-anchor="end" font-size="11">이미지 안</text>
   <text class="s-faint" x="120" y="148" text-anchor="end" font-size="10">docker pull 로</text>
   <text class="s-faint" x="120" y="162" text-anchor="end" font-size="10">교체 가능</text>
-  <path class="s-strong" d="M138 254 H126 V354 H138" marker-end="url(#ar2)"></path>
+  <path class="s-strong" d="M138 254 H126 V354 H138" marker-end="url(#ar2)" />
   <text class="s-t4" x="120" y="296" text-anchor="end" font-size="11">호스트에</text>
   <text class="s-t4" x="120" y="312" text-anchor="end" font-size="11">남는 것</text>
   <text class="s-faint" x="120" y="332" text-anchor="end" font-size="10">직접 설치</text>
@@ -1379,7 +1489,7 @@ vLLM, PyTorch, Triton, bitsandbytes, Flash Attention — 이 커리큘럼에서 
 CUDA Toolkit 버전 충돌을 호스트에서 해결하지 않고 이미지 교체로 처리할 수 있습니다.
 반대로 <strong>드라이버 문제는 컨테이너로 절대 해결되지 않습니다.</strong> 어느 쪽 문제인지 먼저 구분해야 합니다.</p>
 </div>
-<h3 id="대안-스택에서는-무엇이-막히는가-씨앗"><a class="anchor" href="#대안-스택에서는-무엇이-막히는가-씨앗" aria-hidden="true">#</a>대안 스택에서는 무엇이 막히는가 <span class="badge seed">씨앗</span></h3>
+<h3 id="대안-스택에서는-무엇이-막히는가-씨앗">대안 스택에서는 무엇이 막히는가 <span class="badge seed">씨앗</span></h3>
 <p>원문이 맥미니를 만류한 진짜 이유입니다. 성능이 아니라 <strong>도달 가능한 단계</strong>의 문제입니다.</p>
 <div class="table-scroll">
 <table>
@@ -1426,10 +1536,10 @@ CUDA Toolkit 버전 충돌을 호스트에서 해결하지 않고 이미지 교�
 1단계에서는 <strong>“CUDA 밖으로 나가면 14~17단계와 4~9단계 대부분이 막힌다”</strong> 까지면 충분합니다.</p>
 </div>
 <hr />
-<h2 id="gpu-두-대는-정말-두-배인가-씨앗"><a class="anchor" href="#gpu-두-대는-정말-두-배인가-씨앗" aria-hidden="true">#</a>2.7 GPU 두 대는 정말 두 배인가 <span class="badge seed">씨앗</span></h2>
+<h2 id="gpu-두-대는-정말-두-배인가-씨앗">2.7 GPU 두 대는 정말 두 배인가 <span class="badge seed">씨앗</span></h2>
 <p>내 장비는 한 대이므로 실습 대상은 아닙니다. 다만 원문이 3090 <strong>두 대</strong>를 전제하므로,
 그 문장을 읽기 위해, 그리고 나중에 확장을 판단하기 위해 개념은 필요합니다.</p>
-<h3 id="vram-합산이라는-표현의-함정"><a class="anchor" href="#vram-합산이라는-표현의-함정" aria-hidden="true">#</a>“VRAM 합산”이라는 표현의 함정</h3>
+<h3 id="vram-합산이라는-표현의-함정">“VRAM 합산”이라는 표현의 함정</h3>
 <p><code>3090 2대 = 48GB</code> 라는 표현은 절반만 사실입니다.
 <strong>48GB짜리 카드 한 장처럼 쓰이지 않습니다.</strong></p>
 <p>두 GPU는 물리적으로 별개의 메모리를 가집니다. 하나의 모델을 두 대에 올리려면
@@ -1438,7 +1548,7 @@ CUDA Toolkit 버전 충돌을 호스트에서 해결하지 않고 이미지 교�
 <p>두 사람이 한 권의 책을 나눠 읽고 요약하는 것과 같습니다.
 각자 절반을 읽을 수는 있지만, <strong>중간중간 서로 이야기를 맞춰야</strong> 합니다. 그 대화 시간이 순수한 낭비입니다.</p>
 </blockquote>
-<h3 id="그래서-gpu-간-통로가-중요하다"><a class="anchor" href="#그래서-gpu-간-통로가-중요하다" aria-hidden="true">#</a>그래서 GPU 간 통로가 중요하다</h3>
+<h3 id="그래서-gpu-간-통로가-중요하다">그래서 GPU 간 통로가 중요하다</h3>
 <p>그 “대화”가 얼마나 빠른지가 성능을 좌우합니다.</p>
 <div class="table-scroll">
 <table>
@@ -1480,9 +1590,9 @@ CUDA Toolkit 버전 충돌을 호스트에서 해결하지 않고 이미지 교�
 1단계에서는 <strong>“여러 장은 용량을 더하지만 통신 비용을 낸다”</strong> 까지면 충분합니다.</p>
 </div>
 <hr />
-<h2 id="물리적-요건-전력과-열-완전"><a class="anchor" href="#물리적-요건-전력과-열-완전" aria-hidden="true">#</a>2.8 물리적 요건 — 전력과 열 <span class="badge full">완전</span></h2>
+<h2 id="물리적-요건-전력과-열-완전">2.8 물리적 요건 — 전력과 열 <span class="badge full">완전</span></h2>
 <p>여기부터는 소프트웨어가 아니라 물리입니다. 무시하면 실습 중에 시스템이 꺼집니다.</p>
-<h3 id="전력"><a class="anchor" href="#전력" aria-hidden="true">#</a>전력</h3>
+<h3 id="전력">전력</h3>
 <p>TDP(Thermal Design Power)는 원래 발열 설계 기준값이지만, 실무에서는 대략적인 소비 전력으로 씁니다.
 NVIDIA는 그래픽카드에 TGP(Total Graphics Power)라는 표현도 씁니다.</p>
 <pre><code>RTX 5090 TGP           575 W
@@ -1512,7 +1622,7 @@ CPU · 메인보드 · 디스크  약 200 W
 끝까지 딸깍 소리가 나도록 꽂고, 커넥터 근처에서 케이블을 급하게 꺾지 마세요.
 전용 케이블을 쓰고, 변환 어댑터를 여러 단 겹치지 마세요.</p>
 </div>
-<h3 id="열-코어-온도만-보면-안-된다"><a class="anchor" href="#열-코어-온도만-보면-안-된다" aria-hidden="true">#</a>열 — 코어 온도만 보면 안 된다</h3>
+<h3 id="열-코어-온도만-보면-안-된다">열 — 코어 온도만 보면 안 된다</h3>
 <p>GPU에는 서로 다른 온도가 여러 개 있습니다. 이 구분이 실무에서 중요합니다.</p>
 <div class="table-scroll">
 <table>
@@ -1560,10 +1670,10 @@ CPU · 메인보드 · 디스크  약 200 W
 측정 전에 스로틀링이 없는 상태를 확보하는 것이 1단계 체크포인트인 이유입니다.</p>
 </div>
 <hr />
-<h2 id="무엇을-보고-판단하는가-완전"><a class="anchor" href="#무엇을-보고-판단하는가-완전" aria-hidden="true">#</a>2.9 무엇을 보고 판단하는가 <span class="badge full">완전</span></h2>
+<h2 id="무엇을-보고-판단하는가-완전">2.9 무엇을 보고 판단하는가 <span class="badge full">완전</span></h2>
 <p>문제가 생겼을 때 볼 곳을 알아두는 절입니다.
 실제 명령 실행과 결과 기록은 각 단계의 실행 환경(<code>ollama/</code> 등)에서 합니다.</p>
-<h3 id="nvidia-smi가-보여주는-것"><a class="anchor" href="#nvidia-smi가-보여주는-것" aria-hidden="true">#</a>nvidia-smi가 보여주는 것</h3>
+<h3 id="nvidia-smi가-보여주는-것">nvidia-smi가 보여주는 것</h3>
 <p><code>nvidia-smi</code>(NVIDIA System Management Interface)는 드라이버가 제공하는 상태 조회 도구입니다.
 GPU 상태를 볼 때 가장 먼저 쓰는 것이고, <strong>각 칸의 의미를 아는 것 자체가 1단계 내용</strong>입니다.</p>
 <div class="table-scroll">
@@ -1627,7 +1737,7 @@ GPU 상태를 볼 때 가장 먼저 쓰는 것이고, <strong>각 칸의 의미�
 2.4절에서 본 대로 토큰 생성은 대역폭에 막히므로, <strong>연산 유닛은 대체로 놀고 있는데도 100%</strong> 로 표시됩니다.</p>
 <p>즉 <code>GPU-Util</code> 은 <strong>“GPU가 뭔가 하고 있다”</strong> 는 신호일 뿐, 효율의 지표가 아닙니다.</p>
 </div>
-<h3 id="그-외에-볼-것"><a class="anchor" href="#그-외에-볼-것" aria-hidden="true">#</a>그 외에 볼 것</h3>
+<h3 id="그-외에-볼-것">그 외에 볼 것</h3>
 <div class="table-scroll">
 <table>
 <colgroup>
@@ -1673,7 +1783,7 @@ GPU 상태를 볼 때 가장 먼저 쓰는 것이고, <strong>각 칸의 의미�
 <code>ollama/docker-compose.yml</code> 의 <code>deploy.resources.reservations.devices</code> 설정이 그 요청입니다.</p>
 <p>그래서 컨테이너 안에서 보이는 Driver Version은 <strong>호스트의 것</strong>입니다. 이미지를 바꿔도 바뀌지 않습니다.</p>
 </div>
-<h3 id="단계의-체크포인트"><a class="anchor" href="#단계의-체크포인트" aria-hidden="true">#</a>1단계의 체크포인트</h3>
+<h3 id="단계의-체크포인트">1단계의 체크포인트</h3>
 <p>원문의 체크포인트는 <strong>“<code>nvidia-smi</code> 가 GPU 전부를 정상 인식하고, 풀로드 30분을 온도 throttling 없이 버틴다”</strong> 입니다.
 개념적으로 이건 세 가지를 확인하는 것입니다.</p>
 <ol type="1">
@@ -1682,7 +1792,7 @@ GPU 상태를 볼 때 가장 먼저 쓰는 것이고, <strong>각 칸의 의미�
 <li><strong>전원이 버티는가</strong> — 부하 중 재부팅이 없는가 (transient spike)</li>
 </ol>
 <hr />
-<h2 id="대안-하드웨어-씨앗"><a class="anchor" href="#대안-하드웨어-씨앗" aria-hidden="true">#</a>2.10 대안 하드웨어 <span class="badge seed">씨앗</span></h2>
+<h2 id="대안-하드웨어-씨앗">2.10 대안 하드웨어 <span class="badge seed">씨앗</span></h2>
 <p>원문의 판단을 검증하고, 내 장비로 못 하는 것의 대안을 알기 위한 절입니다.</p>
 <div class="table-scroll">
 <table>
@@ -1737,7 +1847,7 @@ GPU 상태를 볼 때 가장 먼저 쓰는 것이고, <strong>각 칸의 의미�
 <p>여기서 보이는 구도가 있습니다. <strong>용량과 대역폭은 대체로 반대로 갑니다.</strong>
 통합 메모리 장비는 큰 모델을 “올릴 수는” 있지만 대역폭이 낮아 느립니다.
 2.4절의 어림셈(<code>tok/s ≈ 대역폭 ÷ 가중치</code>)에 대입해보면 그 차이가 바로 계산됩니다.</p>
-<h3 id="gpu가-한-대라서-못-하는-것의-대안-완전"><a class="anchor" href="#gpu가-한-대라서-못-하는-것의-대안-완전" aria-hidden="true">#</a>GPU가 한 대라서 못 하는 것의 대안 <span class="badge full">완전</span></h3>
+<h3 id="gpu가-한-대라서-못-하는-것의-대안-완전">GPU가 한 대라서 못 하는 것의 대안 <span class="badge full">완전</span></h3>
 <p><strong>9단계(Tensor / Pipeline Parallel)는 GPU가 두 대 이상이어야 합니다.</strong> 이건 우회할 수 없습니다.</p>
 <p>현실적인 대안은 <strong>클라우드로 짧게 빌리는 것</strong>입니다.</p>
 <div class="table-scroll">
@@ -1774,8 +1884,8 @@ GPU 상태를 볼 때 가장 먼저 쓰는 것이고, <strong>각 칸의 의미�
 1단계에서는 <strong>“용량과 대역폭은 반대로 가고, 내 장비는 대역폭 쪽”</strong> 그리고 <strong>“9단계는 클라우드로 뚫는다”</strong> 까지면 충분합니다.</p>
 </div>
 <hr />
-<h2 id="내-장비-기준-정리"><a class="anchor" href="#내-장비-기준-정리" aria-hidden="true">#</a>3. 내 장비 기준 정리</h2>
-<h3 id="무엇이-되고-무엇이-안-되는가"><a class="anchor" href="#무엇이-되고-무엇이-안-되는가" aria-hidden="true">#</a>3.1 무엇이 되고 무엇이 안 되는가</h3>
+<h2 id="내-장비-기준-정리">3. 내 장비 기준 정리</h2>
+<h3 id="무엇이-되고-무엇이-안-되는가">3.1 무엇이 되고 무엇이 안 되는가</h3>
 <div class="table-scroll">
 <table>
 <colgroup>
@@ -1844,7 +1954,7 @@ GPU 상태를 볼 때 가장 먼저 쓰는 것이고, <strong>각 칸의 의미�
 </tbody>
 </table>
 </div>
-<h3 id="원문-전제와의-차이"><a class="anchor" href="#원문-전제와의-차이" aria-hidden="true">#</a>3.2 원문 전제와의 차이</h3>
+<h3 id="원문-전제와의-차이">3.2 원문 전제와의 차이</h3>
 <div class="table-scroll">
 <table>
 <colgroup>
@@ -1923,7 +2033,7 @@ GPU 상태를 볼 때 가장 먼저 쓰는 것이고, <strong>각 칸의 의미�
 </ul>
 </div>
 <hr />
-<h2 id="확인-문제"><a class="anchor" href="#확인-문제" aria-hidden="true">#</a>4. 확인 문제</h2>
+<h2 id="확인-문제">4. 확인 문제</h2>
 <div class="quiz">
 <ol type="1">
 <li><p><strong>Qwen3-14B를 BF16으로 내 32GB GPU에 올릴 수 있는가?</strong> 계산 과정과 함께 답하세요.</p>
@@ -2021,7 +2131,7 @@ Toolkit 버전은 <code>nvcc --version</code> 으로 따로 확인해야 합니�
 </ol>
 </div>
 <hr />
-<h2 id="다음-단계로"><a class="anchor" href="#다음-단계로" aria-hidden="true">#</a>5. 다음 단계로</h2>
+<h2 id="다음-단계로">5. 다음 단계로</h2>
 <p>이 문서에서 <code>[씨앗]</code>으로 남긴 개념들이 어디서 이어지는지 정리합니다.</p>
 <div class="table-scroll">
 <table>
@@ -2081,7 +2191,7 @@ Toolkit 버전은 <code>nvcc --version</code> 으로 따로 확인해야 합니�
 </tbody>
 </table>
 </div>
-<h3 id="단계로-넘어가기-전에"><a class="anchor" href="#단계로-넘어가기-전에" aria-hidden="true">#</a>2단계로 넘어가기 전에</h3>
+<h3 id="단계로-넘어가기-전에">2단계로 넘어가기 전에</h3>
 <p>2단계는 Ollama를 띄우고 <strong>평가 도구를 손에 쥐는</strong> 단계입니다.
 이 문서의 내용이 그때 바로 쓰이는 지점은 다음과 같습니다.</p>
 <ul>
@@ -2092,7 +2202,7 @@ Toolkit 버전은 <code>nvcc --version</code> 으로 따로 확인해야 합니�
 </ul>
 <p>실행 환경은 <a href="../ollama/README.md"><code>../ollama/README.md</code></a> 에 이미 준비돼 있습니다.</p>
 <hr />
-<h2 id="용어표"><a class="anchor" href="#용어표" aria-hidden="true">#</a>6. 용어표</h2>
+<h2 id="용어표">6. 용어표</h2>
 <div class="table-scroll">
 <table>
 <colgroup>
@@ -2285,7 +2395,9 @@ Toolkit 버전은 <code>nvcc --version</code> 으로 따로 확인해야 합니�
 </div>
 
 <script>
-// 테마 토글: localStorage 에 기억, 없으면 OS 설정을 따릅니다.
+// ------------------------------------------------------------
+// ① 테마 토글: localStorage 에 기억, 없으면 OS 설정을 따릅니다.
+// ------------------------------------------------------------
 (function () {
   var root = document.documentElement;
   var KEY = 'study-theme';
@@ -2302,6 +2414,106 @@ Toolkit 버전은 <code>nvcc --version</code> 으로 따로 확인해야 합니�
     root.setAttribute('data-theme', next);
     try { localStorage.setItem(KEY, next); } catch (e) {}
   });
+})();
+
+// ------------------------------------------------------------
+// ② 제목 앵커(#): 본문 h2/h3 에만 붙입니다.
+//    Lua 필터가 아니라 여기서 붙이는 이유 —
+//    필터로 제목 내용에 <a> 를 넣으면 pandoc 이 그 내용을 목차에도
+//    복사해 <a> 안에 <a> 가 중첩되고, 브라우저가 목차 링크를 끊습니다.
+// ------------------------------------------------------------
+(function () {
+  var main = document.querySelector('main');
+  if (!main) return;
+  main.querySelectorAll('h2[id], h3[id]').forEach(function (h) {
+    var a = document.createElement('a');
+    a.className = 'anchor';
+    a.href = '#' + h.id;
+    a.setAttribute('aria-hidden', 'true');
+    a.setAttribute('tabindex', '-1');
+    a.textContent = '#';
+    h.insertBefore(a, h.firstChild);
+  });
+})();
+
+// ------------------------------------------------------------
+// ③ 사이드바 목차: 모바일 드로어 + 현재 위치 표시(scrollspy)
+// ------------------------------------------------------------
+(function () {
+  var sidebar = document.getElementById('sidebar');
+  var toggle  = document.getElementById('nav-toggle');
+  var backdrop = document.getElementById('nav-backdrop');
+  if (!sidebar || !toggle) { if (toggle) toggle.hidden = true; return; }
+
+  // --- 드로어 열고 닫기 (좁은 화면에서만 의미가 있습니다) ---
+  function setOpen(open) {
+    document.body.classList.toggle('nav-open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.textContent = open ? '✕' : '☰';
+    toggle.setAttribute('title', open ? '목차 닫기' : '목차');
+    if (backdrop) backdrop.hidden = !open;
+  }
+  toggle.addEventListener('click', function () {
+    setOpen(!document.body.classList.contains('nav-open'));
+  });
+  if (backdrop) backdrop.addEventListener('click', function () { setOpen(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setOpen(false);
+  });
+
+  // 사이드바 안의 링크를 누르면 드로어를 닫습니다 (좁은 화면)
+  sidebar.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function () { setOpen(false); });
+  });
+
+  // --- 목차 링크 ↔ 제목 요소 짝짓기 ---
+  //     (사이드바 머리말의 문서 제목 링크는 제외 — 현재 위치 표시 대상이 아닙니다)
+  var links = Array.prototype.slice.call(document.querySelectorAll('#TOC a[href^="#"]'));
+  var items = [];
+  links.forEach(function (a) {
+    var raw = a.getAttribute('href').slice(1);
+    var id = raw;
+    try { id = decodeURIComponent(raw); } catch (e) {}
+    var el = document.getElementById(id) || document.getElementById(raw);
+    if (el) items.push({ link: a, el: el });
+  });
+  if (!items.length) return;
+
+  // --- 현재 읽고 있는 절 표시 ---
+  var current = null;
+  function sync() {
+    var line = 120;                       // 화면 상단에서 이 높이를 지난 마지막 제목이 '현재'
+    var found = items[0];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].el.getBoundingClientRect().top <= line) found = items[i];
+      else break;
+    }
+    // 문서 맨 아래에 닿으면 마지막 항목을 현재로
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) {
+      found = items[items.length - 1];
+    }
+    if (found === current) return;
+    if (current) current.link.classList.remove('active');
+    found.link.classList.add('active');
+    current = found;
+
+    // 활성 항목이 사이드바 밖으로 밀려나면 보이는 위치로
+    var r = found.link.getBoundingClientRect();
+    var s = sidebar.getBoundingClientRect();
+    if (r.top < s.top + 8 || r.bottom > s.bottom - 8) {
+      sidebar.scrollTop += r.top - s.top - sidebar.clientHeight / 3;
+    }
+  }
+
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () { ticking = false; sync(); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  sync();
 })();
 </script>
 

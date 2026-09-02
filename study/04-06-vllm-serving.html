@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4–6단계 — 엔진 안으로 들어가고, 속도를 정의한다</title>
+
+<style>
+
+
+:root {
+--bg: #ffffff;
+--bg-soft: #f6f7f9;
+--bg-code: #f4f5f7;
+--fg: #1f2328;
+--fg-soft: #57606a;
+--fg-faint: #8b949e;
+--border: #d8dee4;
+--border-soft: #eaeef2;
+--link: #0550ae;
+--accent-note: #0969da; 
+--accent-key: #8250df; 
+--accent-calc: #1a7f37; 
+--accent-warn: #bc4c00; 
+--accent-later: #6e7781; 
+--accent-quote: #656d76; 
+--accent-quiz: #bf3989; 
+--font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+"Noto Sans KR", "Malgun Gothic", "맑은 고딕", sans-serif;
+--font-mono: "JetBrains Mono", "D2Coding", "Cascadia Mono", "Consolas",
+"DejaVu Sans Mono", monospace;
+--maxw: 52rem;
+--sidebar-w: 19rem;
+--sidebar-break: 1100px; 
+}
+@media (prefers-color-scheme: dark) {
+:root {
+--bg: #0d1117;
+--bg-soft: #161b22;
+--bg-code: #161b22;
+--fg: #e6edf3;
+--fg-soft: #9198a1;
+--fg-faint: #6e7681;
+--border: #30363d;
+--border-soft: #21262d;
+--link: #4493f8;
+--accent-note: #4493f8;
+--accent-key: #ab7df8;
+--accent-calc: #3fb950;
+--accent-warn: #d29922;
+--accent-later: #8b949e;
+--accent-quote: #8b949e;
+--accent-quiz: #db61a2;
+}
+}
+
+:root[data-theme="light"] {
+--bg: #ffffff; --bg-soft: #f6f7f9; --bg-code: #f4f5f7;
+--fg: #1f2328; --fg-soft: #57606a; --fg-faint: #8b949e;
+--border: #d8dee4; --border-soft: #eaeef2; --link: #0550ae;
+--accent-note: #0969da; --accent-key: #8250df; --accent-calc: #1a7f37;
+--accent-warn: #bc4c00; --accent-later: #6e7781; --accent-quote: #656d76;
+--accent-quiz: #bf3989;
+}
+:root[data-theme="dark"] {
+--bg: #0d1117; --bg-soft: #161b22; --bg-code: #161b22;
+--fg: #e6edf3; --fg-soft: #9198a1; --fg-faint: #6e7681;
+--border: #30363d; --border-soft: #21262d; --link: #4493f8;
+--accent-note: #4493f8; --accent-key: #ab7df8; --accent-calc: #3fb950;
+--accent-warn: #d29922; --accent-later: #8b949e; --accent-quote: #8b949e;
+--accent-quiz: #db61a2;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+body {
+margin: 0;
+background: var(--bg);
+color: var(--fg);
+font-family: var(--font-sans);
+font-size: 16.5px;
+line-height: 1.85;
+word-break: keep-all; 
+overflow-wrap: break-word;
+-webkit-text-size-adjust: 100%;
+}
+.wrap {
+max-width: var(--maxw);
+margin: 0 auto;
+padding: 3rem 1.25rem 6rem;
+}
+
+.doc-head {
+border-bottom: 1px solid var(--border);
+padding-bottom: 1.5rem;
+margin-bottom: 2rem;
+}
+.doc-head .eyebrow {
+font-size: 0.8rem;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--accent-note);
+margin: 0 0 0.5rem;
+}
+.doc-head h1 {
+margin: 0 0 0.6rem;
+font-size: 2.1rem;
+line-height: 1.35;
+letter-spacing: -0.02em;
+border: 0;
+padding: 0;
+}
+.doc-head .subtitle {
+margin: 0;
+color: var(--fg-soft);
+font-size: 1rem;
+}
+.doc-head .meta {
+margin: 1rem 0 0;
+font-size: 0.82rem;
+color: var(--fg-faint);
+display: flex;
+flex-wrap: wrap;
+gap: 0.4rem 1.1rem;
+}
+
+h1, h2, h3, h4 {
+line-height: 1.4;
+letter-spacing: -0.01em;
+scroll-margin-top: 1.5rem;
+}
+h2 {
+margin: 3.5rem 0 1.2rem;
+font-size: 1.55rem;
+padding-bottom: 0.45rem;
+border-bottom: 1px solid var(--border);
+}
+h3 { margin: 2.5rem 0 0.9rem; font-size: 1.22rem; }
+h4 { margin: 1.9rem 0 0.7rem; font-size: 1.03rem; color: var(--fg-soft); }
+
+.anchor {
+float: left;
+margin-left: -1.1em;
+padding-right: 0.35em;
+color: var(--fg-faint);
+text-decoration: none;
+opacity: 0;
+font-weight: 400;
+}
+h2:hover .anchor, h3:hover .anchor { opacity: 1; }
+p { margin: 0 0 1.15rem; }
+a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+strong { font-weight: 700; }
+hr {
+border: 0;
+border-top: 1px solid var(--border);
+margin: 3rem 0;
+}
+
+
+#sidebar {
+position: fixed;
+top: 0;
+left: 0;
+bottom: 0;
+width: var(--sidebar-w);
+z-index: 60;
+box-sizing: border-box;
+padding: 1.6rem 0.6rem 3rem 1.1rem;
+background: var(--bg-soft);
+border-right: 1px solid var(--border);
+overflow-y: auto;
+overscroll-behavior: contain;
+font-size: 0.86rem;
+line-height: 1.5;
+}
+.sidebar-head {
+padding: 0 0.55rem 0.9rem;
+margin-bottom: 0.9rem;
+border-bottom: 1px solid var(--border-soft);
+}
+.sidebar-head .side-eyebrow {
+margin: 0 0 0.25rem;
+font-size: 0.68rem;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--accent-note);
+}
+.sidebar-head .side-title {
+display: block;
+color: var(--fg);
+font-weight: 700;
+font-size: 0.95rem;
+line-height: 1.4;
+text-decoration: none;
+}
+.sidebar-head .side-title:hover { color: var(--link); }
+#TOC::before {
+content: "목차";
+display: block;
+padding-left: 0.55rem;
+font-weight: 700;
+font-size: 0.7rem;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--fg-faint);
+margin-bottom: 0.5rem;
+}
+#TOC ul { list-style: none; margin: 0; padding-left: 0; }
+#TOC ul ul { padding-left: 0.7rem; margin: 0.1rem 0 0.4rem; }
+#TOC li { margin: 0; }
+#TOC a {
+display: block;
+padding: 0.26rem 0.55rem;
+border-left: 2px solid transparent;
+border-radius: 0 6px 6px 0;
+color: var(--fg-soft);
+text-decoration: none;
+}
+#TOC a:hover { background: var(--bg); color: var(--link); }
+#TOC > ul > li > a { color: var(--fg); font-weight: 600; margin-top: 0.35rem; }
+
+#TOC a.active {
+color: var(--link);
+background: var(--bg);
+border-left-color: var(--link);
+font-weight: 700;
+}
+#TOC .badge { font-size: 0.6rem; border: 0; padding: 0; margin-left: 0.25em; opacity: 0.85; }
+
+#nav-backdrop {
+position: fixed;
+inset: 0;
+z-index: 55;
+background: rgba(0, 0, 0, 0.45);
+}
+
+#nav-toggle {
+position: fixed;
+top: 0.9rem;
+left: 0.9rem;
+z-index: 70;
+width: 2.3rem;
+height: 2.3rem;
+border-radius: 50%;
+border: 1px solid var(--border);
+background: var(--bg-soft);
+color: var(--fg-soft);
+font-size: 1rem;
+line-height: 1;
+cursor: pointer;
+}
+#nav-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
+
+ul, ol { margin: 0 0 1.15rem; padding-left: 1.5rem; }
+li { margin: 0.3rem 0; }
+li > ul, li > ol { margin: 0.3rem 0; }
+
+code {
+font-family: var(--font-mono);
+font-size: 0.875em;
+background: var(--bg-code);
+border: 1px solid var(--border-soft);
+border-radius: 5px;
+padding: 0.12em 0.38em;
+word-break: break-all;
+}
+pre {
+background: var(--bg-code);
+border: 1px solid var(--border-soft);
+border-radius: 9px;
+padding: 1rem 1.15rem;
+overflow-x: auto; 
+margin: 0 0 1.4rem;
+line-height: 1.62;
+font-size: 0.855rem;
+}
+pre code {
+background: none;
+border: 0;
+padding: 0;
+font-size: inherit;
+word-break: normal;
+white-space: pre;
+}
+
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table {
+border-collapse: collapse;
+width: 100%;
+font-size: 0.92rem;
+line-height: 1.65;
+}
+th, td {
+border: 1px solid var(--border);
+padding: 0.52rem 0.8rem;
+text-align: left;
+vertical-align: top;
+}
+th { background: var(--bg-soft); font-weight: 700; white-space: nowrap; }
+tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--bg-soft) 45%, transparent); }
+caption { caption-side: bottom; padding-top: 0.6rem; font-size: 0.82rem; color: var(--fg-faint); text-align: left; }
+
+blockquote {
+margin: 0 0 1.4rem;
+padding: 0.15rem 0 0.15rem 1.1rem;
+border-left: 3px solid var(--border);
+color: var(--fg-soft);
+}
+blockquote > :last-child { margin-bottom: 0; }
+
+.note, .key, .calc, .warn, .later, .quote, .quiz {
+--c: var(--fg-soft);
+position: relative;
+margin: 1.8rem 0;
+padding: 1.1rem 1.25rem 1.15rem;
+border: 1px solid var(--border);
+border-left: 3px solid var(--c);
+border-radius: 0 9px 9px 0;
+background: color-mix(in srgb, var(--c) 5%, var(--bg));
+font-size: 0.965rem;
+}
+.note::before, .key::before, .calc::before, .warn::before,
+.later::before, .quote::before, .quiz::before {
+display: block;
+font-size: 0.72rem;
+font-weight: 800;
+letter-spacing: 0.09em;
+color: var(--c);
+margin-bottom: 0.55rem;
+}
+.note { --c: var(--accent-note); }
+.key { --c: var(--accent-key); }
+.calc { --c: var(--accent-calc); }
+.warn { --c: var(--accent-warn); }
+.later { --c: var(--accent-later); }
+.quote { --c: var(--accent-quote); }
+.quiz { --c: var(--accent-quiz); }
+.note::before { content: "개념 보충"; }
+.key::before { content: "핵심"; }
+.calc::before { content: "어림셈"; }
+.warn::before { content: "주의"; }
+.later::before { content: "여기까지 — 이후는 뒤 단계"; }
+.quote::before { content: "원문 인용"; }
+.quiz::before { content: "확인 문제"; }
+
+.note[data-label]::before, .key[data-label]::before, .calc[data-label]::before,
+.warn[data-label]::before, .later[data-label]::before,
+.quote[data-label]::before, .quiz[data-label]::before { content: attr(data-label); }
+.note > :last-child, .key > :last-child, .calc > :last-child,
+.warn > :last-child, .later > :last-child,
+.quote > :last-child, .quiz > :last-child { margin-bottom: 0; }
+.quote { font-style: normal; }
+.quote p { color: var(--fg-soft); }
+
+.note pre, .key pre, .calc pre, .warn pre, .later pre, .quiz pre {
+background: var(--bg);
+}
+
+.quiz ol { padding-left: 1.35rem; }
+.quiz li { margin: 0.75rem 0; }
+details {
+margin: 0.5rem 0 0;
+border: 1px dashed var(--border);
+border-radius: 7px;
+padding: 0 0.9rem;
+background: var(--bg);
+}
+details[open] { padding-bottom: 0.6rem; }
+summary {
+cursor: pointer;
+padding: 0.55rem 0;
+font-size: 0.86rem;
+font-weight: 700;
+color: var(--fg-soft);
+list-style: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before { content: "▸ "; color: var(--fg-faint); }
+details[open] summary::before { content: "▾ "; }
+/* pandoc 이 <summary> 안의 텍스트를 <p> 로 감쌉니다 → 인라인으로 되돌립니다 */
+summary > p { display: inline; margin: 0; }
+details > :not(summary) { font-size: 0.94rem; }
+details > :last-child { margin-bottom: 0; }
+
+/* ---------- 그림 / SVG ---------- */
+figure {
+  margin: 2rem 0;
+  padding: 0;
+}
+figure > .svg-scroll { overflow-x: auto; }
+figure svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.84rem;
+  color: var(--fg-faint);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* SVG 안에서 쓸 테마 연동 클래스
+   — SVG 에 색을 하드코딩하지 말고 이 클래스만 쓰세요 (GUIDE.md 8절) */
+svg text      { font-family: var(--font-sans); }
+svg .mono     { font-family: var(--font-mono); }
+
+/* 텍스트 */
+svg .s-fg     { fill: var(--fg); }
+svg .s-soft   { fill: var(--fg-soft); }
+svg .s-faint  { fill: var(--fg-faint); }
+
+/* 선 */
+svg .s-line   { stroke: var(--border); fill: none; }
+svg .s-strong { stroke: var(--fg-faint); fill: none; }
+svg .s-dash   { stroke: var(--border); fill: none; stroke-dasharray: 4 3; }
+svg .s-arrow  { fill: var(--fg-faint); stroke: none; }
+
+/* 상자 */
+svg .s-box    { fill: var(--bg-soft); stroke: var(--border); }
+svg .s-plain  { fill: none; stroke: var(--border); }
+svg .s-accent { fill: var(--accent-note); }
+
+/* 색 채움 — 옅은 배경 + 진한 테두리. 위에 s-fg 텍스트를 얹어도 두 테마에서 읽힙니다 */
+svg .s-f1 { fill: var(--accent-note);  fill-opacity: 0.16; stroke: var(--accent-note); }
+svg .s-f2 { fill: var(--accent-key);   fill-opacity: 0.16; stroke: var(--accent-key); }
+svg .s-f3 { fill: var(--accent-calc);  fill-opacity: 0.16; stroke: var(--accent-calc); }
+svg .s-f4 { fill: var(--accent-warn);  fill-opacity: 0.16; stroke: var(--accent-warn); }
+svg .s-f5 { fill: var(--fg-faint);     fill-opacity: 0.14; stroke: var(--fg-faint); }
+
+/* 색 텍스트 — 위 채움과 짝 */
+svg .s-t1 { fill: var(--accent-note); }
+svg .s-t2 { fill: var(--accent-key); }
+svg .s-t3 { fill: var(--accent-calc); }
+svg .s-t4 { fill: var(--accent-warn); }
+svg .s-t5 { fill: var(--fg-faint); }
+
+/* ---------- 배지 (깊이 표시 [완전]/[씨앗]) ---------- */
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.1em 0.5em;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  vertical-align: 0.12em;
+  margin-left: 0.3em;
+}
+.badge.full  { color: var(--accent-key); }
+.badge.seed  { color: var(--accent-later); }
+
+/* ---------- 테마 토글 버튼 ---------- */
+#theme-toggle {
+  position: fixed;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 50;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--fg-soft);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+#theme-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
+
+/* ---------- 꼬리말 ---------- */
+.doc-foot {
+  margin-top: 5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.84rem;
+  color: var(--fg-faint);
+}
+
+/* ---------- 반응형 ---------- */
+
+/* 넓은 화면 — 사이드바가 자리를 차지하고 본문은 남은 폭 가운데에 놓입니다 */
+@media (min-width: 1100px) {
+  body { padding-left: var(--sidebar-w); }
+  #nav-toggle, #nav-backdrop { display: none; }
+}
+
+/* 좁은 화면 — 사이드바를 왼쪽 바깥으로 밀어두고 ☰ 로 꺼냅니다 */
+@media (max-width: 1099.98px) {
+  #sidebar {
+    width: min(19rem, 84vw);
+    transform: translateX(-102%);
+    transition: transform 0.22s ease, visibility 0.22s;
+    box-shadow: 0 0 2rem rgba(0, 0, 0, 0.25);
+  }
+  body.nav-open #sidebar { transform: none; }
+  /* ☰ 버튼이 사이드바 머리말을 가리지 않도록 위를 비웁니다 */
+  #sidebar { padding-top: 4rem; }
+  body:not(.nav-open) #sidebar { visibility: hidden; }
+  body.nav-open { overflow: hidden; }
+  .wrap { padding-top: 4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sidebar { transition: none; }
+}
+
+@media (max-width: 640px) {
+  body { font-size: 16px; line-height: 1.8; }
+  .wrap { padding: 4rem 1rem 4rem; }
+  .doc-head h1 { font-size: 1.65rem; }
+  h2 { font-size: 1.35rem; margin-top: 2.8rem; }
+  h3 { font-size: 1.12rem; }
+  .anchor { display: none; }
+}
+
+/* ---------- 인쇄 ---------- */
+@media print {
+  :root { --bg: #fff; --fg: #000; }
+  #theme-toggle, #nav-toggle, #sidebar, #nav-backdrop { display: none !important; }
+  body { padding-left: 0; }
+  .wrap { max-width: none; padding: 0; }
+  pre, table, figure, .note, .key, .calc, .warn, .later, .quiz { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<button id="nav-toggle" type="button" aria-label="목차 열기/닫기" aria-expanded="false" aria-controls="sidebar" title="목차">☰</button>
+<button id="theme-toggle" type="button" aria-label="라이트/다크 테마 전환" title="테마 전환">◐</button>
+
+<div id="nav-backdrop" hidden></div>
+
+<aside id="sidebar">
+  <div class="sidebar-head">
+    <p class="side-eyebrow">PHASE 2 · 서빙 기초</p>
+    <a class="side-title" href="#top">4–6단계 — 엔진 안으로 들어가고, 속도를 정의한다</a>
+  </div>
+  <nav id="TOC" role="doc-toc" aria-label="목차">
+<ul>
+<li><a href="#이-단계는-무엇인가" id="toc-이-단계는-무엇인가">1. 이 단계는 무엇인가</a>
+<ul>
+<li><a href="#원문의-요지" id="toc-원문의-요지">원문의 요지</a></li>
+<li><a href="#세-단계를-왜-한-문서로-묶는가" id="toc-세-단계를-왜-한-문서로-묶는가">세 단계를 왜 한 문서로 묶는가</a></li>
+<li><a href="#내-상황에서의-재해석" id="toc-내-상황에서의-재해석">내 상황에서의 재해석</a></li>
+<li><a href="#이-문서를-읽고-나면-답할-수-있는-질문" id="toc-이-문서를-읽고-나면-답할-수-있는-질문">이 문서를 읽고 나면 답할 수 있는 질문</a></li>
+</ul></li>
+<li><a href="#개념" id="toc-개념">2. 개념</a></li>
+<li><a href="#왜-엔진을-갈아타는가-완전" id="toc-왜-엔진을-갈아타는가-완전">2.1 왜 엔진을 갈아타는가 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#두-엔진은-다른-문제를-풀고-있다" id="toc-두-엔진은-다른-문제를-풀고-있다">두 엔진은 다른 문제를 풀고 있다</a></li>
+<li><a href="#지운다의-의미" id="toc-지운다의-의미">“지운다”의 의미</a></li>
+<li><a href="#단계의-진짜-관문은-정확도-재현이다" id="toc-단계의-진짜-관문은-정확도-재현이다">4단계의 진짜 관문은 정확도 재현이다</a></li>
+</ul></li>
+<li><a href="#추론은-두-개의-다른-작업이다-완전" id="toc-추론은-두-개의-다른-작업이다-완전">2.2 추론은 두 개의 다른 작업이다 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#요청-하나가-처리되는-순서" id="toc-요청-하나가-처리되는-순서">요청 하나가 처리되는 순서</a></li>
+<li><a href="#왜-성격이-정반대인가" id="toc-왜-성격이-정반대인가">왜 성격이 정반대인가</a></li>
+</ul></li>
+<li><a href="#compute-bound-와-memory-bound-완전" id="toc-compute-bound-와-memory-bound-완전">2.3 compute-bound 와 memory-bound <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#이-구분이-앞의-판단들을-설명한다" id="toc-이-구분이-앞의-판단들을-설명한다">이 구분이 앞의 판단들을 설명한다</a></li>
+</ul></li>
+<li><a href="#속도를-재는-네-개의-자-완전" id="toc-속도를-재는-네-개의-자-완전">2.4 속도를 재는 네 개의 자 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#toks-와-tpot-는-같은-것의-두-표현이다" id="toc-toks-와-tpot-는-같은-것의-두-표현이다">tok/s 와 TPOT 는 같은 것의 두 표현이다</a></li>
+<li><a href="#체감-기준선" id="toc-체감-기준선">체감 기준선</a></li>
+</ul></li>
+<li><a href="#처리량과-지연시간은-서로-싸운다-완전" id="toc-처리량과-지연시간은-서로-싸운다-완전">2.5 처리량과 지연시간은 서로 싸운다 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#배치를-키우면-벌어지는-일" id="toc-배치를-키우면-벌어지는-일">배치를 키우면 벌어지는 일</a></li>
+<li><a href="#goodput-왜-네-번째-지표가-필요한가" id="toc-goodput-왜-네-번째-지표가-필요한가">Goodput — 왜 네 번째 지표가 필요한가</a></li>
+</ul></li>
+<li><a href="#평균이-아니라-꼬리를-본다-완전" id="toc-평균이-아니라-꼬리를-본다-완전">2.6 평균이 아니라 꼬리를 본다 <span class="badge full">완전</span></a></li>
+<li><a href="#엔진이-기동할-때-말해주는-것-완전" id="toc-엔진이-기동할-때-말해주는-것-완전">2.7 엔진이 기동할 때 말해주는 것 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#엔진은-kv-cache-자리를-미리-잡는다" id="toc-엔진은-kv-cache-자리를-미리-잡는다">엔진은 KV cache 자리를 미리 잡는다</a></li>
+</ul></li>
+<li><a href="#소스-빌드는-무엇을-위한-것인가-씨앗" id="toc-소스-빌드는-무엇을-위한-것인가-씨앗">2.8 소스 빌드는 무엇을 위한 것인가 <span class="badge seed">씨앗</span></a></li>
+<li><a href="#내-장비-기준-정리" id="toc-내-장비-기준-정리">3. 내 장비 기준 정리</a>
+<ul>
+<li><a href="#한-대에서-46단계는-어떻게-되는가" id="toc-한-대에서-46단계는-어떻게-되는가">3.1 5090 한 대에서 4–6단계는 어떻게 되는가</a></li>
+<li><a href="#원문-전제와의-차이" id="toc-원문-전제와의-차이">3.2 원문 전제와의 차이</a></li>
+</ul></li>
+<li><a href="#확인-문제" id="toc-확인-문제">4. 확인 문제</a></li>
+<li><a href="#다음-단계로" id="toc-다음-단계로">5. 다음 단계로</a>
+<ul>
+<li><a href="#이-문서가-회수한-씨앗" id="toc-이-문서가-회수한-씨앗">이 문서가 회수한 씨앗</a></li>
+<li><a href="#이-문서가-남기는-씨앗" id="toc-이-문서가-남기는-씨앗">이 문서가 남기는 씨앗</a></li>
+<li><a href="#단계로-넘어가기-전에" id="toc-단계로-넘어가기-전에">7단계로 넘어가기 전에</a></li>
+</ul></li>
+<li><a href="#용어표" id="toc-용어표">6. 용어표</a></li>
+</ul>
+  </nav>
+</aside>
+
+<div class="wrap">
+
+  <header class="doc-head" id="top">
+    <p class="eyebrow">PHASE 2 · 서빙 기초</p>
+    <h1>4–6단계 — 엔진 안으로 들어가고, 속도를 정의한다</h1>
+    <p class="subtitle">prefill 과 decode 는 왜 다른 기계처럼 움직이는가</p>
+        <div class="meta">
+      <span>대상 장비 — RTX 5090 32GB × 1 (Blackwell, sm_120)</span><span>깊이 규칙 — GUIDE.md 옵션 B</span><span>최종 수정 — 2026-09-02</span>
+    </div>
+      </header>
+
+  <main>
+<h2 id="이-단계는-무엇인가">1. 이 단계는 무엇인가</h2>
+<h3 id="원문의-요지">원문의 요지</h3>
+<div class="quote" data-label="원문 (4단계) — Ollama를 지우고 vLLM을 설치합니다">
+<p>이제 <strong>모델 서빙과 인퍼런스 최적화</strong>로 넘어갑니다.</p>
+</div>
+<div class="quote" data-label="원문 (5단계) — vLLM을 소스 빌드 합니다">
+<ul>
+<li>소스 빌드 하고, <strong>prefill / decode 단계에서 각각 디버깅을 걸어서</strong> 모델 추론을 돌려봅니다.</li>
+<li><strong>Prefill</strong>은 쉽게 얘기하자면, 유저의 요청을 기억에 담아두고 사전에 처리해두는 겁니다.</li>
+<li><strong>Decode</strong>는 쉽게 얘기하자면, LLM의 답변을 한 단어씩 만들어내는 과정입니다.</li>
+<li>Prefill에 걸리는 시간이 이 정도구나, Decode에 걸리는 시간이 이 정도구나, 를 우선 감으로 체감합니다.</li>
+</ul>
+</div>
+<div class="quote" data-label="원문 (6단계) — LLM 성능 벤치마크 측정법을 익힙니다">
+<ul>
+<li><strong>TTFT</strong>는 유저의 요청이 들어간 순간부터, 첫 단어가 나올 때까지의 시간을 의미합니다.</li>
+<li><strong>TPOT</strong>은 단어 생성 속도입니다. TPOT의 역수가 우리가 흔히 얘기하는 <strong>토큰 생성 속도</strong>입니다.</li>
+<li><strong>TPOT이 30 이상이 되면 꽤나 챗봇으로 쓸만합니다.</strong></li>
+</ul>
+</div>
+<h3 id="세-단계를-왜-한-문서로-묶는가">세 단계를 왜 한 문서로 묶는가</h3>
+<p>세 단계가 사실상 <strong>하나의 개념을 세 번 만나는 구조</strong>이기 때문입니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>단계</th>
+<th>하는 일</th>
+<th>만나는 개념</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4단계</td>
+<td>엔진을 vLLM 으로 바꾼다</td>
+<td>제어권이 생긴다 — <strong>무엇을 조절할 수 있게 되는가</strong></td>
+</tr>
+<tr class="even">
+<td>5단계</td>
+<td>그 엔진 안에서 추론을 들여다본다</td>
+<td><strong>prefill 과 decode 는 다르다</strong></td>
+</tr>
+<tr class="odd">
+<td>6단계</td>
+<td>그 차이를 숫자로 잰다</td>
+<td>TTFT 는 prefill, TPOT 는 decode</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>TTFT(Time To First Token)와 TPOT(Time Per Output Token)는 prefill 과 decode 의 다른 이름입니다.</strong> 6단계의 지표를 5단계 없이 설명하면
+“첫 토큰까지 걸리는 시간”이라는 정의만 남고 <strong>왜 그 시간이 그렇게 결정되는지</strong>가 빠집니다.
+반대로 5단계만 하고 6단계를 안 하면 감만 남고 숫자가 없습니다. 그래서 묶습니다.</p>
+<h3 id="내-상황에서의-재해석">내 상황에서의 재해석</h3>
+<p>앞의 두 문서에서 얻은 것을 이어받습니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>문서</th>
+<th>얻은 것</th>
+<th>이 문서에서</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1단계</td>
+<td>계산 능력 — “얼마나 빠를 수 있는가”의 <strong>천장</strong></td>
+<td>그 천장이 <strong>출력에만 적용된다</strong>는 것을 알게 됨</td>
+</tr>
+<tr class="even">
+<td>2–3단계</td>
+<td>측정 능력 — 품질을 재는 자</td>
+<td><strong>속도를 재는 자</strong>를 추가</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>1단계에서 <code>tok/s</code> 천장을 대역폭 ÷ 가중치로 계산했습니다. 그때 각주로 이렇게 남겼습니다 —
+<em>“입력이 긴 요청의 첫 토큰은 이 공식과 무관합니다. 그건 연산 성능이 결정합니다.”</em>
+<strong>이 문서가 그 각주를 푸는 자리입니다.</strong></p>
+<div class="key">
+<p>4–6단계의 산출물은 <strong>“빠르다”를 두 개로 쪼개는 능력</strong>입니다.
+느리다는 말이 나왔을 때 <strong>첫 반응이 느린 건지 이어지는 속도가 느린 건지</strong> 구분할 수 있으면 이 단계는 끝납니다.</p>
+</div>
+<h3 id="이-문서를-읽고-나면-답할-수-있는-질문">이 문서를 읽고 나면 답할 수 있는 질문</h3>
+<ol type="1">
+<li>Ollama 를 “지우라”는 지시는 무엇을 얻기 위한 것인가?</li>
+<li><strong>“입력 4,000 / 출력 100”</strong> 과 <strong>“입력 100 / 출력 4,000”</strong> 은 왜 소요 시간의 구성이 완전히 다른가?</li>
+<li>같은 GPU(Graphics Processing Unit) 인데 왜 어떤 구간은 연산 성능에 막히고 어떤 구간은 메모리 대역폭에 막히는가?</li>
+<li>TTFT 와 TPOT 중 무엇을 개선해야 하는지는 어떻게 판단하는가?</li>
+<li>평균 TTFT 가 좋은데도 사용자가 느리다고 하는 상황이 왜 생기는가?</li>
+</ol>
+<p>4절 확인 문제가 이 다섯 가지를 다시 묻습니다.</p>
+<hr />
+<h2 id="개념">2. 개념</h2>
+<h2 id="왜-엔진을-갈아타는가-완전">2.1 왜 엔진을 갈아타는가 <span class="badge full">완전</span></h2>
+<p>2–3단계에서 Ollama 를 <strong>“출발점이자 나중에 버릴 도구”</strong> 라고 했습니다. 그 “나중”이 지금입니다.</p>
+<h3 id="두-엔진은-다른-문제를-풀고-있다">두 엔진은 다른 문제를 풀고 있다</h3>
+<p>같은 모델을 돌리지만 설계 목표가 다릅니다.</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>Ollama (<code>llama.cpp</code>)</th>
+<th>vLLM</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>상정하는 사용자</td>
+<td><strong>한 사람</strong></td>
+<td><strong>여러 사람 동시</strong></td>
+</tr>
+<tr class="even">
+<td>잘하는 것</td>
+<td>설치가 쉽고, CPU 로도 돌아감</td>
+<td>동시 요청을 겹쳐서 처리</td>
+</tr>
+<tr class="odd">
+<td>동시 요청</td>
+<td>사실상 순차</td>
+<td>수십~수백</td>
+</tr>
+<tr class="even">
+<td>제어권</td>
+<td>거의 없음</td>
+<td><strong>배치 · KV cache · 병렬화가 전부 노출</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>마지막 줄이 갈아타는 이유의 전부입니다.</p>
+<blockquote>
+<p>자동 변속기만 있는 차로는 변속 타이밍을 공부할 수 없습니다. 잘 달리는 것과 배우는 것은 다른 문제입니다.</p>
+</blockquote>
+<p>실제로는 이렇습니다. 7단계는 배치를 1부터 32까지 바꿔가며 무슨 일이 벌어지는지 보는 단계이고,
+8단계는 컨텍스트 길이를 바꾸는 단계입니다. <strong>Ollama 에는 그 손잡이가 없습니다.</strong>
+1단계에서 세운 예산 계산과 2.5절의 세 손잡이를 <strong>실제로 돌려볼 수 있는 엔진</strong>이 필요합니다.</p>
+<h3 id="지운다의-의미">“지운다”의 의미</h3>
+<div class="quote" data-label="원문 (4단계)">
+<p><strong>“지운다”는 지시의 의미</strong>: Ollama를 남겨두면 편해서 계속 씁니다.
+<code>ollama run</code>의 편안함을 끊어야 <code>--gpu-memory-utilization</code>, <code>--max-num-seqs</code> 같은 플래그를 만지게 됩니다.</p>
+</div>
+<p>물리적으로 지우라는 뜻이라기보다 <strong>“이제부터 실습은 전부 vLLM 으로”</strong> 라는 원칙에 가깝습니다.
+편한 도구를 남겨두면 막힐 때마다 그쪽으로 돌아가게 되고, 그러면 손잡이를 만질 일이 없어집니다.</p>
+<h3 id="단계의-진짜-관문은-정확도-재현이다">4단계의 진짜 관문은 정확도 재현이다</h3>
+<p>원문 4단계의 체크포인트는 설치가 아닙니다.</p>
+<div class="quote" data-label="원문 (4단계) — 체크포인트">
+<p>vLLM 서버에 2단계 평가 스크립트를 붙여 3단계와 같은 정확도가 재현된다.
+(= 엔진이 바뀌어도 측정 체계가 살아있다)</p>
+</div>
+<p>2–3단계에서 만든 평가 루프를 떠올리면 왜 이게 가능한지 보입니다.
+그 루프의 다섯 칸 중 <strong>모델 호출은 한 칸</strong>이었고, vLLM 도 같은 방식(OpenAI 호환 API(Application Programming Interface))으로 부를 수 있습니다.
+<strong>그 한 칸의 주소만 바꾸면 나머지가 그대로 돌아갑니다.</strong></p>
+<div class="key">
+<p>2단계에서 평가부터 만든 이유가 여기서 회수됩니다.
+엔진을 바꾸는 것은 큰 변화인데, <strong>측정 체계가 그것을 견디는지</strong>가 4단계의 관문입니다.
+점수가 재현되면 앞으로 무엇을 바꿔도 비교할 수 있다는 뜻입니다.</p>
+</div>
+<div class="warn">
+<p>점수가 재현되지 않는 것도 정상적인 결과입니다. 다만 원인을 <strong>모델 탓으로 돌리기 전에</strong> 확인할 것이 있습니다.</p>
+<ul>
+<li><strong>같은 가중치인가</strong> — Ollama 의 기본 태그는 대체로 양자화 버전입니다. vLLM 에서 원본을 받았다면 <strong>애초에 다른 모델을 비교</strong>하고 있는 것입니다</li>
+<li><strong>양자화 포맷이 같은가</strong> — GGUF(GPT-Generated Unified Format)의 <code>Q4_K_M</code> 과 다른 엔진의 4비트는 <strong>같은 4비트가 아닙니다</strong> (2–3단계 2.8절)</li>
+<li><strong>프롬프트 형식이 같은가</strong> — 채팅 템플릿을 엔진이 다르게 적용하면 점수가 움직입니다</li>
+</ul>
+<p>즉 4단계에서 점수가 어긋나면, 그건 대체로 <strong>“무엇을 비교하고 있었는지”</strong> 를 다시 묻는 신호입니다.</p>
+</div>
+<hr />
+<h2 id="추론은-두-개의-다른-작업이다-완전">2.2 추론은 두 개의 다른 작업이다 <span class="badge full">완전</span></h2>
+<p>이 절이 이 문서의 심장이고, 원문이 <em>“로컬 LLM 이해의 가장 중요한 분기점”</em> 이라고 부른 곳입니다.</p>
+<p>1단계에서 LLM(Large Language Model)의 추론 동작을 이렇게 잡아뒀습니다 — <strong>“토큰 하나를 만들 때마다 가중치 전체를 읽는다.”</strong>
+맞는 말이지만 <strong>절반만 맞습니다.</strong> 그 문장은 답변을 만드는 구간에만 해당합니다.</p>
+<h3 id="요청-하나가-처리되는-순서">요청 하나가 처리되는 순서</h3>
+<p>사용자가 긴 코드를 붙여넣고 리뷰를 요청했다고 해봅시다.
+GPU 가 하는 일은 성격이 전혀 다른 두 구간으로 나뉩니다.</p>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 330" role="img" aria-label="요청 처리는 prefill 과 decode 두 구간으로 나뉜다. prefill 은 입력 전체를 한꺼번에 처리해 KV 캐시를 만들고 첫 토큰을 내며 연산 성능에 막힌다. decode 는 토큰을 하나씩 순차 생성하며 메모리 대역폭에 막힌다.">
+  <defs>
+    <marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path class="s-arrow" d="M0 0 L10 5 L0 10 z" />
+    </marker>
+  </defs>
+  <text class="s-soft" x="16" y="22" font-size="12">입력 2,000 토큰 — &quot;이 코드를 리뷰해줘&quot;</text>
+  <rect class="s-f1" x="16" y="36" width="330" height="120" rx="9" />
+  <text class="s-t1" x="34" y="60" font-size="13" font-weight="700">PREFILL — 입력 처리</text>
+  <text class="s-fg" x="34" y="84" font-size="12">2,000 토큰을 한꺼번에 처리</text>
+  <text class="s-faint" x="34" y="104" font-size="11">큰 행렬 × 큰 행렬</text>
+  <text class="s-faint" x="34" y="122" font-size="11">연산 유닛이 포화 → 연산 성능이 병목</text>
+  <text class="s-t1" x="34" y="144" font-size="11.5">결과 — KV cache 생성 + 첫 토큰 1개</text>
+  <path class="s-strong" d="M352 96 H384" marker-end="url(#ar1)" />
+  <rect class="s-f3" x="390" y="36" width="314" height="120" rx="9" />
+  <text class="s-t3" x="408" y="60" font-size="13" font-weight="700">DECODE — 출력 생성</text>
+  <text class="s-fg" x="408" y="84" font-size="12">토큰 1개 → 다음 1개, 500회 반복</text>
+  <text class="s-faint" x="408" y="104" font-size="11">작은 벡터 × 큰 가중치 행렬</text>
+  <text class="s-faint" x="408" y="122" font-size="11">매번 가중치 전체를 읽음 → 대역폭이 병목</text>
+  <text class="s-t3" x="408" y="144" font-size="11.5">결과 — 나머지 토큰들</text>
+  <line class="s-line" x1="16" y1="196" x2="704" y2="196"></line>
+  <text class="s-soft" x="16" y="188" font-size="11.5">시간 축</text>
+  <rect class="s-f1" x="16" y="202" width="96" height="26" rx="4" />
+  <text class="s-t1" x="64" y="220" text-anchor="middle" font-size="11">prefill</text>
+  <rect class="s-f3" x="114" y="202" width="24" height="26" rx="3" />
+  <rect class="s-f3" x="140" y="202" width="24" height="26" rx="3" />
+  <rect class="s-f3" x="166" y="202" width="24" height="26" rx="3" />
+  <rect class="s-f3" x="192" y="202" width="24" height="26" rx="3" />
+  <rect class="s-f3" x="218" y="202" width="24" height="26" rx="3" />
+  <rect class="s-f3" x="244" y="202" width="24" height="26" rx="3" />
+  <text class="s-faint" x="278" y="220" font-size="11">… 출력 토큰 수만큼 계속</text>
+  <path class="s-strong" d="M16 244 H112" marker-end="url(#ar1)" />
+  <text class="s-t1" x="120" y="248" font-size="11.5">TTFT — 여기까지가 첫 토큰</text>
+  <path class="s-strong" d="M114 272 H140" marker-end="url(#ar1)" />
+  <text class="s-t3" x="150" y="276" font-size="11.5">TPOT — 토큰 사이 간격 하나</text>
+  <text class="s-faint" x="16" y="302" font-size="11">한 번 일어나는 일(prefill)과 수백 번 반복되는 일(decode)이 한 요청 안에 섞여 있습니다.</text>
+  <text class="s-faint" x="16" y="318" font-size="11">그래서 &quot;이 요청이 몇 초 걸렸다&quot;는 숫자 하나로는 무엇이 느린지 알 수 없습니다.</text>
+</svg>
+</div>
+<figcaption>같은 요청 안에서 성격이 정반대인 두 구간이 이어집니다</figcaption>
+</figure>
+<h3 id="왜-성격이-정반대인가">왜 성격이 정반대인가</h3>
+<p>핵심은 <strong>한 번에 처리하는 토큰 수</strong>입니다.</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>prefill</th>
+<th>decode</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>한 번에 다루는 토큰</td>
+<td>입력 전체 (예: 2,000개)</td>
+<td><strong>1개</strong></td>
+</tr>
+<tr class="even">
+<td>연산의 모양</td>
+<td>큰 행렬 × 큰 행렬</td>
+<td>작은 벡터 × 큰 행렬</td>
+</tr>
+<tr class="odd">
+<td>가중치를 읽는 횟수</td>
+<td>1회 (2,000토큰이 함께 씀)</td>
+<td><strong>토큰마다 1회</strong></td>
+</tr>
+<tr class="even">
+<td>병목</td>
+<td><strong>연산 성능</strong></td>
+<td><strong>메모리 대역폭</strong></td>
+</tr>
+<tr class="odd">
+<td>대응 지표</td>
+<td><strong>TTFT</strong></td>
+<td><strong>TPOT</strong></td>
+</tr>
+<tr class="even">
+<td>걸리는 시간</td>
+<td>입력 길이에 따라</td>
+<td>출력 길이에 <strong>비례</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>decode 가 대역폭에 막히는 이유는 1단계에서 이미 봤습니다. 토큰 하나를 만들려고 16GB 를 읽는데,
+그 16GB 로 <strong>딱 한 토큰을 만듭니다.</strong> 읽어온 양에 비해 하는 일이 너무 적습니다.</p>
+<p>prefill 은 다릅니다. 같은 16GB 를 읽어와서 <strong>2,000개 토큰의 계산에 함께 씁니다.</strong>
+읽기 비용이 2,000개에 나눠지므로 대역폭이 문제가 되지 않고, 대신 계산량 자체가 커집니다.</p>
+<div class="key">
+<p><strong>같은 GPU, 같은 모델인데 병목이 구간마다 다릅니다.</strong>
+읽어온 가중치로 <strong>몇 개의 토큰을 처리하느냐</strong>가 그 차이를 만듭니다.
+prefill 은 많이 처리해서 연산에 막히고, decode 는 하나만 처리해서 읽기에 막힙니다.</p>
+</div>
+<div class="note">
+<p>5단계의 원문 지시는 소스를 빌드해 <strong>prefill / decode 에 각각 브레이크포인트를 걸어보라</strong>는 것입니다.
+목적은 코드를 다 이해하는 게 아니라 <em>“prefill 에 이 정도, decode 에 이 정도”</em> 를 <strong>감으로 체감</strong>하는 것입니다.
+원문도 이 단계를 “우선 감으로 체감합니다”라고 표현합니다.</p>
+</div>
+<div class="later">
+<p>엔진 소스에서 스케줄러와 KV cache 관리자가 실제로 어떻게 구현돼 있는지는 이 문서가 다루지 않습니다.
+커널 수준으로 내려가 <strong>연산 자체를 읽고 고치는 것</strong>은 <strong>14 · 17단계</strong>입니다.
+4–6단계에서는 <strong>“두 구간이 있고 병목이 다르다”</strong> 를 코드가 아니라 <strong>동작과 숫자로</strong> 아는 것까지면 충분합니다.</p>
+</div>
+<hr />
+<h2 id="compute-bound-와-memory-bound-완전">2.3 compute-bound 와 memory-bound <span class="badge full">완전</span></h2>
+<p>1단계에서 씨앗으로 남겼던 용어를 여기서 회수합니다.
+연산 장치가 느려지는 이유는 크게 두 가지뿐입니다.</p>
+<blockquote>
+<p>요리사가 손이 느려서 요리가 늦어질 수도 있고, 재료가 늦게 와서 늦어질 수도 있습니다.
+손이 느린 쪽이면 요리사를 늘려야 하고, 재료가 늦는 쪽이면 요리사를 늘려도 소용이 없습니다.</p>
+</blockquote>
+<p>실제로는 이렇습니다. GPU 는 <strong>계산하는 부분</strong>과 <strong>메모리에서 값을 읽어오는 부분</strong>이 함께 돌아가는데,
+둘 중 느린 쪽이 전체 속도를 정합니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>compute-bound (연산 병목)</th>
+<th>memory-bound (대역폭 병목)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>무엇이 부족한가</td>
+<td>계산 능력</td>
+<td>값을 읽어오는 속도</td>
+</tr>
+<tr class="even">
+<td>이 커리큘럼에서</td>
+<td><strong>prefill</strong></td>
+<td><strong>decode</strong></td>
+</tr>
+<tr class="odd">
+<td>개선하려면</td>
+<td>더 빠른 연산 · 낮은 정밀도 연산</td>
+<td><strong>읽을 바이트를 줄인다</strong></td>
+</tr>
+<tr class="even">
+<td>효과 있는 조치</td>
+<td>연산 성능이 높은 GPU</td>
+<td><strong>양자화</strong>, 배치로 읽기 공유</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="이-구분이-앞의-판단들을-설명한다">이 구분이 앞의 판단들을 설명한다</h3>
+<p>1단계와 2–3단계에서 내린 결론들이 사실 전부 이 한 가지에서 나왔습니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>앞에서 본 결론</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>양자화하면 <strong>생성이 빨라진다</strong></td>
+<td>decode 가 memory-bound → 읽을 바이트가 줄면 바로 이득</td>
+</tr>
+<tr class="even">
+<td>4090 이 3090 보다 연산 성능 2배인데 <strong>체감이 비슷하다</strong></td>
+<td>체감을 좌우하는 decode 는 대역폭 게임인데, 대역폭은 8% 차이</td>
+</tr>
+<tr class="odd">
+<td>1단계의 <code>tok/s</code> 천장 공식이 <strong>대역폭 ÷ 가중치</strong> 였다</td>
+<td>그 공식은 decode 구간만 설명하는 식이었음</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p>1단계에서 계산한 <code>tok/s</code> 천장은 <strong>decode 의 천장</strong>이었습니다.
+TTFT 는 그 공식과 무관하며, 입력이 길수록 커집니다.
+<strong>속도를 하나의 숫자로 말할 수 없는 이유</strong>가 여기 있습니다.</p>
+</div>
+<div class="warn">
+<p>prefill 의 계산량은 입력 길이에 <strong>비례보다 빠르게</strong> 늘어납니다.
+토큰마다 앞의 모든 토큰을 참조하므로, 입력이 2배가 되면 참조 관계는 그보다 더 늘어납니다.</p>
+<p>그래서 입력이 아주 길어지면 <strong>TTFT 가 갑자기 나빠지는</strong> 구간이 옵니다.
+그 증가가 정확히 어떤 모양인지, 그리고 컨텍스트를 늘릴 때 메모리와 연산이 어떻게 다르게 늘어나는지는
+<strong>8단계</strong>에서 직접 늘려보며 확인합니다. 여기서는 <strong>“입력이 길면 TTFT 가 불리해진다”</strong> 까지만 잡아둡니다.</p>
+</div>
+<hr />
+<h2 id="속도를-재는-네-개의-자-완전">2.4 속도를 재는 네 개의 자 <span class="badge full">완전</span></h2>
+<p>이제 2–3단계에서 <code>[씨앗]</code>으로 남겨둔 <strong>성능 축</strong>을 채웁니다.
+품질을 MMLU Pro / HumanEval 로 쟀듯이, 속도에는 네 개의 지표가 있습니다.</p>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 200" role="img" aria-label="요청 전송부터 완료까지의 시간 축에서 TTFT는 첫 토큰까지의 시간이고 TPOT는 이후 토큰들 사이의 간격이다. 전체 지연시간은 TTFT에 TPOT 곱하기 출력 토큰 수를 더한 값이다.">
+  <defs>
+    <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path class="s-arrow" d="M0 0 L10 5 L0 10 z" />
+    </marker>
+  </defs>
+  <text class="s-soft" x="16" y="26" font-size="12">요청 전송</text>
+  <text class="s-soft" x="704" y="26" text-anchor="end" font-size="12">완료</text>
+  <line class="s-line" x1="16" y1="40" x2="16" y2="150"></line>
+  <line class="s-line" x1="704" y1="40" x2="704" y2="150"></line>
+  <rect class="s-f1" x="16" y="56" width="190" height="30" rx="4" />
+  <text class="s-t1" x="111" y="76" text-anchor="middle" font-size="12">prefill</text>
+  <rect class="s-f3" x="210" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="244" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="278" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="312" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="346" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="380" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="414" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="448" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="482" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="516" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="550" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="584" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="618" y="56" width="30" height="30" rx="3" />
+  <rect class="s-f3" x="652" y="56" width="30" height="30" rx="3" />
+  <path class="s-strong" d="M16 106 H206" marker-end="url(#ar2)" />
+  <text class="s-t1" x="111" y="126" text-anchor="middle" font-size="12">TTFT</text>
+  <text class="s-faint" x="111" y="142" text-anchor="middle" font-size="10.5">첫 토큰까지</text>
+  <path class="s-strong" d="M210 106 H240" marker-end="url(#ar2)" />
+  <text class="s-t3" x="300" y="126" font-size="12">TPOT — 토큰 사이 간격</text>
+  <text class="s-faint" x="300" y="142" font-size="10.5">이 간격의 역수가 tok/s</text>
+  <text class="s-faint mono" x="16" y="180" font-size="11.5">전체 지연시간 = TTFT + TPOT × (출력 토큰 수 − 1)</text>
+</svg>
+</div>
+<figcaption>한 요청의 시간은 두 종류의 시간으로 이루어집니다</figcaption>
+</figure>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>지표</th>
+<th>정의</th>
+<th>단위</th>
+<th>무엇이 정하는가</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>TTFT</strong></td>
+<td>Time To First Token — 요청부터 첫 토큰까지</td>
+<td>ms</td>
+<td>prefill — <strong>입력 길이</strong>와 연산 성능</td>
+</tr>
+<tr class="even">
+<td><strong>TPOT</strong></td>
+<td>Time Per Output Token — 토큰 사이 간격</td>
+<td>ms/token</td>
+<td>decode — <strong>메모리 대역폭</strong>과 모델 크기</td>
+</tr>
+<tr class="odd">
+<td><strong>Throughput</strong></td>
+<td>서버 전체가 처리한 토큰 수</td>
+<td>tok/s</td>
+<td>배치 크기, KV cache 여유</td>
+</tr>
+<tr class="even">
+<td><strong>Goodput</strong></td>
+<td>목표 기준을 만족한 요청만 센 처리량</td>
+<td>req/s</td>
+<td>위 전부</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="toks-와-tpot-는-같은-것의-두-표현이다">tok/s 와 TPOT 는 같은 것의 두 표현이다</h3>
+<p>원문에 <em>“TPOT이 30 이상이면 챗봇으로 쓸만합니다”</em> 라는 문장이 있는데, 여기서 단위를 짚고 가야 합니다.</p>
+<div class="calc">
+<p><strong>TPOT 와 토큰 생성 속도의 변환</strong></p>
+<pre><code>토큰 생성 속도(tok/s)  =  1000 ÷ TPOT(ms)
+TPOT(ms)              =  1000 ÷ 토큰 생성 속도(tok/s)</code></pre>
+<p>원문의 “30”은 TPOT 자체가 아니라 <strong>생성 속도 30 tok/s</strong> 를 가리킵니다. 변환하면:</p>
+<pre><code>30 tok/s   →  TPOT ≈ 33 ms
+100 tok/s  →  TPOT ≈ 10 ms
+10 tok/s   →  TPOT ≈ 100 ms</code></pre>
+<p><strong>이 변환이 어긋나는 경우</strong></p>
+<ul>
+<li><strong>TPOT 가 크면 좋은 게 아니라 나쁩니다.</strong> 두 지표는 방향이 반대입니다. <code>tok/s</code> 는 클수록, <code>TPOT</code> 는 작을수록 좋습니다</li>
+<li><strong>서버 전체 처리량과 헷갈리면 안 됩니다.</strong> 동시 요청이 여러 개면 서버의 총 <code>tok/s</code> 는 개별 사용자의 <code>1/TPOT</code> 보다 훨씬 큽니다. <strong>누구 기준인지</strong>를 항상 확인해야 합니다</li>
+<li>실무 문서에서 두 단위를 섞어 쓰는 경우가 많습니다. 숫자만 보지 말고 <strong>단위를 확인</strong>하세요</li>
+</ul>
+</div>
+<h3 id="체감-기준선">체감 기준선</h3>
+<div class="note">
+<p>숫자가 감이 오지 않을 때 참고할 기준선입니다.</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th>토큰 생성 속도</th>
+<th>체감</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>약 5 tok/s</td>
+<td>읽는 속도보다 느림. 답답함</td>
+</tr>
+<tr class="even">
+<td>약 10 tok/s</td>
+<td>느린 타이핑. 참을 수는 있음</td>
+</tr>
+<tr class="odd">
+<td>약 20 tok/s</td>
+<td>사람이 읽는 속도와 비슷</td>
+</tr>
+<tr class="even">
+<td><strong>30 이상</strong></td>
+<td>쾌적. 챗봇으로 쓸 만함 ← 원문 기준</td>
+</tr>
+<tr class="odd">
+<td>100 이상</td>
+<td>순식간. 에이전트 · 코드 생성에 적합</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>TTFT 쪽은 대화형이라면 <strong>200ms 이하</strong>를 목표로 하고, <strong>1초를 넘으면</strong> 눈에 띄게 답답해집니다.</p>
+</div>
+<hr />
+<h2 id="처리량과-지연시간은-서로-싸운다-완전">2.5 처리량과 지연시간은 서로 싸운다 <span class="badge full">완전</span></h2>
+<p>지표가 네 개인 이유가 여기 있습니다. <strong>하나로 합칠 수 없기 때문</strong>입니다.</p>
+<h3 id="배치를-키우면-벌어지는-일">배치를 키우면 벌어지는 일</h3>
+<p>decode 가 memory-bound 라는 사실에서 중요한 결과가 하나 나옵니다.
+한 번 읽어온 가중치로 <strong>여러 요청의 토큰을 함께 계산</strong>할 수 있습니다.
+읽기 비용을 나눠 쓰는 것입니다.</p>
+<pre><code>요청 1개  — 가중치 16GB 를 읽어 토큰 1개 생성   → 읽기가 통째로 낭비
+요청 8개  — 가중치 16GB 를 읽어 토큰 8개 생성   → 같은 읽기로 8배의 일</code></pre>
+<p>그래서 <strong>동시 요청을 늘리면 서버 전체 처리량이 오릅니다.</strong> 공짜처럼 보이지만 대가가 있습니다.</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th>배치를 키우면</th>
+<th>방향</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>서버 전체 처리량</td>
+<td>⬆️ 크게 오름</td>
+</tr>
+<tr class="even">
+<td>개별 사용자의 TPOT</td>
+<td>⬇️ 느려짐 (내 차례를 기다림)</td>
+</tr>
+<tr class="odd">
+<td>KV cache 사용량</td>
+<td>⬆️ <strong>요청 수만큼 곱해짐</strong> (1단계 2.5절)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p><strong>“빠르다”는 말은 누구 기준인지를 밝히지 않으면 의미가 없습니다.</strong></p>
+<ul>
+<li>챗봇 — 개인의 TTFT / TPOT 가 중요</li>
+<li>문서 일괄 처리 · 에이전트 — 전체 처리량이 중요</li>
+</ul>
+<p>두 목표는 같은 손잡이를 <strong>반대 방향으로</strong> 돌립니다.</p>
+</div>
+<div class="later">
+<p>배치를 실제로 1 → 2 → 4 → … 로 늘려가며 처리량과 지연시간이 어떻게 갈라지는지,
+그리고 어디서 KV cache 가 먼저 터지는지는 <strong>7단계</strong>에서 직접 확인합니다.
+그때 <strong>Continuous Batching</strong> 과 <strong>PagedAttention</strong> 이라는 두 기법도 함께 다룹니다.
+4–6단계에서는 <strong>“둘은 맞바꿈 관계이고, 배치가 그 손잡이다”</strong> 까지면 충분합니다.</p>
+</div>
+<h3 id="goodput-왜-네-번째-지표가-필요한가">Goodput — 왜 네 번째 지표가 필요한가</h3>
+<p>처리량만 보면 놓치는 게 있습니다. <strong>느려터진 응답도 처리량에는 포함되기 때문</strong>입니다.</p>
+<blockquote>
+<p>식당이 시간당 100그릇을 냈다고 자랑하는데, 그중 30그릇은 손님이 기다리다 지쳐 나간 뒤에 나왔다면
+실제로 판 것은 70그릇입니다.</p>
+</blockquote>
+<p>Goodput 은 <strong>미리 정한 기준(예: TTFT 1초 이내)을 만족한 요청만</strong> 세는 처리량입니다.
+처리량과 지연시간을 하나의 숫자로 합치려는 시도이고, 그래서 <strong>먼저 기준을 정해야</strong> 계산됩니다.</p>
+<hr />
+<h2 id="평균이-아니라-꼬리를-본다-완전">2.6 평균이 아니라 꼬리를 본다 <span class="badge full">완전</span></h2>
+<p>2–3단계에서 정확도를 잴 때 <strong>표본 오차</strong>를 봤습니다. 속도에도 대응하는 함정이 있습니다.
+이쪽은 오차가 아니라 <strong>분포</strong>입니다.</p>
+<p>측정 결과가 <code>Mean TTFT 200ms</code> 로 나왔다고 모든 사용자가 200ms 를 겪는 게 아닙니다.</p>
+<pre><code>평균 TTFT   200 ms   ← 보고서에 적히는 숫자
+P99  TTFT  8,000 ms  ← 100명 중 1명이 겪는 시간</code></pre>
+<p>100명 중 1명은 8초를 기다립니다. 그 사람에게 이 서버는 <strong>평균과 무관하게 느립니다.</strong></p>
+<div class="note">
+<p><code>P99</code> 는 “100개 중 99개가 이 값 이하”라는 뜻입니다. <code>P50</code>(중앙값), <code>P95</code>, <code>P99</code> 를 함께 봅니다.
+평균은 <strong>아주 느린 소수에 끌려다니거나</strong>, 반대로 <strong>그것을 감춥니다.</strong>
+분포가 한쪽으로 길게 늘어질수록 평균은 실제 경험을 대표하지 못합니다.</p>
+</div>
+<div class="key">
+<p>서빙 측정에서는 <strong>평균보다 꼬리(P95 / P99)</strong> 를 먼저 봅니다.
+평균이 좋은데 사용자가 느리다고 말하는 상황은 대부분 꼬리에서 벌어집니다.</p>
+</div>
+<div class="warn">
+<p>6단계 측정에서 조건을 고정해야 하는 것은 2–3단계와 같습니다.
+다만 속도 쪽에는 <strong>정확도 측정에는 없던 오염원</strong>이 있습니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>오염원</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>첫 요청</strong></td>
+<td>모델 로딩·초기화가 섞여 유독 느립니다. 워밍업 뒤부터 재야 합니다</td>
+</tr>
+<tr class="even">
+<td><strong>요청 도착 속도</strong></td>
+<td>같은 서버라도 요청이 몰리면 대기가 생겨 TTFT 가 나빠집니다. 이건 서버가 느려진 게 아닙니다</td>
+</tr>
+<tr class="odd">
+<td><strong>입력 / 출력 길이</strong></td>
+<td>TTFT 와 TPOT 를 각각 움직입니다. 섞어 놓으면 원인을 분리할 수 없습니다</td>
+</tr>
+<tr class="even">
+<td><strong>온도 스로틀링</strong></td>
+<td>오래 돌리면 클럭이 떨어집니다 (1단계 2.8절)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>6단계 체크포인트가 <em>“어느 변수가 TTFT 를 움직이고 어느 변수가 TPOT 를 움직이는지 실측으로 구분”</em> 인 이유가 이것입니다.
+<strong>한 번에 하나만 바꿔야</strong> 구분됩니다.</p>
+</div>
+<hr />
+<h2 id="엔진이-기동할-때-말해주는-것-완전">2.7 엔진이 기동할 때 말해주는 것 <span class="badge full">완전</span></h2>
+<p>원문 4단계는 기동 로그를 <strong>반드시 읽으라</strong>고 합니다.
+이유는 그 로그가 <strong>1단계에서 손으로 계산한 것을 엔진이 다시 계산해 보여주기 때문</strong>입니다.</p>
+<div class="quote" data-label="원문 (4단계)">
+<pre><code>Loading model weights took XX.XX GB
+GPU KV cache size: XXX,XXX tokens          ← 7·8단계의 핵심 숫자
+Maximum concurrency for 8192 tokens per request: XX.XXx</code></pre>
+</div>
+<p>세 줄이 각각 1단계의 어느 계산에 대응하는지 보면 읽는 법이 정해집니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>로그가 말하는 것</th>
+<th>대응하는 1단계 계산</th>
+<th>어긋나면</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>가중치가 차지한 용량</td>
+<td><code>파라미터 수 × 정밀도 바이트</code></td>
+<td>받은 모델의 정밀도가 예상과 다름</td>
+</tr>
+<tr class="even">
+<td><strong>KV cache 에 몇 토큰을 담을 수 있는가</strong></td>
+<td>남은 예산 ÷ 토큰당 KV 바이트</td>
+<td>예산 배분이 예상과 다름</td>
+</tr>
+<tr class="odd">
+<td>이 컨텍스트로 <strong>동시에 몇 요청</strong>이 가능한가</td>
+<td>위 토큰 수 ÷ 컨텍스트 길이</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p>세 번째 줄이 <strong>1단계 KV cache 계산의 답안지</strong>입니다.
+“컨텍스트 8K 로 몇 명까지 동시에 받을 수 있나”를 손으로 계산해 두고 이 줄과 맞춰보면,
+공식을 제대로 쓰고 있는지 바로 확인됩니다.</p>
+</div>
+<h3 id="엔진은-kv-cache-자리를-미리-잡는다">엔진은 KV cache 자리를 미리 잡는다</h3>
+<p>1단계에서 어림셈의 “틀리는 조건”에 이렇게 적어뒀습니다 —
+<em>“실제 점유는 계산값보다 큽니다. 서빙 엔진은 보통 KV 자리를 미리 잡아둡니다.”</em>
+그 동작을 여기서 볼 수 있습니다.</p>
+<p>vLLM 은 기동할 때 <strong>남는 VRAM(Video Random Access Memory)을 KV cache 용으로 통째로 예약</strong>합니다.
+그래서 <code>nvidia-smi</code> 로 보면 요청이 하나도 없어도 VRAM 이 거의 꽉 차 있습니다.</p>
+<div class="warn">
+<p><strong>이건 메모리 누수가 아닙니다.</strong> 미리 잡아둔 자리이고, 그렇게 하는 이유가 있습니다.
+요청마다 메모리를 할당·해제하면 조각이 나서 나중에 큰 자리를 못 잡기 때문입니다.</p>
+<p>그래서 엔진에는 <strong>VRAM 의 몇 %까지 쓸지 정하는 손잡이</strong>가 있습니다.
+그 값을 낮추면 KV cache 자리가 줄고, 높이면 늘어나는 대신 여유가 사라집니다.</p>
+</div>
+<div class="later">
+<p>그 예약 공간을 <strong>블록 단위로 쪼개 관리하는 방식(PagedAttention)</strong> 과, 그것이 왜 조각남 문제를 푸는지는 <strong>7단계</strong>입니다.
+엔진 소스에서 그 관리자가 어떻게 구현돼 있는지는 5단계 원문이 안내하는 코드 탐색의 몫입니다.
+4–6단계에서는 <strong>“엔진이 KV 자리를 미리 잡고, 그 크기가 곧 동시 처리 능력이다”</strong> 까지면 충분합니다.</p>
+</div>
+<hr />
+<h2 id="소스-빌드는-무엇을-위한-것인가-씨앗">2.8 소스 빌드는 무엇을 위한 것인가 <span class="badge seed">씨앗</span></h2>
+<p>5단계는 vLLM 을 <strong>소스로 빌드</strong>하라고 합니다. 설치만 하면 되는데 왜 빌드까지 할까요.</p>
+<p>이유는 <strong>코드에 브레이크포인트를 걸기 위해서</strong>입니다. 패키지로 설치하면 안에서 무슨 일이 벌어지는지
+보기 어렵지만, 소스를 편집 가능한 상태로 두면 prefill 과 decode 가 갈라지는 지점에 멈춰 세울 수 있습니다.</p>
+<p>다만 목적을 오해하면 안 됩니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>5단계의 목적</th>
+<th>5단계의 목적이 아닌 것</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>두 구간의 <strong>시간 감각</strong>을 얻는 것</td>
+<td>엔진 코드를 다 이해하는 것</td>
+</tr>
+<tr class="even">
+<td>스케줄러가 <strong>무엇을 결정하는지</strong> 아는 것</td>
+<td>스케줄링 알고리즘을 재구현하는 것</td>
+</tr>
+<tr class="odd">
+<td>코드에서 <strong>구조를 찾는 습관</strong></td>
+<td>특정 버전의 파일 경로를 외우는 것</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>원문도 경로가 버전마다 바뀐다고 못박고, <code>grep</code> 으로 구조를 찾는 습관을 권합니다.
+<strong>파일 이름이 아니라 “이 엔진에는 스케줄러가 있고 KV cache 관리자가 있다”는 지도</strong>가 남으면 됩니다.</p>
+<div class="note">
+<p>시간이 부족하면 코드를 뜯기 전에 <strong>로그 레벨을 올려 프로파일 출력만 봐도</strong> 5단계의 목적은 달성됩니다.
+prefill 과 decode 의 시간 분해가 로그로 나옵니다. 원문도 이 경로를 함께 제시합니다.</p>
+</div>
+<div class="later">
+<p>엔진 커널을 직접 읽는 것은 <strong>14단계</strong>(<code>llama.cpp</code> 커널), 직접 작성하는 것은 <strong>17단계</strong>(Triton kernel)입니다.
+prefill 과 decode 를 아예 다른 장비로 분리하는 기법(P/D disaggregation)은 <strong>15단계</strong>에서 이름을 만납니다.
+4–6단계에서는 <strong>“엔진 안에 스케줄러와 KV cache 관리자가 있다”</strong> 는 지도까지면 충분합니다.</p>
+</div>
+<hr />
+<h2 id="내-장비-기준-정리">3. 내 장비 기준 정리</h2>
+<h3 id="한-대에서-46단계는-어떻게-되는가">3.1 5090 한 대에서 4–6단계는 어떻게 되는가</h3>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>항목</th>
+<th>판정</th>
+<th>근거</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>vLLM 설치 · 서빙</td>
+<td>✅</td>
+<td>sm_120 지원 버전이 필요 — 1단계 2.6절의 스택 확인이 여기서 쓰임</td>
+</tr>
+<tr class="even">
+<td>8B BF16 원본 서빙</td>
+<td>✅ 여유</td>
+<td>가중치 16GB + KV cache 예약분 (1단계 2.5절)</td>
+</tr>
+<tr class="odd">
+<td>4단계 정확도 재현</td>
+<td>✅</td>
+<td>2–3단계 비교표가 이미 있으므로 대조 가능</td>
+</tr>
+<tr class="even">
+<td>prefill / decode 관찰</td>
+<td>✅</td>
+<td>단일 GPU 로 충분</td>
+</tr>
+<tr class="odd">
+<td>6단계 벤치마크</td>
+<td>✅</td>
+<td>동시 요청은 GPU 대수가 아니라 KV cache 여유가 정함</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note">
+<p>1단계에서 확인한 <strong>FP8(Floating Point 8) 하드웨어 가속(Blackwell)</strong> 이 여기서 처음 실전적 의미를 갖습니다.
+prefill 은 compute-bound 이므로 <strong>낮은 정밀도로 계산할 수 있으면 그 구간이 빨라집니다.</strong>
+다만 엔진과 커널이 그 경로를 지원해야 하고, 지원 여부는 버전에 따라 다릅니다.</p>
+</div>
+<h3 id="원문-전제와의-차이">3.2 원문 전제와의 차이</h3>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>항목</th>
+<th>원문 (3090 24GB × 2)</th>
+<th>내 장비 (5090 32GB × 1)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>연산 성능 (FP16 Tensor)</td>
+<td>약 142 TFLOPS(Tera FLoating point Operations Per Second)/장</td>
+<td><strong>약 419 TFLOPS</strong> → prefill 에 유리</td>
+</tr>
+<tr class="even">
+<td>메모리 대역폭</td>
+<td>약 936 GB/s</td>
+<td><strong>약 1,792 GB/s</strong> → decode 에 유리</td>
+</tr>
+<tr class="odd">
+<td>동시 처리 여유</td>
+<td>두 장 합쳐 48GB</td>
+<td>32GB — <strong>KV cache 여유가 원문보다 적음</strong></td>
+</tr>
+<tr class="even">
+<td>6단계 측정</td>
+<td>두 장에 나눠 띄우거나 병렬화</td>
+<td>한 장 기준으로 단순 — <strong>변수가 적어 오히려 유리</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p>5090 한 대는 <strong>두 병목 모두에서 3090 한 장보다 빠릅니다.</strong>
+불리한 것은 총 VRAM(48GB → 32GB)이고, 그 차이는 <strong>동시에 받을 수 있는 요청 수</strong>로 나타납니다.
+즉 개인 사용 속도는 유리하고, 동시 처리 규모는 불리합니다.</p>
+</div>
+<hr />
+<h2 id="확인-문제">4. 확인 문제</h2>
+<div class="quiz">
+<ol type="1">
+<li><p><strong>“입력 4,000 토큰 / 출력 100 토큰” 과 “입력 100 토큰 / 출력 4,000 토큰” 은 왜 소요 시간의 구성이 완전히 다른가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>두 요청이 시간을 쓰는 구간이 반대이기 때문입니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>입력 4,000 / 출력 100</th>
+<th>입력 100 / 출력 4,000</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>지배하는 구간</td>
+<td><strong>prefill</strong></td>
+<td><strong>decode</strong></td>
+</tr>
+<tr class="even">
+<td>병목</td>
+<td>연산 성능</td>
+<td>메모리 대역폭</td>
+</tr>
+<tr class="odd">
+<td>나빠지는 지표</td>
+<td><strong>TTFT</strong> (첫 토큰이 늦음)</td>
+<td><strong>전체 시간</strong> (TPOT × 4,000)</td>
+</tr>
+<tr class="even">
+<td>체감</td>
+<td>한참 기다리다 금방 끝남</td>
+<td>바로 시작하는데 오래 이어짐</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>두 요청의 전체 시간이 우연히 같더라도 <strong>사용자 경험은 전혀 다릅니다.</strong>
+그래서 속도를 하나의 숫자로 말할 수 없습니다.</p>
+</details></li>
+<li><p><strong>1단계에서 계산한 <code>tok/s</code> 천장(대역폭 ÷ 가중치)은 TTFT 를 예측하는 데 쓸 수 있는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>쓸 수 없습니다. 그 공식은 <strong>decode 구간만</strong> 설명합니다.</p>
+<p>근거는 병목이 다르다는 것입니다. 공식의 분자가 메모리 대역폭인 이유는
+“토큰마다 가중치 전체를 읽는다”는 decode 의 성질에서 나왔습니다.
+prefill 은 읽어온 가중치를 입력 토큰 전체가 나눠 쓰므로 읽기가 병목이 아니고,
+<strong>연산 성능이 TTFT 를 정합니다.</strong></p>
+<p>그 공식으로 예측할 수 있는 것은 <strong>TPOT(= 1 / tok/s)</strong> 쪽입니다.</p>
+</details></li>
+<li><p><strong>decode 가 memory-bound 라는 사실에서, 왜 “양자화하면 빨라진다”와 “배치를 키우면 처리량이 오른다”가 동시에 나오는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>둘 다 <strong>읽기 비용을 줄이는</strong> 방법이기 때문입니다. 방향만 다릅니다.</p>
+<ul>
+<li><strong>양자화</strong> — 읽어야 할 바이트 자체를 줄입니다. 16GB 대신 5GB 를 읽으면 같은 대역폭으로 더 자주 읽을 수 있습니다</li>
+<li><strong>배치</strong> — 읽는 양은 그대로 두고, <strong>한 번 읽은 것으로 더 많은 토큰을 처리</strong>합니다. 읽기 비용을 요청들이 나눠 냅니다</li>
+</ul>
+<p>같은 병목을 양쪽에서 공략하는 것입니다.
+그래서 두 방법의 대가도 다릅니다 — 양자화는 정확도를 내주고, 배치는 개별 사용자의 지연시간을 내줍니다.</p>
+</details></li>
+<li><p><strong>벤치마크 결과가 <code>Mean TTFT 180ms</code>, <code>P99 TTFT 6,200ms</code> 로 나왔습니다. 이 서버는 빠른가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>답할 수 없고, <strong>누구 기준인지를 먼저 물어야</strong> 합니다.</p>
+<p>평균만 보면 훌륭합니다(대화형 목표 200ms 이하). 그런데 <strong>100명 중 1명은 6.2초를 기다립니다.</strong>
+그 사용자에게 이 서버는 평균과 무관하게 느립니다.</p>
+<p>이런 분포는 보통 요청이 몰려 대기가 생겼다는 신호입니다.
+조치를 판단하려면 <strong>기준(SLO, Service Level Objective)을 정하고 Goodput 으로 다시 봐야</strong> 합니다 —
+“TTFT 1초 이내”를 기준으로 잡으면, 그 기준을 넘긴 요청은 처리량에서 빠집니다.</p>
+</details></li>
+<li><p><strong>vLLM 서버를 띄웠더니 요청을 하나도 안 보냈는데 <code>nvidia-smi</code> 에서 VRAM 이 거의 꽉 차 있습니다. 문제인가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>정상입니다. 엔진이 <strong>KV cache 로 쓸 자리를 기동 시점에 미리 예약</strong>하기 때문입니다.</p>
+<p>그렇게 하는 이유는 요청마다 할당·해제를 반복하면 메모리가 조각나서
+나중에 큰 자리를 잡지 못하기 때문입니다.</p>
+<p>확인할 것은 점유량이 아니라 <strong>기동 로그의 “KV cache 에 몇 토큰”</strong> 줄입니다.
+그 값이 1단계 공식으로 계산한 예상과 크게 다르다면, 그때는 예산 배분을 점검할 이유가 있습니다.</p>
+</details></li>
+<li><p><strong>4단계에서 vLLM 으로 잰 MMLU Pro 점수가 3단계 Ollama 결과보다 크게 낮게 나왔습니다. “vLLM 이 부정확하다”고 결론내도 되는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>안 됩니다. <strong>같은 것을 비교하고 있는지</strong>부터 확인해야 합니다.</p>
+<ol type="1">
+<li><strong>같은 가중치인가</strong> — Ollama 의 기본 태그는 대체로 양자화 버전입니다. vLLM 에서 원본을 받았다면 애초에 다른 모델입니다</li>
+<li><strong>양자화 포맷이 같은가</strong> — GGUF 의 <code>Q4_K_M</code> 과 다른 엔진의 4비트는 같은 방식이 아닙니다</li>
+<li><strong>프롬프트 형식이 같은가</strong> — 채팅 템플릿 적용이 다르면 점수가 움직입니다</li>
+<li><strong>문항 세트·샘플링이 같은가</strong> — 2–3단계의 재현성 조건이 그대로 적용됩니다</li>
+</ol>
+<p>엔진 비교가 성립하려면 <strong>가중치·포맷·프롬프트가 모두 같아야</strong> 합니다.
+본격적인 엔진 간 비교는 20단계의 주제입니다.</p>
+</details></li>
+<li><p><strong>원문의 “TPOT 이 30 이상이면 챗봇으로 쓸만하다”를 그대로 읽으면 왜 이상한가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>TPOT 는 <strong>작을수록 좋은</strong> 지표(ms 단위 간격)이므로, “30 이상이면 좋다”는 방향이 반대입니다.</p>
+<p>문맥상 이 문장은 <strong>토큰 생성 속도 30 tok/s 이상</strong>을 뜻합니다. 변환하면 <code>1000 ÷ 30 ≈ 33ms</code> 이므로
+<strong>TPOT 33ms 이하</strong>가 맞는 표현입니다.</p>
+<p>실무 문서에서 <code>tok/s</code> 와 <code>TPOT(ms)</code> 를 섞어 쓰는 일이 흔하므로, 숫자를 볼 때 <strong>단위를 먼저 확인</strong>해야 합니다.</p>
+</details></li>
+<li><p><strong>처리량을 올리려고 동시 요청 수를 계속 키웠습니다. 이때 가장 먼저 한계에 부딪히는 것은 무엇인가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p><strong>KV cache 자리</strong>입니다.</p>
+<p>1단계에서 본 대로 KV cache 는 <code>컨텍스트 길이 × 동시 요청 수</code> 로 <strong>곱해집니다.</strong>
+가중치는 고정이므로, 요청을 늘릴 때 늘어나는 것은 KV cache 쪽입니다.
+엔진이 예약해둔 자리를 다 쓰면 새 요청은 <strong>대기</strong>하게 되고, 그러면 TTFT 의 꼬리가 길어집니다.</p>
+<p>즉 처리량을 올리려던 조치가 <strong>지연시간의 꼬리로 되돌아옵니다.</strong> 이것이 2.5절의 맞바꿈이고,
+실제로 어디서 그 지점이 오는지는 7단계에서 직접 늘려보며 확인합니다.</p>
+</details></li>
+</ol>
+</div>
+<hr />
+<h2 id="다음-단계로">5. 다음 단계로</h2>
+<h3 id="이-문서가-회수한-씨앗">이 문서가 회수한 씨앗</h3>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>어느 문서에서</th>
+<th>무엇을</th>
+<th>이 문서의 어디에서</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1단계</td>
+<td>“토큰마다 가중치 전체를 읽는다”</td>
+<td>2.2절 — decode 구간의 이야기였음이 드러남</td>
+</tr>
+<tr class="even">
+<td>1단계</td>
+<td>compute-bound / memory-bound</td>
+<td>2.3절</td>
+</tr>
+<tr class="odd">
+<td>1단계</td>
+<td>“첫 토큰은 대역폭 공식과 무관”</td>
+<td>2.3절 — TTFT 는 연산 성능이 정함</td>
+</tr>
+<tr class="even">
+<td>1단계</td>
+<td>“엔진은 KV 자리를 미리 잡는다”</td>
+<td>2.7절</td>
+</tr>
+<tr class="odd">
+<td>2–3단계</td>
+<td>성능 축 (TTFT / TPOT / 처리량)</td>
+<td>2.4절</td>
+</tr>
+<tr class="even">
+<td>2–3단계</td>
+<td>Ollama 와 vLLM 의 차이</td>
+<td>2.1절</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="이-문서가-남기는-씨앗">이 문서가 남기는 씨앗</h3>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>씨앗</th>
+<th>여기서 알아둔 것</th>
+<th>이어지는 단계</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>배치와 지연시간의 맞바꿈</td>
+<td>“둘은 반대로 움직인다”</td>
+<td><strong>7단계</strong> — 직접 늘려 확인</td>
+</tr>
+<tr class="even">
+<td>Continuous Batching · PagedAttention</td>
+<td>이름과 푸는 문제</td>
+<td><strong>7단계</strong></td>
+</tr>
+<tr class="odd">
+<td>입력이 길 때 TTFT 가 나빠지는 모양</td>
+<td>“비례보다 빠르게 는다”</td>
+<td><strong>8단계</strong> — 선형과 제곱의 구분</td>
+</tr>
+<tr class="even">
+<td>엔진 소스의 구조</td>
+<td>“스케줄러와 KV cache 관리자가 있다”</td>
+<td><strong>14 · 17단계</strong> — 커널</td>
+</tr>
+<tr class="odd">
+<td>P/D disaggregation</td>
+<td>이름만</td>
+<td><strong>15단계</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="단계로-넘어가기-전에">7단계로 넘어가기 전에</h3>
+<p>7단계는 <strong>배치를 1 → 32 로 늘려가며 직접 터뜨려 보는</strong> 단계입니다.
+이 문서의 내용이 그때 바로 쓰이는 지점은 다음과 같습니다.</p>
+<ul>
+<li><strong>무엇을 측정할지 이미 압니다</strong> — 배치를 키우면 처리량은 오르고 TPOT 는 나빠집니다. 이 예상이 맞는지 보는 것이 7단계입니다</li>
+<li><strong>어디가 먼저 터질지도 압니다</strong> — KV cache 입니다. 1단계 공식으로 터지는 지점을 <strong>미리 계산해두고</strong> 실측과 맞춰보면 좋습니다</li>
+<li><strong>꼬리를 봅니다</strong> — 배치를 키우면 평균보다 P99 가 먼저 나빠집니다</li>
+</ul>
+<div class="key">
+<p>Phase 2 가 끝났을 때 손에 남아야 하는 것은 <strong>“느리다”를 두 갈래로 나누는 습관</strong>입니다.
+첫 토큰이 늦은 것인지, 이어지는 속도가 느린 것인지.
+전자는 prefill 과 입력 길이를, 후자는 decode 와 모델 크기를 봅니다.</p>
+</div>
+<hr />
+<h2 id="용어표">6. 용어표</h2>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>약어 / 용어</th>
+<th>full name</th>
+<th>뜻</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>API</td>
+<td>Application Programming Interface</td>
+<td>프로그램이 다른 프로그램을 호출하는 규약</td>
+</tr>
+<tr class="even">
+<td>compute-bound</td>
+<td>— (용어)</td>
+<td>연산 능력이 병목인 상태. 이 커리큘럼에서는 prefill</td>
+</tr>
+<tr class="odd">
+<td>Continuous Batching</td>
+<td>— (기법 이름)</td>
+<td>끝난 요청 자리에 대기 요청을 바로 넣는 스케줄링. 7단계</td>
+</tr>
+<tr class="even">
+<td>decode</td>
+<td>— (용어)</td>
+<td>토큰을 하나씩 순차 생성하는 구간. memory-bound</td>
+</tr>
+<tr class="odd">
+<td>E2E latency</td>
+<td>End-to-End latency</td>
+<td>요청부터 완료까지의 전체 시간</td>
+</tr>
+<tr class="even">
+<td>FP8</td>
+<td>Floating Point 8</td>
+<td>1바이트 부동소수점. Blackwell(5090)에서 하드웨어 가속</td>
+</tr>
+<tr class="odd">
+<td>GGUF</td>
+<td>GPT-Generated Unified Format</td>
+<td><code>llama.cpp</code> 계열의 모델 파일 포맷</td>
+</tr>
+<tr class="even">
+<td>Goodput</td>
+<td>— (지표 이름)</td>
+<td>정해진 기준(SLO)을 만족한 요청만 센 처리량</td>
+</tr>
+<tr class="odd">
+<td>GPU</td>
+<td>Graphics Processing Unit</td>
+<td>대량 병렬 연산 장치</td>
+</tr>
+<tr class="even">
+<td>KV cache</td>
+<td>Key-Value cache</td>
+<td>이전 토큰의 Key / Value 저장분. 1단계 2.5절</td>
+</tr>
+<tr class="odd">
+<td>LLM</td>
+<td>Large Language Model</td>
+<td>대규모 언어 모델</td>
+</tr>
+<tr class="even">
+<td>memory-bound</td>
+<td>— (용어)</td>
+<td>메모리 대역폭이 병목인 상태. 이 커리큘럼에서는 decode</td>
+</tr>
+<tr class="odd">
+<td>P50 / P95 / P99</td>
+<td>percentile</td>
+<td>하위 50 / 95 / 99% 지점의 값. 꼬리 지연시간을 보는 단위</td>
+</tr>
+<tr class="even">
+<td>PagedAttention</td>
+<td>— (기법 이름)</td>
+<td>KV cache 를 블록 단위로 관리해 조각남을 줄이는 방식. 7단계</td>
+</tr>
+<tr class="odd">
+<td>P/D disaggregation</td>
+<td>Prefill/Decode disaggregation</td>
+<td>두 구간을 다른 장비에 나누는 기법. 15단계</td>
+</tr>
+<tr class="even">
+<td>prefill</td>
+<td>— (용어)</td>
+<td>입력 전체를 한꺼번에 처리하는 구간. compute-bound</td>
+</tr>
+<tr class="odd">
+<td>SLO</td>
+<td>Service Level Objective</td>
+<td>서비스가 지키기로 한 성능 기준</td>
+</tr>
+<tr class="even">
+<td>TFLOPS</td>
+<td>Tera FLoating point Operations Per Second</td>
+<td>연산 성능 단위</td>
+</tr>
+<tr class="odd">
+<td>Throughput</td>
+<td>— (지표 이름)</td>
+<td>서버 전체가 처리한 초당 토큰 수</td>
+</tr>
+<tr class="even">
+<td>tok/s</td>
+<td>tokens per second</td>
+<td>초당 생성 토큰 수. <code>1000 ÷ TPOT(ms)</code></td>
+</tr>
+<tr class="odd">
+<td>TPOT</td>
+<td>Time Per Output Token</td>
+<td>출력 토큰 사이 간격(ms). decode 가 정함</td>
+</tr>
+<tr class="even">
+<td>TTFT</td>
+<td>Time To First Token</td>
+<td>첫 토큰까지의 시간(ms). prefill 이 정함</td>
+</tr>
+<tr class="odd">
+<td>vLLM</td>
+<td>— (프로젝트 이름)</td>
+<td>다중 사용자 서빙에 초점을 둔 추론 엔진. 4단계부터 사용</td>
+</tr>
+<tr class="even">
+<td>VRAM</td>
+<td>Video Random Access Memory</td>
+<td>GPU 전용 메모리. 32GB 고정</td>
+</tr>
+</tbody>
+</table>
+</div>
+  </main>
+
+  <footer class="doc-foot">
+    <p>상위 커리큘럼 — <a href="../README.md">../README.md</a> 4–6단계</p><p>앞 문서 — <a href="02-03-ollama-quant.html">2–3단계</a></p><p>작성 기준 — <a href="GUIDE.md">GUIDE.md</a></p>
+  </footer>
+
+</div>
+
+<script>
+// ------------------------------------------------------------
+// ① 테마 토글: localStorage 에 기억, 없으면 OS 설정을 따릅니다.
+// ------------------------------------------------------------
+(function () {
+  var root = document.documentElement;
+  var KEY = 'study-theme';
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+
+  document.getElementById('theme-toggle').addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme');
+    if (!cur) {
+      cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+})();
+
+// ------------------------------------------------------------
+// ② 제목 앵커(#): 본문 h2/h3 에만 붙입니다.
+//    Lua 필터가 아니라 여기서 붙이는 이유 —
+//    필터로 제목 내용에 <a> 를 넣으면 pandoc 이 그 내용을 목차에도
+//    복사해 <a> 안에 <a> 가 중첩되고, 브라우저가 목차 링크를 끊습니다.
+// ------------------------------------------------------------
+(function () {
+  var main = document.querySelector('main');
+  if (!main) return;
+  main.querySelectorAll('h2[id], h3[id]').forEach(function (h) {
+    var a = document.createElement('a');
+    a.className = 'anchor';
+    a.href = '#' + h.id;
+    a.setAttribute('aria-hidden', 'true');
+    a.setAttribute('tabindex', '-1');
+    a.textContent = '#';
+    h.insertBefore(a, h.firstChild);
+  });
+})();
+
+// ------------------------------------------------------------
+// ③ 사이드바 목차: 모바일 드로어 + 현재 위치 표시(scrollspy)
+// ------------------------------------------------------------
+(function () {
+  var sidebar = document.getElementById('sidebar');
+  var toggle  = document.getElementById('nav-toggle');
+  var backdrop = document.getElementById('nav-backdrop');
+  if (!sidebar || !toggle) { if (toggle) toggle.hidden = true; return; }
+
+  // --- 드로어 열고 닫기 (좁은 화면에서만 의미가 있습니다) ---
+  function setOpen(open) {
+    document.body.classList.toggle('nav-open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.textContent = open ? '✕' : '☰';
+    toggle.setAttribute('title', open ? '목차 닫기' : '목차');
+    if (backdrop) backdrop.hidden = !open;
+  }
+  toggle.addEventListener('click', function () {
+    setOpen(!document.body.classList.contains('nav-open'));
+  });
+  if (backdrop) backdrop.addEventListener('click', function () { setOpen(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setOpen(false);
+  });
+
+  // 사이드바 안의 링크를 누르면 드로어를 닫습니다 (좁은 화면)
+  sidebar.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function () { setOpen(false); });
+  });
+
+  // --- 목차 링크 ↔ 제목 요소 짝짓기 ---
+  //     (사이드바 머리말의 문서 제목 링크는 제외 — 현재 위치 표시 대상이 아닙니다)
+  var links = Array.prototype.slice.call(document.querySelectorAll('#TOC a[href^="#"]'));
+  var items = [];
+  links.forEach(function (a) {
+    var raw = a.getAttribute('href').slice(1);
+    var id = raw;
+    try { id = decodeURIComponent(raw); } catch (e) {}
+    var el = document.getElementById(id) || document.getElementById(raw);
+    if (el) items.push({ link: a, el: el });
+  });
+  if (!items.length) return;
+
+  // --- 현재 읽고 있는 절 표시 ---
+  var current = null;
+  function sync() {
+    var line = 120;                       // 화면 상단에서 이 높이를 지난 마지막 제목이 '현재'
+    var found = items[0];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].el.getBoundingClientRect().top <= line) found = items[i];
+      else break;
+    }
+    // 문서 맨 아래에 닿으면 마지막 항목을 현재로
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) {
+      found = items[items.length - 1];
+    }
+    if (found === current) return;
+    if (current) current.link.classList.remove('active');
+    found.link.classList.add('active');
+    current = found;
+
+    // 활성 항목이 사이드바 밖으로 밀려나면 보이는 위치로
+    var r = found.link.getBoundingClientRect();
+    var s = sidebar.getBoundingClientRect();
+    if (r.top < s.top + 8 || r.bottom > s.bottom - 8) {
+      sidebar.scrollTop += r.top - s.top - sidebar.clientHeight / 3;
+    }
+  }
+
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () { ticking = false; sync(); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  sync();
+})();
+</script>
+
+</body>
+</html>

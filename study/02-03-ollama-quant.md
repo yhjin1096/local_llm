@@ -858,6 +858,8 @@ Phase 1 이 끝났을 때 손에 남아야 하는 것은 두 가지입니다.
 모델을 돌려본 경험이 아니라 이 둘이 산출물입니다.
 :::
 
+4–6단계 개념 이해서는 [`04-06-vllm-serving.md`](04-06-vllm-serving.html) 에 있습니다.
+
 실행 환경과 명령은 [`../ollama/README.md`](../ollama/README.md), 모델별 VRAM 계산 근거는
 [`../ollama/MODELS.md`](../ollama/MODELS.md) 에 있습니다.
 

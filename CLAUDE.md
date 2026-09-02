@@ -31,8 +31,8 @@ RTX 5090 32GB 한 대로 **원문 커리큘럼 21단계를 순서대로 완주**
 |---|---|---|
 | `01-hardware.md` | 1 | ✅ 완료 |
 | `02-03-ollama-quant.md` | 2–3 | ✅ 완료 |
-| `04-06-vllm-serving.md` | 4–6 | 다음 차례 |
-| `07-kv-cache.md` | 7 | |
+| `04-06-vllm-serving.md` | 4–6 | ✅ 완료 |
+| `07-kv-cache.md` | 7 | 다음 차례 — **공식은 1단계가 이미 다룸**. 배치 실험 · Continuous Batching · PagedAttention 중심 |
 | `08-09-context-parallel.md` | 8–9 | |
 | `10-lora.md` | 10 | |
 | `16-layer-quant.md` | 16 | |

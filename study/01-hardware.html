@@ -582,7 +582,8 @@ svg .s-t5 { fill: var(--fg-faint); }
 <li><a href="#vram-예산-32gb를-무엇이-나눠-쓰는가-완전" id="toc-vram-예산-32gb를-무엇이-나눠-쓰는가-완전">2.5 VRAM 예산 — 32GB를 무엇이 나눠 쓰는가 <span class="badge full">완전</span></a>
 <ul>
 <li><a href="#예산의-네-항목" id="toc-예산의-네-항목">예산의 네 항목</a></li>
-<li><a href="#kv-cache-예산의-진짜-변수-씨앗" id="toc-kv-cache-예산의-진짜-변수-씨앗">② KV cache — 예산의 진짜 변수 <span class="badge seed">씨앗</span></a></li>
+<li><a href="#kv-cache-예산의-진짜-변수-완전" id="toc-kv-cache-예산의-진짜-변수-완전">② KV cache — 예산의 진짜 변수 <span class="badge full">완전</span></a></li>
+<li><a href="#kv-cache-크기는-조절할-수-있는가-완전" id="toc-kv-cache-크기는-조절할-수-있는가-완전">KV cache 크기는 조절할 수 있는가 <span class="badge full">완전</span></a></li>
 <li><a href="#내-32gb-대입-무엇이-되는가" id="toc-내-32gb-대입-무엇이-되는가">내 32GB 대입 — 무엇이 되는가</a></li>
 </ul></li>
 <li><a href="#아키텍처-세대와-소프트웨어-스택-완전" id="toc-아키텍처-세대와-소프트웨어-스택-완전">2.6 아키텍처 세대와 소프트웨어 스택 <span class="badge full">완전</span></a>
@@ -668,7 +669,7 @@ svg .s-t5 { fill: var(--fg-faint); }
 </div>
 <h3 id="이-문서를-읽고-나면-답할-수-있는-질문">이 문서를 읽고 나면 답할 수 있는 질문</h3>
 <ol type="1">
-<li>내 32GB로 어떤 크기의 모델이 되고, 어떤 것이 안 되는가?</li>
+<li>내 32GB로 어떤 크기의 모델이 되고, 어떤 것이 안 되는가? <strong>가중치 말고 무엇을 더 세야</strong> 그 답이 맞는가?</li>
 <li>내 GPU가 낼 수 있는 <strong>토큰 생성 속도의 이론적 천장</strong>은 얼마인가?</li>
 <li>연산 성능(TFLOPS)이 훨씬 높은 GPU가 왜 그만큼 빠르지 않은가?</li>
 <li>커리큘럼 21단계 중 내 장비로 <strong>못 하는 것</strong>은 무엇이고, 대안은 있는가?</li>
@@ -1252,7 +1253,7 @@ GPU를 고를 때 VRAM 용량이 그토록 중요한 이유가 이것입니다. 
 <p><strong>④ CUDA 컨텍스트</strong> — 아무 모델도 올리지 않아도 사라지는 공간입니다.
 CUDA 런타임이 GPU와 통신하기 위해 잡아두는 자리로, 0.5~1GB 정도입니다.
 <strong>32GB 카드의 실사용 예산을 약 30GB로 봐야 하는 이유</strong>입니다.</p>
-<h3 id="kv-cache-예산의-진짜-변수-씨앗">② KV cache — 예산의 진짜 변수 <span class="badge seed">씨앗</span></h3>
+<h3 id="kv-cache-예산의-진짜-변수-완전">② KV cache — 예산의 진짜 변수 <span class="badge full">완전</span></h3>
 <p>가중치는 크지만 <strong>고정</strong>입니다. 그런데 VRAM을 먹는 항목 중 하나는 고정이 아니라 <strong>상황에 따라 늘어납니다.</strong>
 KV cache(Key-Value cache)입니다.</p>
 <p>왜 필요한지는 비유로 잡을 수 있습니다.</p>
@@ -1270,13 +1271,252 @@ KV cache(Key-Value cache)입니다.</p>
 KV cache  ∝ 컨텍스트 길이 × 동시 요청 수            ← 곱셈으로 늘어남</code></pre>
 <p><strong>곱셈</strong>이라는 점이 함정입니다. 방심하면 KV cache가 가중치보다 커집니다.
 32GB에 16GB짜리 모델을 올렸으니 16GB가 남는다고 계산하면, 실제로는 훨씬 일찍 터집니다.</p>
+<h4 id="정확히-무엇이-저장되는가">정확히 무엇이 저장되는가</h4>
+<p>비유를 사실로 바꿔야 계산을 할 수 있습니다. 저장되는 것의 개수를 세어보면 됩니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>곱해지는 항</th>
+<th>왜 곱해지는가</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>2</strong></td>
+<td>토큰마다 Key 한 벌, Value 한 벌을 저장합니다</td>
+</tr>
+<tr class="even">
+<td><strong>레이어 수</strong></td>
+<td>레이어마다 자기 Key / Value 를 따로 갖습니다. 공유하지 않습니다</td>
+</tr>
+<tr class="odd">
+<td><strong>KV 헤드 수 × head_dim</strong></td>
+<td>attention 은 여러 갈래(head)로 나뉘어 계산되고, 갈래마다 벡터를 하나씩 갖습니다. 이 둘을 곱한 값이 벡터 한 벌의 길이입니다</td>
+</tr>
+<tr class="even">
+<td><strong>정밀도 바이트</strong></td>
+<td>그 숫자를 몇 바이트로 저장하는가 (2.2절과 같은 이야기)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>여기까지가 <strong>토큰 하나</strong>의 비용입니다. 여기에 토큰 개수(컨텍스트)와 요청 개수를 곱하면 총량이 됩니다.</p>
+<div class="calc">
+<p><strong>KV cache 어림셈</strong></p>
+<pre><code>토큰 1개당 바이트 ≈ 2 × 레이어 수 × KV 헤드 수 × head_dim × 정밀도 바이트
+                     ↑ Key와 Value
+
+총 KV cache      ≈ 토큰당 바이트 × 컨텍스트 길이 × 동시 요청 수</code></pre>
+<p>내 장비에서 돌릴 주력 모델(Qwen3-8B — 레이어 36, KV 헤드 8, head_dim 128, FP16 저장)에 대입:</p>
+<pre><code>토큰 1개당 = 2 × 36 × 8 × 128 × 2 바이트 = 147,456 바이트 ≈ 144 KB
+
+컨텍스트  8K, 요청 1개  →  144 KB × 8,192   ≈  1.2 GB
+컨텍스트 32K, 요청 1개  →  144 KB × 32,768  ≈  4.5 GB</code></pre>
+<p>레이어 수·KV 헤드 수·head_dim 은 모델마다 다르고, 모델 배포처의 <code>config.json</code> 에 적혀 있습니다.
+외울 값이 아니라 <strong>찾아서 넣는 값</strong>입니다.</p>
+<p><strong>이 어림셈이 틀리는 경우</strong></p>
+<ul>
+<li><strong>표준 transformer 가 아닌 모델</strong> — 선형 attention 을 섞은 하이브리드 구조는 일부 레이어만 이 공식을 따르고, 나머지는 컨텍스트가 길어져도 크기가 늘지 않습니다. 공식을 그대로 쓰면 크게 과대평가합니다</li>
+<li><strong>KV 를 압축해 저장하는 구조</strong>(MLA(Multi-head Latent Attention) 계열 등)는 항이 다릅니다</li>
+<li><strong>실제 점유는 이 값보다 큽니다.</strong> 서빙 엔진은 보통 KV 자리를 블록 단위로 <strong>미리 잡아둡니다.</strong> 계산값은 하한에 가깝습니다 (→ 7단계)</li>
+<li>위 예는 <strong>요청 1개 기준</strong>입니다. 동시 요청이 늘면 그만큼 곱해집니다</li>
+</ul>
+</div>
+<h4 id="gqa-공식에서-가장-크게-줄일-수-있었던-자리">GQA — 공식에서 가장 크게 줄일 수 있었던 자리</h4>
+<p>위 공식에 <code>KV 헤드 수</code> 가 따로 있는 게 이상해 보일 수 있습니다.
+attention 의 갈래 수와 같은 값이면 그냥 “헤드 수”라고 썼을 텐데, 굳이 나눠 쓴 이유가 있습니다.</p>
+<p>Qwen3-8B 는 attention 갈래가 <strong>32개</strong>인데 <strong>KV 헤드는 8개</strong>입니다.
+갈래 4개가 Key / Value 한 벌을 <strong>공유</strong>합니다. 이 방식이 GQA(Grouped Query Attention)입니다.</p>
+<pre><code>KV 헤드가 32개였다면  →  2 × 36 × 32 × 128 × 2 = 576 KB / 토큰   (4배)
+실제 (KV 헤드 8개)    →                          144 KB / 토큰</code></pre>
+<div class="key">
+<p>최신 모델이 대부분 GQA 를 쓰는 이유는 <strong>품질이 아니라 서빙 경제성</strong>입니다.
+같은 파라미터 수라도 이 값이 다르면 <strong>KV cache 요구량이 몇 배씩 차이 납니다.</strong>
+그래서 “몇 B 모델인가”만으로는 VRAM 예산을 세울 수 없습니다.</p>
+</div>
+<h4 id="예산에-다시-대입하면">예산에 다시 대입하면</h4>
+<p>2.2절에서 8B BF16 을 16GB 로 계산했습니다. 이제 나머지를 채울 수 있습니다.</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th>항목</th>
+<th>8B BF16, 컨텍스트 32K, 요청 1개</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>① 가중치</td>
+<td>16.0 GB</td>
+</tr>
+<tr class="even">
+<td>② KV cache</td>
+<td>4.5 GB</td>
+</tr>
+<tr class="odd">
+<td>③ 작업 버퍼</td>
+<td>약 1 GB</td>
+</tr>
+<tr class="even">
+<td>④ CUDA 컨텍스트</td>
+<td>약 1 GB</td>
+</tr>
+<tr class="odd">
+<td><strong>합계</strong></td>
+<td><strong>약 22.5 GB</strong> — 32GB 안에서 여유 있음</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>가중치만 셌다면 16GB 였을 것이 실제로는 22.5GB 입니다. <strong>이 차이가 KV cache 를 세야 하는 이유</strong>입니다.</p>
+<div class="warn">
+<p>위 표는 <strong>요청 1개</strong> 기준입니다. 동시 요청이 늘면 ②가 그 수만큼 곱해집니다.
+어디까지 늘리면 터지는지, 그리고 그 한계를 뒤로 밀어내는 기법들은 <strong>7단계에서 직접 늘려보며</strong> 확인합니다.
+1단계에서 필요한 것은 <strong>“예산에 KV cache 자리를 반드시 남겨야 한다”</strong> 는 계산 습관입니다.</p>
+</div>
+<p>그리고 이 비례식은 나쁜 소식만은 아닙니다. <strong>곱해지는 항목이 곧 내가 조절할 수 있는 손잡이</strong>이기 때문입니다.
+바로 다음 절에서 이어집니다.</p>
+<h3 id="kv-cache-크기는-조절할-수-있는가-완전">KV cache 크기는 조절할 수 있는가 <span class="badge full">완전</span></h3>
+<p>앞의 비례식을 뒤집어 읽으면 이렇게 됩니다. <strong>KV cache 는 정해진 크기가 아니라 내가 정하는 크기입니다.</strong>
+가중치는 모델을 고르는 순간 정해지지만, KV cache 는 그렇지 않습니다.</p>
+<p>손잡이는 세 개이고, 성질이 서로 다릅니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>손잡이</th>
+<th>무엇을 정하는가</th>
+<th>누가 정하는가</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>컨텍스트 길이</strong></td>
+<td>한 요청이 토큰을 <strong>몇 개</strong>까지 담는가</td>
+<td>내가 설정</td>
+</tr>
+<tr class="even">
+<td><strong>동시 요청 수</strong></td>
+<td>그런 요청을 <strong>몇 개</strong>나 동시에 처리하는가</td>
+<td>내가 설정 (또는 들어오는 부하)</td>
+</tr>
+<tr class="odd">
+<td><strong>KV 저장 정밀도</strong></td>
+<td>토큰 하나를 <strong>몇 바이트</strong>로 저장하는가</td>
+<td>내가 설정</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>앞의 둘은 <strong>“얼마나 많이 담을까”</strong> 이고, 셋째는 <strong>“한 칸을 몇 바이트로 담을까”</strong> 입니다.
+2.2절에서 가중치를 두고 했던 이야기와 정확히 같은 구조입니다.</p>
+<div class="note">
+<p>손잡이가 <strong>아닌</strong> 것도 있습니다. 앞에서 본 <strong>레이어 수 · KV 헤드 수 · head_dim</strong> 입니다.
+이건 모델을 고르는 순간 정해지고 나중에 바꿀 수 없습니다.
+GQA 를 쓰는 모델을 고르는 것은 “조절”이 아니라 <strong>선택</strong>입니다.</p>
+</div>
+<h4 id="컨텍스트-길이와-sequence-length는-같은-말인가">컨텍스트 길이와 sequence length는 같은 말인가</h4>
+<p>거의 같은 말로 씁니다. <strong>sequence(시퀀스)는 토큰의 나열</strong>이고, sequence length 는 그 길이,
+즉 토큰 개수입니다. context length(컨텍스트 길이)도 같은 것을 가리킵니다.</p>
+<p>다만 실제로 헷갈리는 지점이 두 군데 있고, 둘 다 VRAM 예산을 틀리게 만듭니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>오해</th>
+<th>실제</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>“내가 넣은 프롬프트의 길이”</td>
+<td><strong>입력 + 지금까지 생성한 출력</strong>의 합계입니다. 대화가 이어지면 계속 길어집니다</td>
+</tr>
+<tr class="even">
+<td>“지금 쓰고 있는 길이”</td>
+<td>설정에서 말하는 값은 보통 <strong>최대치(max sequence length)</strong> 입니다. 지금 쓰는 양이 아니라 <strong>상한 선언</strong>입니다</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>두 번째가 특히 중요합니다. 예산을 세울 때 기준이 되는 것은 <strong>“내가 지금 얼마나 쓰는가”가 아니라
+“최대 얼마까지 쓸 수 있다고 선언했는가”</strong> 쪽입니다.</p>
 <div class="later">
-<p>정확한 KV cache 공식, 실제 크기 계산, 그리고 그것을 줄이는 기법(GQA, PagedAttention 등)은 <strong>7단계</strong>에서 다룹니다.
-컨텍스트 길이를 늘리면 어떻게 되는지는 <strong>8단계</strong>입니다.
-1단계에서는 <strong>“VRAM 예산을 세울 때 가중치만 세면 틀린다”</strong> 까지면 충분합니다.</p>
+<p>선언한 최대치를 늘리면 실제로 어떤 일이 벌어지는지, 그리고 <strong>“선언된 컨텍스트 ≠ 모델이 실제로 잘 기억하는 컨텍스트”</strong> 라는
+더 까다로운 문제는 <strong>8단계</strong>에서 직접 늘려보며 확인합니다.
+1단계에서는 <strong>“컨텍스트 길이는 입력과 출력을 합친 토큰 수이고, 설정값은 상한이다”</strong> 까지면 충분합니다.</p>
+</div>
+<h4 id="kv-cache도-양자화할-수-있는가">KV cache도 양자화할 수 있는가</h4>
+<p>할 수 있습니다. 2.2절에서 가중치에 한 일을 <strong>KV cache 에 그대로 적용</strong>하는 것이고, 원리도 같습니다.
+값을 더 적은 비트의 눈금에 맞춰 저장합니다.</p>
+<p>여기서 짚어야 할 것이 하나 있습니다. <strong>가중치 양자화와 KV cache 양자화는 별개의 설정입니다.</strong></p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th>조합</th>
+<th>가능한가</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>가중치 4비트 + KV cache 16비트</td>
+<td>✅ 흔한 기본 조합</td>
+</tr>
+<tr class="even">
+<td>가중치 16비트 + KV cache 8비트</td>
+<td>✅ 가능</td>
+</tr>
+<tr class="odd">
+<td>둘 다 낮추기</td>
+<td>✅ 가능</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>즉 “모델을 양자화했으니 KV cache 도 줄었겠지”는 <strong>틀린 추론</strong>입니다. 둘은 따로 놉니다.</p>
+<p>효과는 앞의 공식에서 바로 읽힙니다. 마지막 항인 <strong>정밀도 바이트</strong>를 2에서 1로 바꾸는 것이므로,
+<strong>KV cache 가 그대로 절반</strong>이 됩니다.</p>
+<pre><code>FP16 저장  →  2 × 36 × 8 × 128 × 2 바이트 ≈ 144 KB / 토큰
+FP8  저장  →  2 × 36 × 8 × 128 × 1 바이트 ≈  72 KB / 토큰</code></pre>
+<p>대가도 가중치 때와 같은 모양입니다. 값이 눈금에 맞춰지면서 <strong>정보가 뭉개집니다.</strong></p>
+<div class="note">
+<p>내 장비가 유리한 지점입니다. 5090(Blackwell)은 3090(Ampere)에 없는 <strong>FP8 하드웨어 지원</strong>이 있습니다.
+다만 KV cache 를 FP8 로 저장하는 것은 일차적으로 <strong>저장 공간을 아끼는 선택</strong>이고,
+하드웨어 가속이 어디까지 이득으로 이어지는지는 엔진과 커널이 그 포맷을 어떻게 다루느냐에 달려 있습니다.</p>
+</div>
+<div class="later">
+<p>KV cache 를 낮추면 답이 실제로 얼마나 나빠지는지, 그 손익 판단은 <strong>16단계</strong>에서 다룹니다.
+1단계에서는 <strong>“KV cache 도 양자화 대상이고, 가중치 양자화와는 별개 설정이다”</strong> 까지면 충분합니다.</p>
+</div>
+<div class="key">
+<p>KV cache 는 <strong>주어지는 값이 아니라 설계 변수</strong>입니다.
+컨텍스트 길이 · 동시 요청 수 · 저장 정밀도 세 손잡이로 조절하며,
+그래서 “이 모델이 32GB에 들어가는가”라는 질문은 <strong>“어떤 조건으로 서빙할 때”</strong> 를 함께 말해야 답이 됩니다.</p>
+</div>
+<div class="later">
+<p>손잡이를 실제로 돌려보는 것은 뒤 단계입니다.
+<strong>동시 요청 수</strong>를 늘려가며 어디서 터지는지, 그리고 그 한계를 미루는 기법(Continuous Batching, PagedAttention)은 <strong>7단계</strong>.
+<strong>컨텍스트 길이</strong>를 늘릴 때 메모리와 연산이 서로 다른 속도로 늘어나는 문제는 <strong>8단계</strong>입니다.
+1단계에서는 <strong>공식으로 예산을 세울 수 있는 것</strong>까지면 충분합니다. 한계를 직접 보는 건 그다음입니다.</p>
 </div>
 <h3 id="내-32gb-대입-무엇이-되는가">내 32GB 대입 — 무엇이 되는가</h3>
-<p>실사용 예산을 <strong>약 30GB</strong>(CUDA 컨텍스트와 작업 버퍼 제외)로 잡고, KV cache 자리를 <strong>최소 4GB 이상</strong> 남기는 기준으로 판정합니다.</p>
+<p>실사용 예산을 <strong>약 30GB</strong>(CUDA 컨텍스트와 작업 버퍼 제외)로 잡고,
+KV cache 자리를 <strong>최소 4GB 이상</strong>(앞의 공식 기준으로 8B 급 모델의 32K 컨텍스트 · 단일 요청에 해당) 남기는 기준으로 판정합니다.</p>
 <div class="table-scroll">
 <table>
 <colgroup>
@@ -1904,7 +2144,7 @@ GPU 상태를 볼 때 가장 먼저 쓰는 것이고, <strong>각 칸의 의미�
 <tr class="odd">
 <td>8B BF16 원본 서빙</td>
 <td>✅ 여유</td>
-<td>가중치 16GB + KV cache 약 14GB (2.5절)</td>
+<td>가중치 16GB + KV cache 4.5GB(32K·요청1) + 버퍼 2GB ≈ 22.5GB (2.5절)</td>
 </tr>
 <tr class="even">
 <td>8B 양자화 전 계열 비교</td>
@@ -2049,6 +2289,36 @@ CUDA 컨텍스트 + 작업 버퍼 ≈ 2 GB
 <p>기술적으로 로딩은 될 수 있지만 KV cache 자리가 거의 없어 짧은 컨텍스트·단일 요청밖에 안 됩니다.
 FP8(14 GB)이나 Q4_K_M(약 9 GB)으로 내려야 실용적입니다.</p>
 </details></li>
+<li><p><strong>레이어 36, KV 헤드 8, head_dim 128 인 8B 모델을 FP16 KV cache 로 컨텍스트 16K, 동시 요청 4개로 서빙합니다. KV cache 는 얼마인가?</strong> 그리고 이 모델을 BF16 으로 올렸을 때 32GB 안에 들어가는가?</p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<pre><code>토큰 1개당 = 2 × 36 × 8 × 128 × 2 바이트 = 147,456 B ≈ 144 KB
+KV cache   = 144 KB × 16,384 × 4 요청    ≈ 9.4 GB</code></pre>
+<p>예산을 합치면:</p>
+<pre><code>가중치 (8B BF16)        16.0 GB
+KV cache                 9.4 GB
+작업 버퍼 + CUDA 컨텍스트 약 2 GB
+─────────────────────────────────
+합계                   약 27.4 GB   →  32GB 안에 들어감 (여유 약 4.6GB)</code></pre>
+<p>들어갑니다. 다만 <strong>여유가 크지 않습니다.</strong> 요청을 8개로 늘리면 KV cache 만 약 18.8GB 가 되어
+합계가 약 36.8GB 로 예산을 넘깁니다. <strong>가중치는 그대로인데 요청 수만으로 터진다</strong>는 점이
+KV cache 를 따로 세야 하는 이유입니다.</p>
+</details></li>
+<li><p><strong>KV cache 를 FP8 로 저장하면 무엇이 얼마나 달라지는가?</strong> 그리고 이것은 모델 가중치를 양자화하는 것과 같은 설정인가?</p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>공식의 마지막 항인 <strong>정밀도 바이트</strong>가 2에서 1로 바뀝니다. 따라서 <strong>KV cache 가 정확히 절반</strong>이 됩니다.
+위 문제의 조건이라면 9.4GB → 약 4.7GB 입니다.</p>
+<p><strong>같은 설정이 아닙니다.</strong> 가중치 양자화와 KV cache 양자화는 <strong>별개로 지정합니다.</strong>
+가중치는 4비트인데 KV cache 는 16비트인 조합이 흔하고, 그 반대도 가능합니다.
+“모델을 양자화했으니 KV cache 도 줄었겠지”는 틀린 추론입니다.</p>
+<p>대가는 가중치 때와 같습니다. 값이 눈금에 맞춰지며 정보가 뭉개집니다.
+그 손실이 실제로 얼마나 답을 나쁘게 하는지는 16단계에서 다룹니다.</p>
+</details></li>
 <li><p><strong>8B 모델을 Q4_K_M으로 돌릴 때 토큰 생성 속도의 이론적 천장은?</strong> 그리고 이 값을 실측 기대치로 써도 되는가?</p>
 <details>
 <summary>
@@ -2117,22 +2387,24 @@ Toolkit 버전은 <code>nvcc --version</code> 으로 따로 확인해야 합니�
 부하 테스트 중 갑자기 재부팅되면 대부분 이 원인입니다.
 추가로 PSU는 정격의 50~80% 부하에서 효율이 가장 좋습니다.</p>
 </details></li>
-<li><p><strong>커리큘럼 21단계 중 내 장비로 실습할 수 없는 단계는 무엇이고, 그 이유와 대안은?</strong></p>
+<li><p><strong>커리큘럼 21단계 중 내 장비로 실습할 수 없는 단계는 무엇이고, 그 이유와 대안은?</strong></p></li>
+</ol>
 <details>
 <summary>
-<p>답</p>
+답
 </summary>
 <p><strong>9단계(Parallelism — Tensor Parallel vs Pipeline Parallel)</strong> 입니다.
 두 방식 모두 <strong>GPU가 두 대 이상</strong>이어야 성립합니다. GPU가 한 대이므로 우회할 수 없습니다.</p>
 <p>대안은 Runpod, vast.ai 같은 시간당 GPU 대여 서비스로 몇 시간만 빌려 TP/PP를 비교 측정하는 것입니다.
 내 5090 측정값을 기준선으로 갖고 있으면 그 비교가 그대로 학습이 됩니다.</p>
 <p>나머지 20단계는 모두 실습 가능하고, 특히 3·16단계는 FP8/FP4 가속이 있어 원문 전제보다 유리합니다.</p>
-</details></li>
-</ol>
+</details>
 </div>
 <hr />
 <h2 id="다음-단계로">5. 다음 단계로</h2>
-<p>이 문서에서 <code>[씨앗]</code>으로 남긴 개념들이 어디서 이어지는지 정리합니다.</p>
+<p>이 문서에서 <code>[씨앗]</code>으로 남긴 개념들이 어디서 이어지는지 정리합니다.
+<strong>KV cache 자체는 이 문서에서 <code>[완전]</code>으로 다뤘습니다</strong> (2.5절 — 공식과 예산 계산).
+아래 표에 남은 것은 그중 <strong>직접 측정해봐야 하는 부분</strong>입니다.</p>
 <div class="table-scroll">
 <table>
 <colgroup>
@@ -2174,16 +2446,31 @@ Toolkit 버전은 <code>nvcc --version</code> 으로 따로 확인해야 합니�
 <td><strong>5단계</strong></td>
 </tr>
 <tr class="even">
-<td><strong>KV cache</strong></td>
-<td><strong>“가중치만 세면 예산이 틀린다”</strong></td>
-<td><strong>7단계</strong> 계산 · <strong>8단계</strong> 컨텍스트</td>
+<td>동시 요청을 늘렸을 때의 한계</td>
+<td>“곱셈으로 늘어난다” (계산은 할 수 있음)</td>
+<td><strong>7단계</strong> — 직접 늘려 터뜨려 보기</td>
 </tr>
 <tr class="odd">
+<td>KV 절감 기법</td>
+<td>이름만 — Continuous Batching, PagedAttention</td>
+<td><strong>7단계</strong></td>
+</tr>
+<tr class="even">
+<td>컨텍스트를 늘렸을 때</td>
+<td>“설정값은 상한이다”</td>
+<td><strong>8단계</strong> — 메모리와 연산이 다르게 늘어남</td>
+</tr>
+<tr class="odd">
+<td>KV cache 양자화의 손익</td>
+<td>“절반이 되고, 대신 뭉개진다”</td>
+<td><strong>16단계</strong> — 얼마나 나빠지는가</td>
+</tr>
+<tr class="even">
 <td>멀티 GPU</td>
 <td>“용량을 더하고 통신 비용을 낸다”</td>
 <td><strong>9단계</strong> (실습은 클라우드)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>대안 스택</td>
 <td>“CUDA 밖은 대부분 막힌다”</td>
 <td><strong>21단계</strong></td>
@@ -2234,59 +2521,69 @@ Toolkit 버전은 <code>nvcc --version</code> 으로 따로 확인해야 합니�
 <td>중앙처리장치. 소수의 강한 코어</td>
 </tr>
 <tr class="even">
+<td>context length</td>
+<td>— (용어)</td>
+<td>한 시퀀스의 토큰 수. <strong>입력 + 출력</strong> 합계이며, 설정값은 보통 상한</td>
+</tr>
+<tr class="odd">
 <td>cuBLAS</td>
 <td>CUDA Basic Linear Algebra Subprograms</td>
 <td>CUDA용 선형대수 라이브러리</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>CUDA</td>
 <td>Compute Unified Device Architecture</td>
 <td>NVIDIA GPU용 프로그래밍 플랫폼 및 생태계</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>cuDNN</td>
 <td>CUDA Deep Neural Network library</td>
 <td>CUDA용 딥러닝 연산 라이브러리</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>FLOPS</td>
 <td>FLoating point Operations Per Second</td>
 <td>초당 부동소수점 연산 횟수. 연산 성능 단위</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>FP4 / FP8 / FP16 / FP32</td>
 <td>Floating Point 4 / 8 / 16 / 32</td>
 <td>각각 0.5 / 1 / 2 / 4바이트 부동소수점</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>GDDR7</td>
 <td>Graphics Double Data Rate 7</td>
 <td>5090이 쓰는 VRAM 규격</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>GPU</td>
 <td>Graphics Processing Unit</td>
 <td>수천 개의 약한 코어로 대량 병렬 연산</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>GQA</td>
 <td>Grouped Query Attention</td>
-<td>KV cache를 줄이는 구조. 7단계</td>
+<td>여러 attention 갈래가 Key/Value 한 벌을 공유해 KV cache를 줄이는 구조</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>INT4 / INT8</td>
 <td>4-bit / 8-bit Integer</td>
 <td>정수 표현. 값 = 정수 × 배율</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>JPEG</td>
 <td>Joint Photographic Experts Group</td>
 <td>이미지 압축 표준. 2.2절 양자화 비유에 등장</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>KV cache</td>
 <td>Key-Value cache</td>
-<td>이전 토큰의 중간 계산 결과 저장분. 컨텍스트 × 동시 요청에 비례</td>
+<td>이전 토큰의 Key / Value 저장분. 컨텍스트 × 동시 요청 × 정밀도에 비례</td>
+</tr>
+<tr class="even">
+<td>head_dim</td>
+<td>head dimension</td>
+<td>attention 갈래 하나가 다루는 벡터 길이. KV cache 공식의 한 항</td>
 </tr>
 <tr class="odd">
 <td>LLM</td>
@@ -2299,49 +2596,59 @@ Toolkit 버전은 <code>nvcc --version</code> 으로 따로 확인해야 합니�
 <td>Apple Silicon용 머신러닝 프레임워크</td>
 </tr>
 <tr class="odd">
+<td>MLA</td>
+<td>Multi-head Latent Attention</td>
+<td>KV를 압축해 저장하는 구조. KV cache 공식이 달라짐</td>
+</tr>
+<tr class="even">
 <td>MoE</td>
 <td>Mixture of Experts</td>
 <td>일부 파라미터만 활성화하는 구조. 18단계</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>NCCL</td>
 <td>NVIDIA Collective Communications Library</td>
 <td>GPU 간 통신 라이브러리. 9단계에서 쓰임</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>NVLink</td>
 <td>— (NVIDIA 제품명)</td>
 <td>GPU 간 전용 고속 링크. 3090에 있고 4090·5090에 없음</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>PCIe</td>
 <td>Peripheral Component Interconnect Express</td>
 <td>CPU와 GPU를 잇는 표준 버스</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>PP</td>
 <td>Pipeline Parallel</td>
 <td>레이어를 묶어 GPU에 나누는 병렬화. 9단계</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>PSU</td>
 <td>Power Supply Unit</td>
 <td>전원 공급 장치</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>RAM</td>
 <td>Random Access Memory</td>
 <td>주기억장치</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>ROCm</td>
 <td>Radeon Open Compute platform</td>
 <td>AMD의 GPU 컴퓨팅 플랫폼</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>SM</td>
 <td>Streaming Multiprocessor</td>
 <td>NVIDIA GPU의 연산 단위 블록</td>
+</tr>
+<tr class="odd">
+<td>sequence length</td>
+<td>— (용어)</td>
+<td>시퀀스(토큰 나열)의 길이. context length와 같은 뜻으로 씀</td>
 </tr>
 <tr class="even">
 <td>sm_XX</td>

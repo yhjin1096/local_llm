@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2–3단계 — 측정 도구를 쥐고, 양자화의 대가를 잰다</title>
+
+<style>
+
+
+:root {
+--bg: #ffffff;
+--bg-soft: #f6f7f9;
+--bg-code: #f4f5f7;
+--fg: #1f2328;
+--fg-soft: #57606a;
+--fg-faint: #8b949e;
+--border: #d8dee4;
+--border-soft: #eaeef2;
+--link: #0550ae;
+--accent-note: #0969da; 
+--accent-key: #8250df; 
+--accent-calc: #1a7f37; 
+--accent-warn: #bc4c00; 
+--accent-later: #6e7781; 
+--accent-quote: #656d76; 
+--accent-quiz: #bf3989; 
+--font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+"Noto Sans KR", "Malgun Gothic", "맑은 고딕", sans-serif;
+--font-mono: "JetBrains Mono", "D2Coding", "Cascadia Mono", "Consolas",
+"DejaVu Sans Mono", monospace;
+--maxw: 52rem;
+--sidebar-w: 19rem;
+--sidebar-break: 1100px; 
+}
+@media (prefers-color-scheme: dark) {
+:root {
+--bg: #0d1117;
+--bg-soft: #161b22;
+--bg-code: #161b22;
+--fg: #e6edf3;
+--fg-soft: #9198a1;
+--fg-faint: #6e7681;
+--border: #30363d;
+--border-soft: #21262d;
+--link: #4493f8;
+--accent-note: #4493f8;
+--accent-key: #ab7df8;
+--accent-calc: #3fb950;
+--accent-warn: #d29922;
+--accent-later: #8b949e;
+--accent-quote: #8b949e;
+--accent-quiz: #db61a2;
+}
+}
+
+:root[data-theme="light"] {
+--bg: #ffffff; --bg-soft: #f6f7f9; --bg-code: #f4f5f7;
+--fg: #1f2328; --fg-soft: #57606a; --fg-faint: #8b949e;
+--border: #d8dee4; --border-soft: #eaeef2; --link: #0550ae;
+--accent-note: #0969da; --accent-key: #8250df; --accent-calc: #1a7f37;
+--accent-warn: #bc4c00; --accent-later: #6e7781; --accent-quote: #656d76;
+--accent-quiz: #bf3989;
+}
+:root[data-theme="dark"] {
+--bg: #0d1117; --bg-soft: #161b22; --bg-code: #161b22;
+--fg: #e6edf3; --fg-soft: #9198a1; --fg-faint: #6e7681;
+--border: #30363d; --border-soft: #21262d; --link: #4493f8;
+--accent-note: #4493f8; --accent-key: #ab7df8; --accent-calc: #3fb950;
+--accent-warn: #d29922; --accent-later: #8b949e; --accent-quote: #8b949e;
+--accent-quiz: #db61a2;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+body {
+margin: 0;
+background: var(--bg);
+color: var(--fg);
+font-family: var(--font-sans);
+font-size: 16.5px;
+line-height: 1.85;
+word-break: keep-all; 
+overflow-wrap: break-word;
+-webkit-text-size-adjust: 100%;
+}
+.wrap {
+max-width: var(--maxw);
+margin: 0 auto;
+padding: 3rem 1.25rem 6rem;
+}
+
+.doc-head {
+border-bottom: 1px solid var(--border);
+padding-bottom: 1.5rem;
+margin-bottom: 2rem;
+}
+.doc-head .eyebrow {
+font-size: 0.8rem;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--accent-note);
+margin: 0 0 0.5rem;
+}
+.doc-head h1 {
+margin: 0 0 0.6rem;
+font-size: 2.1rem;
+line-height: 1.35;
+letter-spacing: -0.02em;
+border: 0;
+padding: 0;
+}
+.doc-head .subtitle {
+margin: 0;
+color: var(--fg-soft);
+font-size: 1rem;
+}
+.doc-head .meta {
+margin: 1rem 0 0;
+font-size: 0.82rem;
+color: var(--fg-faint);
+display: flex;
+flex-wrap: wrap;
+gap: 0.4rem 1.1rem;
+}
+
+h1, h2, h3, h4 {
+line-height: 1.4;
+letter-spacing: -0.01em;
+scroll-margin-top: 1.5rem;
+}
+h2 {
+margin: 3.5rem 0 1.2rem;
+font-size: 1.55rem;
+padding-bottom: 0.45rem;
+border-bottom: 1px solid var(--border);
+}
+h3 { margin: 2.5rem 0 0.9rem; font-size: 1.22rem; }
+h4 { margin: 1.9rem 0 0.7rem; font-size: 1.03rem; color: var(--fg-soft); }
+
+.anchor {
+float: left;
+margin-left: -1.1em;
+padding-right: 0.35em;
+color: var(--fg-faint);
+text-decoration: none;
+opacity: 0;
+font-weight: 400;
+}
+h2:hover .anchor, h3:hover .anchor { opacity: 1; }
+p { margin: 0 0 1.15rem; }
+a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+strong { font-weight: 700; }
+hr {
+border: 0;
+border-top: 1px solid var(--border);
+margin: 3rem 0;
+}
+
+
+#sidebar {
+position: fixed;
+top: 0;
+left: 0;
+bottom: 0;
+width: var(--sidebar-w);
+z-index: 60;
+box-sizing: border-box;
+padding: 1.6rem 0.6rem 3rem 1.1rem;
+background: var(--bg-soft);
+border-right: 1px solid var(--border);
+overflow-y: auto;
+overscroll-behavior: contain;
+font-size: 0.86rem;
+line-height: 1.5;
+}
+.sidebar-head {
+padding: 0 0.55rem 0.9rem;
+margin-bottom: 0.9rem;
+border-bottom: 1px solid var(--border-soft);
+}
+.sidebar-head .side-eyebrow {
+margin: 0 0 0.25rem;
+font-size: 0.68rem;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--accent-note);
+}
+.sidebar-head .side-title {
+display: block;
+color: var(--fg);
+font-weight: 700;
+font-size: 0.95rem;
+line-height: 1.4;
+text-decoration: none;
+}
+.sidebar-head .side-title:hover { color: var(--link); }
+#TOC::before {
+content: "목차";
+display: block;
+padding-left: 0.55rem;
+font-weight: 700;
+font-size: 0.7rem;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--fg-faint);
+margin-bottom: 0.5rem;
+}
+#TOC ul { list-style: none; margin: 0; padding-left: 0; }
+#TOC ul ul { padding-left: 0.7rem; margin: 0.1rem 0 0.4rem; }
+#TOC li { margin: 0; }
+#TOC a {
+display: block;
+padding: 0.26rem 0.55rem;
+border-left: 2px solid transparent;
+border-radius: 0 6px 6px 0;
+color: var(--fg-soft);
+text-decoration: none;
+}
+#TOC a:hover { background: var(--bg); color: var(--link); }
+#TOC > ul > li > a { color: var(--fg); font-weight: 600; margin-top: 0.35rem; }
+
+#TOC a.active {
+color: var(--link);
+background: var(--bg);
+border-left-color: var(--link);
+font-weight: 700;
+}
+#TOC .badge { font-size: 0.6rem; border: 0; padding: 0; margin-left: 0.25em; opacity: 0.85; }
+
+#nav-backdrop {
+position: fixed;
+inset: 0;
+z-index: 55;
+background: rgba(0, 0, 0, 0.45);
+}
+
+#nav-toggle {
+position: fixed;
+top: 0.9rem;
+left: 0.9rem;
+z-index: 70;
+width: 2.3rem;
+height: 2.3rem;
+border-radius: 50%;
+border: 1px solid var(--border);
+background: var(--bg-soft);
+color: var(--fg-soft);
+font-size: 1rem;
+line-height: 1;
+cursor: pointer;
+}
+#nav-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
+
+ul, ol { margin: 0 0 1.15rem; padding-left: 1.5rem; }
+li { margin: 0.3rem 0; }
+li > ul, li > ol { margin: 0.3rem 0; }
+
+code {
+font-family: var(--font-mono);
+font-size: 0.875em;
+background: var(--bg-code);
+border: 1px solid var(--border-soft);
+border-radius: 5px;
+padding: 0.12em 0.38em;
+word-break: break-all;
+}
+pre {
+background: var(--bg-code);
+border: 1px solid var(--border-soft);
+border-radius: 9px;
+padding: 1rem 1.15rem;
+overflow-x: auto; 
+margin: 0 0 1.4rem;
+line-height: 1.62;
+font-size: 0.855rem;
+}
+pre code {
+background: none;
+border: 0;
+padding: 0;
+font-size: inherit;
+word-break: normal;
+white-space: pre;
+}
+
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table {
+border-collapse: collapse;
+width: 100%;
+font-size: 0.92rem;
+line-height: 1.65;
+}
+th, td {
+border: 1px solid var(--border);
+padding: 0.52rem 0.8rem;
+text-align: left;
+vertical-align: top;
+}
+th { background: var(--bg-soft); font-weight: 700; white-space: nowrap; }
+tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--bg-soft) 45%, transparent); }
+caption { caption-side: bottom; padding-top: 0.6rem; font-size: 0.82rem; color: var(--fg-faint); text-align: left; }
+
+blockquote {
+margin: 0 0 1.4rem;
+padding: 0.15rem 0 0.15rem 1.1rem;
+border-left: 3px solid var(--border);
+color: var(--fg-soft);
+}
+blockquote > :last-child { margin-bottom: 0; }
+
+.note, .key, .calc, .warn, .later, .quote, .quiz {
+--c: var(--fg-soft);
+position: relative;
+margin: 1.8rem 0;
+padding: 1.1rem 1.25rem 1.15rem;
+border: 1px solid var(--border);
+border-left: 3px solid var(--c);
+border-radius: 0 9px 9px 0;
+background: color-mix(in srgb, var(--c) 5%, var(--bg));
+font-size: 0.965rem;
+}
+.note::before, .key::before, .calc::before, .warn::before,
+.later::before, .quote::before, .quiz::before {
+display: block;
+font-size: 0.72rem;
+font-weight: 800;
+letter-spacing: 0.09em;
+color: var(--c);
+margin-bottom: 0.55rem;
+}
+.note { --c: var(--accent-note); }
+.key { --c: var(--accent-key); }
+.calc { --c: var(--accent-calc); }
+.warn { --c: var(--accent-warn); }
+.later { --c: var(--accent-later); }
+.quote { --c: var(--accent-quote); }
+.quiz { --c: var(--accent-quiz); }
+.note::before { content: "개념 보충"; }
+.key::before { content: "핵심"; }
+.calc::before { content: "어림셈"; }
+.warn::before { content: "주의"; }
+.later::before { content: "여기까지 — 이후는 뒤 단계"; }
+.quote::before { content: "원문 인용"; }
+.quiz::before { content: "확인 문제"; }
+
+.note[data-label]::before, .key[data-label]::before, .calc[data-label]::before,
+.warn[data-label]::before, .later[data-label]::before,
+.quote[data-label]::before, .quiz[data-label]::before { content: attr(data-label); }
+.note > :last-child, .key > :last-child, .calc > :last-child,
+.warn > :last-child, .later > :last-child,
+.quote > :last-child, .quiz > :last-child { margin-bottom: 0; }
+.quote { font-style: normal; }
+.quote p { color: var(--fg-soft); }
+
+.note pre, .key pre, .calc pre, .warn pre, .later pre, .quiz pre {
+background: var(--bg);
+}
+
+.quiz ol { padding-left: 1.35rem; }
+.quiz li { margin: 0.75rem 0; }
+details {
+margin: 0.5rem 0 0;
+border: 1px dashed var(--border);
+border-radius: 7px;
+padding: 0 0.9rem;
+background: var(--bg);
+}
+details[open] { padding-bottom: 0.6rem; }
+summary {
+cursor: pointer;
+padding: 0.55rem 0;
+font-size: 0.86rem;
+font-weight: 700;
+color: var(--fg-soft);
+list-style: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before { content: "▸ "; color: var(--fg-faint); }
+details[open] summary::before { content: "▾ "; }
+/* pandoc 이 <summary> 안의 텍스트를 <p> 로 감쌉니다 → 인라인으로 되돌립니다 */
+summary > p { display: inline; margin: 0; }
+details > :not(summary) { font-size: 0.94rem; }
+details > :last-child { margin-bottom: 0; }
+
+/* ---------- 그림 / SVG ---------- */
+figure {
+  margin: 2rem 0;
+  padding: 0;
+}
+figure > .svg-scroll { overflow-x: auto; }
+figure svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.84rem;
+  color: var(--fg-faint);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* SVG 안에서 쓸 테마 연동 클래스
+   — SVG 에 색을 하드코딩하지 말고 이 클래스만 쓰세요 (GUIDE.md 8절) */
+svg text      { font-family: var(--font-sans); }
+svg .mono     { font-family: var(--font-mono); }
+
+/* 텍스트 */
+svg .s-fg     { fill: var(--fg); }
+svg .s-soft   { fill: var(--fg-soft); }
+svg .s-faint  { fill: var(--fg-faint); }
+
+/* 선 */
+svg .s-line   { stroke: var(--border); fill: none; }
+svg .s-strong { stroke: var(--fg-faint); fill: none; }
+svg .s-dash   { stroke: var(--border); fill: none; stroke-dasharray: 4 3; }
+svg .s-arrow  { fill: var(--fg-faint); stroke: none; }
+
+/* 상자 */
+svg .s-box    { fill: var(--bg-soft); stroke: var(--border); }
+svg .s-plain  { fill: none; stroke: var(--border); }
+svg .s-accent { fill: var(--accent-note); }
+
+/* 색 채움 — 옅은 배경 + 진한 테두리. 위에 s-fg 텍스트를 얹어도 두 테마에서 읽힙니다 */
+svg .s-f1 { fill: var(--accent-note);  fill-opacity: 0.16; stroke: var(--accent-note); }
+svg .s-f2 { fill: var(--accent-key);   fill-opacity: 0.16; stroke: var(--accent-key); }
+svg .s-f3 { fill: var(--accent-calc);  fill-opacity: 0.16; stroke: var(--accent-calc); }
+svg .s-f4 { fill: var(--accent-warn);  fill-opacity: 0.16; stroke: var(--accent-warn); }
+svg .s-f5 { fill: var(--fg-faint);     fill-opacity: 0.14; stroke: var(--fg-faint); }
+
+/* 색 텍스트 — 위 채움과 짝 */
+svg .s-t1 { fill: var(--accent-note); }
+svg .s-t2 { fill: var(--accent-key); }
+svg .s-t3 { fill: var(--accent-calc); }
+svg .s-t4 { fill: var(--accent-warn); }
+svg .s-t5 { fill: var(--fg-faint); }
+
+/* ---------- 배지 (깊이 표시 [완전]/[씨앗]) ---------- */
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.1em 0.5em;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  vertical-align: 0.12em;
+  margin-left: 0.3em;
+}
+.badge.full  { color: var(--accent-key); }
+.badge.seed  { color: var(--accent-later); }
+
+/* ---------- 테마 토글 버튼 ---------- */
+#theme-toggle {
+  position: fixed;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 50;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--fg-soft);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+#theme-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
+
+/* ---------- 꼬리말 ---------- */
+.doc-foot {
+  margin-top: 5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.84rem;
+  color: var(--fg-faint);
+}
+
+/* ---------- 반응형 ---------- */
+
+/* 넓은 화면 — 사이드바가 자리를 차지하고 본문은 남은 폭 가운데에 놓입니다 */
+@media (min-width: 1100px) {
+  body { padding-left: var(--sidebar-w); }
+  #nav-toggle, #nav-backdrop { display: none; }
+}
+
+/* 좁은 화면 — 사이드바를 왼쪽 바깥으로 밀어두고 ☰ 로 꺼냅니다 */
+@media (max-width: 1099.98px) {
+  #sidebar {
+    width: min(19rem, 84vw);
+    transform: translateX(-102%);
+    transition: transform 0.22s ease, visibility 0.22s;
+    box-shadow: 0 0 2rem rgba(0, 0, 0, 0.25);
+  }
+  body.nav-open #sidebar { transform: none; }
+  /* ☰ 버튼이 사이드바 머리말을 가리지 않도록 위를 비웁니다 */
+  #sidebar { padding-top: 4rem; }
+  body:not(.nav-open) #sidebar { visibility: hidden; }
+  body.nav-open { overflow: hidden; }
+  .wrap { padding-top: 4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sidebar { transition: none; }
+}
+
+@media (max-width: 640px) {
+  body { font-size: 16px; line-height: 1.8; }
+  .wrap { padding: 4rem 1rem 4rem; }
+  .doc-head h1 { font-size: 1.65rem; }
+  h2 { font-size: 1.35rem; margin-top: 2.8rem; }
+  h3 { font-size: 1.12rem; }
+  .anchor { display: none; }
+}
+
+/* ---------- 인쇄 ---------- */
+@media print {
+  :root { --bg: #fff; --fg: #000; }
+  #theme-toggle, #nav-toggle, #sidebar, #nav-backdrop { display: none !important; }
+  body { padding-left: 0; }
+  .wrap { max-width: none; padding: 0; }
+  pre, table, figure, .note, .key, .calc, .warn, .later, .quiz { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<button id="nav-toggle" type="button" aria-label="목차 열기/닫기" aria-expanded="false" aria-controls="sidebar" title="목차">☰</button>
+<button id="theme-toggle" type="button" aria-label="라이트/다크 테마 전환" title="테마 전환">◐</button>
+
+<div id="nav-backdrop" hidden></div>
+
+<aside id="sidebar">
+  <div class="sidebar-head">
+    <p class="side-eyebrow">PHASE 1 · 첫 접촉</p>
+    <a class="side-title" href="#top">2–3단계 — 측정 도구를 쥐고, 양자화의 대가를 잰다</a>
+  </div>
+  <nav id="TOC" role="doc-toc" aria-label="목차">
+<ul>
+<li><a href="#이-단계는-무엇인가" id="toc-이-단계는-무엇인가">1. 이 단계는 무엇인가</a>
+<ul>
+<li><a href="#원문의-요지" id="toc-원문의-요지">원문의 요지</a></li>
+<li><a href="#내-상황에서의-재해석" id="toc-내-상황에서의-재해석">내 상황에서의 재해석</a></li>
+<li><a href="#이-문서를-읽고-나면-답할-수-있는-질문" id="toc-이-문서를-읽고-나면-답할-수-있는-질문">이 문서를 읽고 나면 답할 수 있는 질문</a></li>
+</ul></li>
+<li><a href="#개념" id="toc-개념">2. 개념</a></li>
+<li><a href="#왜-측정-도구부터-쥐는가-완전" id="toc-왜-측정-도구부터-쥐는가-완전">2.1 왜 측정 도구부터 쥐는가 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#평가는-한-번-짜두면-계속-쓰는-도구다" id="toc-평가는-한-번-짜두면-계속-쓰는-도구다">평가는 한 번 짜두면 계속 쓰는 도구다</a></li>
+</ul></li>
+<li><a href="#ollama-출발점이자-나중에-버릴-도구-완전" id="toc-ollama-출발점이자-나중에-버릴-도구-완전">2.2 Ollama — 출발점이자, 나중에 버릴 도구 <span class="badge full">완전</span></a></li>
+<li><a href="#무엇을-재는가-축이-두-개다-완전" id="toc-무엇을-재는가-축이-두-개다-완전">2.3 무엇을 재는가 — 축이 두 개다 <span class="badge full">완전</span></a></li>
+<li><a href="#두-벤치마크-mmlu-pro-와-humaneval-완전" id="toc-두-벤치마크-mmlu-pro-와-humaneval-완전">2.4 두 벤치마크 — MMLU Pro 와 HumanEval <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#mmlu-pro-골라-맞히기" id="toc-mmlu-pro-골라-맞히기">MMLU Pro — 골라 맞히기</a></li>
+<li><a href="#humaneval-만들어서-통과하기" id="toc-humaneval-만들어서-통과하기">HumanEval — 만들어서 통과하기</a></li>
+<li><a href="#왜-둘-다-재는가" id="toc-왜-둘-다-재는가">왜 둘 다 재는가</a></li>
+</ul></li>
+<li><a href="#같은-자로-잰다-재현성이-곧-실력이다-완전" id="toc-같은-자로-잰다-재현성이-곧-실력이다-완전">2.5 같은 자로 잰다 — 재현성이 곧 실력이다 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#고정해야-하는-것들" id="toc-고정해야-하는-것들">고정해야 하는 것들</a></li>
+<li><a href="#절대-점수를-좇지-않는다" id="toc-절대-점수를-좇지-않는다">절대 점수를 좇지 않는다</a></li>
+</ul></li>
+<li><a href="#표본이-작으면-차이는-착시다-완전" id="toc-표본이-작으면-차이는-착시다-완전">2.6 표본이 작으면 차이는 착시다 <span class="badge full">완전</span></a></li>
+<li><a href="#양자화는-숫자에-무슨-짓을-하는가-완전" id="toc-양자화는-숫자에-무슨-짓을-하는가-완전">2.7 양자화는 숫자에 무슨 짓을 하는가 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#값을-격자에-붙인다" id="toc-값을-격자에-붙인다">값을 격자에 붙인다</a></li>
+<li><a href="#눈금의-간격은-어떻게-정하는가-블록과-배율" id="toc-눈금의-간격은-어떻게-정하는가-블록과-배율">눈금의 간격은 어떻게 정하는가 — 블록과 배율</a></li>
+<li><a href="#왜-이것이-모델을-멍청하게-만드는가" id="toc-왜-이것이-모델을-멍청하게-만드는가">왜 이것이 모델을 멍청하게 만드는가</a></li>
+</ul></li>
+<li><a href="#포맷-이름-읽는-법-완전" id="toc-포맷-이름-읽는-법-완전">2.8 포맷 이름 읽는 법 <span class="badge full">완전</span></a></li>
+<li><a href="#손상은-모델마다-다르게-나타난다-완전" id="toc-손상은-모델마다-다르게-나타난다-완전">2.9 손상은 모델마다 다르게 나타난다 <span class="badge full">완전</span></a></li>
+<li><a href="#정확도만-바뀌는-게-아니다-완전" id="toc-정확도만-바뀌는-게-아니다-완전">2.10 정확도만 바뀌는 게 아니다 <span class="badge full">완전</span></a></li>
+<li><a href="#측정을-조용히-오염시키는-것들-완전" id="toc-측정을-조용히-오염시키는-것들-완전">2.11 측정을 조용히 오염시키는 것들 <span class="badge full">완전</span></a></li>
+<li><a href="#내-장비-기준-정리" id="toc-내-장비-기준-정리">3. 내 장비 기준 정리</a>
+<ul>
+<li><a href="#gb-한-장으로-이-실험이-성립하는가" id="toc-gb-한-장으로-이-실험이-성립하는가">3.1 32GB 한 장으로 이 실험이 성립하는가</a></li>
+<li><a href="#원문-전제와의-차이" id="toc-원문-전제와의-차이">3.2 원문 전제와의 차이</a></li>
+</ul></li>
+<li><a href="#확인-문제" id="toc-확인-문제">4. 확인 문제</a></li>
+<li><a href="#다음-단계로" id="toc-다음-단계로">5. 다음 단계로</a>
+<ul>
+<li><a href="#단계로-넘어가기-전에" id="toc-단계로-넘어가기-전에">4단계로 넘어가기 전에</a></li>
+</ul></li>
+<li><a href="#용어표" id="toc-용어표">6. 용어표</a></li>
+</ul>
+  </nav>
+</aside>
+
+<div class="wrap">
+
+  <header class="doc-head" id="top">
+    <p class="eyebrow">PHASE 1 · 첫 접촉</p>
+    <h1>2–3단계 — 측정 도구를 쥐고, 양자화의 대가를 잰다</h1>
+    <p class="subtitle">왜 벤치마크부터 배우는가, 그리고 정확도는 어디서 새는가</p>
+        <div class="meta">
+      <span>대상 장비 — RTX 5090 32GB × 1 (Blackwell, sm_120)</span><span>깊이 규칙 — GUIDE.md 옵션 B</span><span>최종 수정 — 2026-09-02</span>
+    </div>
+      </header>
+
+  <main>
+<h2 id="이-단계는-무엇인가">1. 이 단계는 무엇인가</h2>
+<h3 id="원문의-요지">원문의 요지</h3>
+<div class="quote" data-label="원문 (2단계) — Ollama를 설치해서 간단한 모델을 돌려봅니다">
+<ul>
+<li>8B, 14B 등 작은 모델 위주로 돌려봅니다.</li>
+<li>그리고, <strong>MMLU Pro, HumanEval 등 모델의 정확도를 판단하는 evaluation을 하는 방법</strong>을 익힙니다.</li>
+<li>GPT / Opus 에게 물어보면 스크립트를 짜줄 겁니다.</li>
+</ul>
+</div>
+<div class="quote" data-label="원문 (3단계) — 여러 양자화 모델의 정확도를 비교해봅니다">
+<ul>
+<li>같은 모델이지만, <strong>모델 가중치의 소수점 길이를 바꿔서</strong> 성능을 조절할 수 있습니다.</li>
+<li>풀 모델(BF16)에 비해, 양자화된 모델(Q4_K_M, Q8_0, NVFP4) 등은 용량도 훨씬 작고, 정확도도 떨어집니다.</li>
+<li>풀 모델 vs 양자화 모델의 정확도를 MMLU Pro, HumanEval을 통해서 비교합니다.</li>
+<li><strong>“양자화할수록 모델 정확도가 처참하게 떨어지는 걸 체감합니다.”</strong></li>
+</ul>
+</div>
+<p>두 단계는 하나의 동작입니다. <strong>2단계에서 자를 만들고, 3단계에서 그 자로 잽니다.</strong>
+그래서 이 문서도 둘을 묶어서 다룹니다.</p>
+<h3 id="내-상황에서의-재해석">내 상황에서의 재해석</h3>
+<p>1단계에서 얻은 것은 <strong>계산 능력</strong>이었습니다. “이 모델이 GPU(Graphics Processing Unit)의
+VRAM(Video Random Access Memory) 32GB 에 들어가는가, 얼마나 빠를 수 있는가”를
+돌려보기 전에 어림셈할 수 있게 됐습니다.</p>
+<p>2–3단계에서 얻을 것은 <strong>측정 능력</strong>입니다. 그리고 이 둘은 짝입니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>단계</th>
+<th>얻는 것</th>
+<th>없으면 벌어지는 일</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1단계</td>
+<td>계산 능력 (예측)</td>
+<td>일단 돌려보고 터지면 줄이는 방식이 됨</td>
+</tr>
+<tr class="even">
+<td><strong>2–3단계</strong></td>
+<td><strong>측정 능력 (검증)</strong></td>
+<td>예측이 맞았는지 알 수 없고, 모든 판단이 “느낌”이 됨</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>여기서 한 가지를 분명히 해둡니다. <strong>이 단계의 진짜 산출물은 점수가 아니라 비교표입니다.</strong>
+<code>qwen3:8b</code> 가 벤치마크에서 몇 점인지는 이 커리큘럼에서 별로 중요하지 않습니다. 중요한 것은
+<strong>같은 모델의 fp16 과 q4_K_M 이 같은 자로 쟀을 때 얼마나 벌어지는가</strong> 입니다.
+이 표가 4단계(엔진을 바꿔도 정확도가 재현되는가), 16단계(레이어별 양자화로 그 손실을 되찾을 수 있는가),
+20단계(다른 엔진은 같은 양자화에서 같은 점수를 내는가)의 기준선이 됩니다.</p>
+<div class="key">
+<p>2–3단계의 산출물은 <strong>재현 가능한 비교표</strong> 하나입니다.
+점수의 절대값이 아니라, <strong>같은 조건에서 잰 차이</strong>가 이후 단계에서 계속 쓰입니다.</p>
+</div>
+<h3 id="이-문서를-읽고-나면-답할-수-있는-질문">이 문서를 읽고 나면 답할 수 있는 질문</h3>
+<ol type="1">
+<li>왜 모델을 최적화하기 <strong>전에</strong> 벤치마크부터 배우는가?</li>
+<li>MMLU Pro 와 HumanEval 은 각각 무엇을 재고, 왜 둘 다 필요한가?</li>
+<li>두 모델의 점수 차이가 <strong>몇 %p 부터</strong> 의미가 있는가?</li>
+<li>양자화는 숫자에 정확히 무슨 짓을 하고, 정확도 말고 <strong>무엇을 함께 바꾸는가?</strong> 왜 같은 4비트끼리도 품질이 다른가?</li>
+<li>측정을 조용히 오염시키는 것들은 무엇인가?</li>
+</ol>
+<p>4절 확인 문제가 이 다섯 가지를 다시 묻습니다.</p>
+<hr />
+<h2 id="개념">2. 개념</h2>
+<h2 id="왜-측정-도구부터-쥐는가-완전">2.1 왜 측정 도구부터 쥐는가 <span class="badge full">완전</span></h2>
+<p>원문 2단계는 “Ollama를 설치해서 모델을 돌려본다”인데, 정작 내용의 절반이 <strong>벤치마크</strong>입니다.
+순서가 이상해 보입니다. 아직 최적화할 것도 없는데 왜 재는 법부터 배울까요.</p>
+<blockquote>
+<p>저울 없이 다이어트를 시작하면, 두 달 뒤에 “살이 빠진 것 같기도 하고 아닌 것 같기도 한” 상태가 됩니다.
+저울은 살을 빼주지 않지만, <strong>뺐는지 아닌지를 판단할 수 있게</strong> 해줍니다.</p>
+</blockquote>
+<p>실제로 이 커리큘럼의 3단계 이후는 거의 전부 <strong>“바꿨더니 어떻게 되는가”</strong> 형태입니다.
+양자화를 바꾸고(3단계), 엔진을 바꾸고(4단계), 배치를 바꾸고(7단계), 컨텍스트를 바꾸고(8단계),
+레이어별 양자화를 적용합니다(16단계). 측정 도구가 없으면 이 모든 실습의 결론이
+<strong>“체감상 괜찮은 것 같다”</strong> 로 끝납니다.</p>
+<div class="key">
+<p>측정 도구는 성능을 올려주지 않습니다. <strong>올랐는지 내렸는지를 말할 수 있게</strong> 해줍니다.
+이후 18개 단계가 전부 “바꾸고 비교하기”이므로, 이 도구가 없으면 나머지가 성립하지 않습니다.</p>
+</div>
+<h3 id="평가는-한-번-짜두면-계속-쓰는-도구다">평가는 한 번 짜두면 계속 쓰는 도구다</h3>
+<p>평가 스크립트가 하는 일은 생각보다 단순한 반복문입니다.</p>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 210" role="img" aria-label="평가 루프의 다섯 단계: 문항 세트에서 문제를 꺼내 프롬프트로 조립하고, 모델을 호출하고, 응답에서 답을 파싱하고, 정답과 대조해 채점한다. 프롬프트 조립, 모델 호출, 응답 파싱 세 곳이 흔들리면 점수가 흔들린다.">
+  <defs>
+    <marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path class="s-arrow" d="M0 0 L10 5 L0 10 z" />
+    </marker>
+  </defs>
+  <rect class="s-f5" x="8" y="46" width="116" height="56" rx="7" />
+  <text class="s-fg" x="66" y="70" text-anchor="middle" font-size="12.5">① 문항 세트</text>
+  <text class="s-faint" x="66" y="88" text-anchor="middle" font-size="10.5">문제 + 정답</text>
+  <path class="s-strong" d="M126 74 H150" marker-end="url(#ar1)" />
+  <rect class="s-f1" x="154" y="46" width="116" height="56" rx="7" />
+  <text class="s-fg" x="212" y="70" text-anchor="middle" font-size="12.5">② 프롬프트 조립</text>
+  <text class="s-faint" x="212" y="88" text-anchor="middle" font-size="10.5">형식·예시·지시문</text>
+  <path class="s-strong" d="M272 74 H296" marker-end="url(#ar1)" />
+  <rect class="s-f1" x="300" y="46" width="116" height="56" rx="7" />
+  <text class="s-fg" x="358" y="70" text-anchor="middle" font-size="12.5">③ 모델 호출</text>
+  <text class="s-faint" x="358" y="88" text-anchor="middle" font-size="10.5">HTTP API</text>
+  <path class="s-strong" d="M418 74 H442" marker-end="url(#ar1)" />
+  <rect class="s-f1" x="446" y="46" width="116" height="56" rx="7" />
+  <text class="s-fg" x="504" y="70" text-anchor="middle" font-size="12.5">④ 응답 파싱</text>
+  <text class="s-faint" x="504" y="88" text-anchor="middle" font-size="10.5">답만 뽑아내기</text>
+  <path class="s-strong" d="M564 74 H588" marker-end="url(#ar1)" />
+  <rect class="s-f3" x="592" y="46" width="116" height="56" rx="7" />
+  <text class="s-fg" x="650" y="70" text-anchor="middle" font-size="12.5">⑤ 채점</text>
+  <text class="s-faint" x="650" y="88" text-anchor="middle" font-size="10.5">정답과 대조</text>
+  <path class="s-dash" d="M212 106 V140" />
+  <path class="s-dash" d="M358 106 V140" />
+  <path class="s-dash" d="M504 106 V140" />
+  <rect class="s-f4" x="154" y="140" width="408" height="44" rx="7" />
+  <text class="s-t4" x="358" y="160" text-anchor="middle" font-size="12.5">이 셋이 바뀌면 같은 모델도 점수가 달라집니다</text>
+  <text class="s-faint" x="358" y="176" text-anchor="middle" font-size="10.5">그래서 비교 실험에서는 셋을 고정합니다 (2.5절)</text>
+</svg>
+</div>
+<figcaption>평가 루프의 구조. 모델은 ③ 한 칸일 뿐이고, 점수를 흔드는 것은 주로 그 양옆입니다</figcaption>
+</figure>
+<p>모델은 여기서 HTTP(HyperText Transfer Protocol) 위의 API(Application Programming Interface)로 호출되는
+하나의 부품일 뿐입니다. 이 다섯 칸 중 <strong>모델이 차지하는 건 ③ 한 칸뿐</strong>입니다. 나머지 네 칸은 내가 정하는 것이고,
+그래서 <strong>내가 바꾸면 점수도 바뀝니다.</strong> 2.5절이 이 문제를 다룹니다.</p>
+<div class="note">
+<p>평가 하네스(harness)는 기성품이 있습니다. <code>lm-evaluation-harness</code>(MMLU Pro 등)와
+<code>evalplus</code>(HumanEval 계열)가 대표적이고, 실행 환경에 이미 준비돼 있습니다.</p>
+<p>그럼에도 원문이 “직접 짜보라”고 권하는 이유는 위 그림 때문입니다.
+②·④를 한 번 손으로 만들어보면, 나중에 점수가 이상할 때 <strong>어디를 의심해야 하는지</strong> 알게 됩니다.</p>
+</div>
+<hr />
+<h2 id="ollama-출발점이자-나중에-버릴-도구-완전">2.2 Ollama — 출발점이자, 나중에 버릴 도구 <span class="badge full">완전</span></h2>
+<p>Ollama는 <code>llama.cpp</code> 라는 추론 엔진 위에 씌운 <strong>사용성 래퍼</strong>입니다.
+모델 다운로드·메모리 배치·API 서버를 한 덩어리로 묶어 명령 한 줄로 만들어 줍니다.</p>
+<p>장점은 명확합니다. <strong>1분 안에 모델이 돈다.</strong> 1단계에서 계산만 하던 것을 처음으로 실물로 확인하는 자리이므로,
+Phase 1 의 도구로는 이보다 나은 선택이 없습니다.</p>
+<p>그런데 원문은 4단계에서 <strong>“Ollama를 지우라”</strong> 고 합니다. 왜 시작하자마자 버릴 도구로 시작할까요.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Ollama의 성질</th>
+<th>Phase 1 에서는</th>
+<th>Phase 2 이후에는</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>설정을 알아서 정해줌</td>
+<td>✅ 빨리 시작할 수 있음</td>
+<td>❌ 무엇이 어떻게 정해졌는지 모름</td>
+</tr>
+<tr class="even">
+<td>기본 태그가 대체로 4비트 양자화</td>
+<td>✅ 작은 VRAM 에서도 잘 돌아감</td>
+<td>❌ <strong>손실을 모르고 쓰게 됨</strong> — 3단계가 여기를 찌릅니다</td>
+</tr>
+<tr class="odd">
+<td>배치·스케줄링 제어권이 거의 없음</td>
+<td>—</td>
+<td>❌ 7단계 실습이 불가능</td>
+</tr>
+<tr class="even">
+<td>엔진이 <code>llama.cpp</code> (GGUF 포맷)</td>
+<td>✅ CPU(Central Processing Unit) 도 되고 설치가 쉬움</td>
+<td>❌ 서버 처리량 최적화는 vLLM 계열이 담당</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p>Ollama 의 기본값은 대체로 <strong>이미 양자화된 모델</strong>입니다.
+즉 대부분의 사람은 자기도 모르게 3단계의 “손상된 쪽”을 쓰고 있습니다.
+3단계는 그 손상이 얼마인지를 <strong>자기 숫자로 확인하는 자리</strong>입니다.</p>
+</div>
+<div class="later">
+<p>Ollama 와 vLLM 이 무엇이 다른지, 왜 서빙 엔진을 갈아타야 하는지는 <strong>4단계</strong>에서 다룹니다.
+<code>llama.cpp</code> 의 커널 구현을 직접 읽는 것은 <strong>14단계</strong>입니다.
+2단계에서는 <strong>“Ollama 는 빠르게 시작하기 위한 출발점이고, 기본값이 이미 양자화돼 있다”</strong> 까지면 충분합니다.</p>
+</div>
+<div class="note">
+<p>용어 하나만 짚어둡니다. <strong>GGUF(GPT-Generated Unified Format)</strong> 는 <code>llama.cpp</code> 계열이 쓰는 모델 파일 포맷입니다.
+<code>Q4_K_M</code> 같은 표기가 붙는 것도 이 포맷의 양자화 방식 이름입니다(2.8절).
+vLLM 계열은 다른 포맷을 쓰므로, 4단계 이후에는 이 이름들이 그대로 통하지 않습니다.</p>
+</div>
+<hr />
+<h2 id="무엇을-재는가-축이-두-개다-완전">2.3 무엇을 재는가 — 축이 두 개다 <span class="badge full">완전</span></h2>
+<p>“모델 성능”이라는 한 단어에 서로 다른 두 가지가 섞여 있습니다. 이 둘을 분리하는 것이 2단계의 핵심입니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>축</th>
+<th>묻는 것</th>
+<th>대표 지표</th>
+<th>이 커리큘럼에서</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>품질 (quality)</strong></td>
+<td>얼마나 <strong>똑똑한가</strong></td>
+<td>MMLU Pro, HumanEval, GSM8K</td>
+<td><strong>2–3단계</strong></td>
+</tr>
+<tr class="even">
+<td><strong>성능 (performance)</strong></td>
+<td>얼마나 <strong>빠른가</strong></td>
+<td>TTFT(Time To First Token), TPOT(Time Per Output Token), 처리량</td>
+<td>6단계</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>두 축은 <strong>서로 독립이 아니라 맞바꿈 관계</strong>입니다. 3단계가 그 맞바꿈을 처음 보는 자리입니다.
+양자화는 품질을 깎는 대신 용량과 속도를 벌어옵니다. 1단계에서 계산한 그대로입니다.</p>
+<div class="warn">
+<p>“성능이 좋아졌다”는 말은 이 커리큘럼에서 금지어에 가깝습니다.
+<strong>품질이 오른 것인지 속도가 오른 것인지</strong>를 항상 구분해서 말해야 합니다.
+3단계 이후 거의 모든 실습이 “한쪽을 주고 다른 쪽을 받는” 거래이기 때문입니다.</p>
+</div>
+<div class="later">
+<p>속도 쪽 지표 — TTFT, TPOT, 처리량(throughput) — 의 정의와 측정법은 <strong>6단계</strong>에서 다룹니다.
+2–3단계에서는 <strong>“품질 축과 성능 축은 다른 자로 잰다”</strong> 와, 비교표에 <code>tok/s</code> 를 한 칸 같이 적어둔다는 것까지면 충분합니다.</p>
+</div>
+<hr />
+<h2 id="두-벤치마크-mmlu-pro-와-humaneval-완전">2.4 두 벤치마크 — MMLU Pro 와 HumanEval <span class="badge full">완전</span></h2>
+<p>원문이 이 둘을 고른 데는 이유가 있습니다. <strong>채점 방식이 근본적으로 다릅니다.</strong></p>
+<h3 id="mmlu-pro-골라-맞히기">MMLU Pro — 골라 맞히기</h3>
+<p>MMLU(Massive Multitask Language Understanding)는 14개 분야의 객관식 문제 모음입니다.
+MMLU Pro 는 그 개선판으로, 약 12,000문항 규모입니다.</p>
+<p>원본 MMLU 가 개선된 지점이 3단계에 그대로 도움이 됩니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>개선</th>
+<th>3단계에 주는 효과</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>선택지 4개 → <strong>10개</strong></td>
+<td>찍어서 맞을 확률이 25% → 10%. 바닥이 낮아져 <strong>차이가 드러날 공간</strong>이 생김</td>
+</tr>
+<tr class="even">
+<td>추론 단계가 깊은 문제 위주</td>
+<td>중간에 한 번 어긋나면 답이 틀림 → <strong>양자화 손상이 잘 드러남</strong></td>
+</tr>
+<tr class="odd">
+<td>최신 모델이 만점에 가까워지는 포화 완화</td>
+<td>상단이 붙어버리지 않아 비교가 가능</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>채점은 단순합니다. 모델의 응답에서 선택지 하나를 뽑아내 정답과 대조하고, 맞은 비율을 냅니다.</p>
+<h3 id="humaneval-만들어서-통과하기">HumanEval — 만들어서 통과하기</h3>
+<p>HumanEval 은 164개의 파이썬 함수 작성 문제입니다. 함수 설명(docstring)을 주고 본문을 쓰게 합니다.
+<strong>채점 방식이 특이합니다. 생성된 코드를 실제로 실행해 테스트를 통과하는지 봅니다.</strong></p>
+<p>지표는 <code>pass@k</code> — k번 시도해서 하나라도 통과할 확률입니다. 비교 실험에서는 보통 <code>pass@1</code> 을 씁니다.</p>
+<div class="note">
+<p>HumanEval 계열에는 테스트를 대폭 강화한 <strong>HumanEval+</strong> 가 있습니다.
+원본 테스트가 허술해서 <strong>틀린 코드가 통과해버리는</strong> 경우를 줄인 것입니다.
+비교 실험에서는 강화판이 유리합니다. 눈금이 촘촘한 자를 쓰는 것과 같습니다.</p>
+</div>
+<h3 id="왜-둘-다-재는가">왜 둘 다 재는가</h3>
+<p>한 축만 재면 손상을 놓칩니다. 두 과제는 <strong>모델에게 요구하는 것이 다릅니다.</strong></p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>MMLU Pro</th>
+<th>HumanEval</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>요구하는 능력</td>
+<td>지식 + 짧은 추론</td>
+<td>긴 생성 + 형식 정확성</td>
+</tr>
+<tr class="even">
+<td>출력 길이</td>
+<td>짧음 (선택지 하나)</td>
+<td>김 (함수 본문 전체)</td>
+</tr>
+<tr class="odd">
+<td>부분 점수</td>
+<td>없음 (맞음/틀림)</td>
+<td>없음 (통과/실패)</td>
+</tr>
+<tr class="even">
+<td>한 토큰이 틀리면</td>
+<td>답이 바뀌면 오답</td>
+<td><strong>문법이 깨져 실행 자체가 실패</strong></td>
+</tr>
+<tr class="odd">
+<td>채점의 객관성</td>
+<td>정답표와 대조</td>
+<td><strong>실행 결과</strong> — 사람 판단이 안 들어감</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>마지막 줄이 중요합니다. 코드 생성은 <strong>긴 출력 내내 한 번도 틀리면 안 되는</strong> 과제입니다.
+양자화처럼 토큰마다 조금씩 확률을 흔드는 손상은, <strong>출력이 길수록 누적됩니다.</strong>
+그래서 같은 모델이라도 두 벤치마크에서 손상 폭이 다르게 나타날 수 있습니다.</p>
+<div class="key">
+<p>MMLU Pro 는 <strong>아는가</strong>를, HumanEval 은 <strong>끝까지 정확하게 만들어내는가</strong>를 봅니다.
+양자화 손상은 후자에서 더 크게 보이는 경향이 있고, 그래서 두 축을 함께 재야 손상의 모양을 알 수 있습니다.</p>
+</div>
+<hr />
+<h2 id="같은-자로-잰다-재현성이-곧-실력이다-완전">2.5 같은 자로 잰다 — 재현성이 곧 실력이다 <span class="badge full">완전</span></h2>
+<p>2.1절 그림의 다섯 칸 중 네 칸이 내가 정하는 것이었습니다. 그 말은
+<strong>설정을 하나만 바꿔도 점수가 움직인다</strong>는 뜻입니다. 3단계는 “fp16 대비 q4_K_M 이 몇 점 떨어지는가”를
+묻는데, 그 차이가 양자화 때문인지 내가 설정을 바꿨기 때문인지 구분할 수 없다면 실험이 무의미해집니다.</p>
+<h3 id="고정해야-하는-것들">고정해야 하는 것들</h3>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>고정 대상</th>
+<th>흔들리면 생기는 일</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>문항 세트</strong> (개수와 표집)</td>
+<td>다른 문제로 재면 난이도가 달라짐. 특히 일부만 뽑아 쓸 때는 <strong>같은 부분집합</strong>이어야 함</td>
+</tr>
+<tr class="even">
+<td><strong>프롬프트 형식</strong></td>
+<td>지시문·예시 개수가 바뀌면 같은 모델도 점수가 움직임</td>
+</tr>
+<tr class="odd">
+<td><strong>샘플링 설정</strong> (temperature 등)</td>
+<td>무작위성이 들어가면 <strong>같은 모델을 두 번 재도 점수가 다름</strong></td>
+</tr>
+<tr class="even">
+<td><strong>응답 파싱 규칙</strong></td>
+<td>모델이 답을 쓰는 형식이 조금 달라 파싱에 실패하면, 아는 문제도 오답 처리</td>
+</tr>
+<tr class="odd">
+<td><strong>컨텍스트 길이</strong></td>
+<td>프롬프트가 잘리면 문제 자체가 훼손됨</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="warn">
+<p>가장 조용한 함정은 <strong>파싱 실패</strong>입니다. 모델이 <code>&quot;정답: C&quot;</code> 대신 <code>&quot;C가 맞습니다&quot;</code> 라고 쓰면
+채점기가 못 알아보고 오답 처리합니다. 이때 점수는 떨어지지만 <strong>모델이 멍청해진 게 아닙니다.</strong></p>
+<p>양자화된 모델이 지시 형식을 덜 지키는 경향이 있어서, 3단계에서 이 오류가
+<strong>“양자화 때문에 정확도가 떨어졌다”</strong> 로 잘못 읽히기 쉽습니다.
+점수가 크게 떨어졌다면 응답 원문을 몇 개 직접 눈으로 보세요.</p>
+</div>
+<h3 id="절대-점수를-좇지-않는다">절대 점수를 좇지 않는다</h3>
+<p>공개된 리더보드 점수와 내 측정값은 <strong>거의 확실히 다릅니다.</strong> 프롬프트 형식, 문항 수, 샘플링,
+양자화 여부가 모두 다르기 때문입니다. 이건 문제가 아닙니다.</p>
+<div class="key">
+<p><strong>이 실험에서 필요한 것은 절대 점수가 아니라 차이입니다.</strong>
+남의 점수와 맞출 필요는 없고, <strong>내 측정값끼리 비교 가능하면 됩니다.</strong>
+대신 그 조건은 실행마다 한 글자도 바뀌면 안 됩니다.</p>
+</div>
+<hr />
+<h2 id="표본이-작으면-차이는-착시다-완전">2.6 표본이 작으면 차이는 착시다 <span class="badge full">완전</span></h2>
+<p>여기가 이 문서에서 가장 실전적인 절입니다.</p>
+<p>MMLU Pro 전체는 12,000문항입니다. 로컬 8B 모델로 전부 돌리면 매우 오래 걸리므로,
+보통 앞부분 일부만 잘라서 씁니다. 그런데 <strong>문항 수를 줄이면 점수의 불확실성이 커집니다.</strong></p>
+<blockquote>
+<p>동전을 10번 던져 6번 앞면이 나왔다고 “이 동전은 앞면이 잘 나온다”고 말할 수 없습니다.
+1,000번 던져 600번이면 이야기가 다릅니다.</p>
+</blockquote>
+<p>벤치마크 점수도 같습니다. 채점은 문항마다 맞음/틀림이므로, 점수는 <strong>비율의 추정치</strong>입니다.
+추정치에는 오차가 따라옵니다.</p>
+<div class="calc">
+<p><strong>점수 오차 어림셈</strong></p>
+<pre><code>표준오차(%p)   ≈  100 × √( p × (1 − p) ÷ n )
+95% 신뢰구간   ≈  점수 ± 2 × 표준오차</code></pre>
+<p><code>p</code> 는 정답률(0~1), <code>n</code> 은 문항 수입니다.</p>
+<p>정답률이 50% 근처일 때(오차가 가장 큰 경우) 문항 수별로 대입하면:</p>
+<pre><code>n =   200  →  √(0.25 ÷ 200)   ≈ 0.035  →  ±  3.5 %p   →  95% 구간 약 ± 7 %p
+n = 1,000  →  √(0.25 ÷ 1000)  ≈ 0.016  →  ±  1.6 %p   →  95% 구간 약 ± 3 %p
+n = 12,000 →  √(0.25 ÷ 12000) ≈ 0.005  →  ±  0.5 %p   →  95% 구간 약 ± 1 %p</code></pre>
+<p>즉 <strong>200문항으로 잰 62% 와 59% 는 사실상 같은 점수</strong>입니다. 차이를 주장할 수 없습니다.</p>
+<p><strong>이 어림셈이 틀리는 경우</strong></p>
+<ul>
+<li><strong>같은 문항 세트로 두 모델을 재면(paired) 차이의 오차는 이보다 작습니다.</strong> 두 모델이 쉬운 문제는 둘 다 맞히고 어려운 문제는 둘 다 틀리기 때문에, 문항 난이도에서 오는 흔들림이 상쇄됩니다. 그래서 2.5절이 “같은 문항 세트”를 고정하라고 요구한 것입니다</li>
+<li><strong>문항이 고르게 뽑히지 않으면</strong> 실제 오차는 더 큽니다. 앞에서 200개를 자르면 특정 분야에 몰릴 수 있습니다</li>
+<li><strong>샘플링 무작위성은 이 공식에 들어 있지 않습니다.</strong> temperature 가 0이 아니면 같은 모델을 두 번 재도 점수가 흔들리고, 그 흔들림은 위 오차에 <strong>더해집니다</strong></li>
+</ul>
+</div>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 230" role="img" aria-label="같은 3퍼센트포인트 점수 차이라도, 문항 수가 적으면 두 모델의 신뢰구간이 크게 겹쳐 차이를 주장할 수 없고, 문항 수가 많으면 구간이 좁아져 차이가 분리된다.">
+  <text class="s-soft" x="16" y="26" font-size="12">문항 200개 — 구간이 겹침</text>
+  <line class="s-line" x1="16" y1="96" x2="330" y2="96"></line>
+  <rect class="s-f4" x="60" y="38" width="156" height="54" rx="4" />
+  <line class="s-strong" x1="60" y1="52" x2="240" y2="52"></line>
+  <line class="s-strong" x1="60" y1="46" x2="60" y2="58"></line>
+  <line class="s-strong" x1="240" y1="46" x2="240" y2="58"></line>
+  <circle class="s-accent" cx="150" cy="52" r="4.5"></circle>
+  <text class="s-faint" x="256" y="56" font-size="11">모델 A</text>
+  <line class="s-strong" x1="36" y1="80" x2="216" y2="80"></line>
+  <line class="s-strong" x1="36" y1="74" x2="36" y2="86"></line>
+  <line class="s-strong" x1="216" y1="74" x2="216" y2="86"></line>
+  <circle class="s-accent" cx="126" cy="80" r="4.5"></circle>
+  <text class="s-faint" x="232" y="84" font-size="11">모델 B</text>
+  <text class="s-t4" x="16" y="120" font-size="11.5">겹치는 구간이 넓다 → 차이를 주장할 수 없음</text>
+  <text class="s-soft" x="392" y="26" font-size="12">문항 2,000개 — 구간이 분리됨</text>
+  <line class="s-line" x1="392" y1="96" x2="706" y2="96"></line>
+  <rect class="s-f3" x="500" y="38" width="4" height="54" rx="2" />
+  <line class="s-strong" x1="500" y1="52" x2="556" y2="52"></line>
+  <line class="s-strong" x1="500" y1="46" x2="500" y2="58"></line>
+  <line class="s-strong" x1="556" y1="46" x2="556" y2="58"></line>
+  <circle class="s-accent" cx="528" cy="52" r="4.5"></circle>
+  <text class="s-faint" x="572" y="56" font-size="11">모델 A</text>
+  <line class="s-strong" x1="448" y1="80" x2="504" y2="80"></line>
+  <line class="s-strong" x1="448" y1="74" x2="448" y2="86"></line>
+  <line class="s-strong" x1="504" y1="74" x2="504" y2="86"></line>
+  <circle class="s-accent" cx="476" cy="80" r="4.5"></circle>
+  <text class="s-faint" x="520" y="84" font-size="11">모델 B</text>
+  <text class="s-t3" x="392" y="120" font-size="11.5">거의 겹치지 않는다 → 차이가 있다고 말할 수 있음</text>
+  <text class="s-faint" x="16" y="160" font-size="11">가로축은 점수(%). 가운데 점이 측정값, 가로 막대가 95% 신뢰구간입니다.</text>
+  <text class="s-faint" x="16" y="180" font-size="11">두 그림의 점수 차이는 똑같습니다. 달라진 것은 문항 수뿐입니다.</text>
+  <text class="s-faint" x="16" y="200" font-size="11">그래서 &quot;몇 점 차이인가&quot;보다 &quot;몇 문항으로 쟀는가&quot;를 먼저 물어야 합니다.</text>
+</svg>
+</div>
+<figcaption>같은 점수 차이라도 문항 수에 따라 결론이 달라집니다</figcaption>
+</figure>
+<div class="key">
+<p>비교표를 볼 때 순서가 있습니다. <strong>① 몇 문항으로 쟀는가 → ② 오차는 얼마인가 → ③ 그 차이가 오차보다 큰가.</strong>
+이 순서를 건너뛰면 오차 범위 안의 흔들림을 “양자화 손상”으로 읽게 됩니다.</p>
+</div>
+<div class="note">
+<p>그렇다고 문항을 늘리는 게 항상 답은 아닙니다. 8B 모델로 12,000문항을 도는 데는 시간이 많이 듭니다.
+현실적인 접근은 <strong>적은 문항으로 여러 설정을 빠르게 훑어 후보를 좁히고,
+결론을 낼 비교만 문항을 늘려 다시 재는 것</strong>입니다.
+그리고 어느 쪽이든 <strong>문항 세트는 모든 실행에서 동일</strong>해야 합니다.</p>
+</div>
+<hr />
+<h2 id="양자화는-숫자에-무슨-짓을-하는가-완전">2.7 양자화는 숫자에 무슨 짓을 하는가 <span class="badge full">완전</span></h2>
+<p>1단계에서 <strong>“정밀도를 낮추면 용량이 줄고 정확도를 내준다”</strong> 까지 알고 넘어왔습니다.
+3단계는 그 “내준다”의 크기를 재는 자리이므로, 이제 <strong>정확히 무엇이 손실되는지</strong>를 봐야 합니다.</p>
+<h3 id="값을-격자에-붙인다">값을 격자에 붙인다</h3>
+<p>모델 가중치는 실수 수십억 개입니다. 양자화는 그 값을 <strong>정해진 개수의 눈금 중 가장 가까운 곳으로 옮깁니다.</strong></p>
+<ul>
+<li>4비트로 표현할 수 있는 값은 <strong>16가지</strong>뿐입니다 (2⁴).</li>
+<li>8비트면 <strong>256가지</strong>입니다 (2⁸).</li>
+</ul>
+<p>원래 값과 옮겨간 눈금 사이의 거리가 <strong>양자화 오차</strong>입니다. 이 오차가 손상의 정체입니다.</p>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 270" role="img" aria-label="원본 가중치 값들은 연속된 위치에 있지만, 4비트 양자화는 16개의 눈금 중 가장 가까운 곳으로 값을 옮긴다. 원래 위치와 옮겨간 눈금 사이의 거리가 양자화 오차다.">
+  <text class="s-soft" x="16" y="34" font-size="12">원본 (BF16) — 값이 눈금 사이 어디에나 있습니다</text>
+  <line class="s-line" x1="60" y1="72" x2="660" y2="72"></line>
+  <circle class="s-accent" cx="92" cy="72" r="4"></circle>
+  <circle class="s-accent" cx="141" cy="72" r="4"></circle>
+  <circle class="s-accent" cx="203" cy="72" r="4"></circle>
+  <circle class="s-accent" cx="268" cy="72" r="4"></circle>
+  <circle class="s-accent" cx="316" cy="72" r="4"></circle>
+  <circle class="s-accent" cx="372" cy="72" r="4"></circle>
+  <circle class="s-accent" cx="430" cy="72" r="4"></circle>
+  <circle class="s-accent" cx="487" cy="72" r="4"></circle>
+  <circle class="s-accent" cx="545" cy="72" r="4"></circle>
+  <circle class="s-accent" cx="604" cy="72" r="4"></circle>
+  <path class="s-dash" d="M92 78 V172" />
+  <path class="s-dash" d="M141 78 V172" />
+  <path class="s-dash" d="M203 78 V172" />
+  <path class="s-dash" d="M268 78 V172" />
+  <path class="s-dash" d="M316 78 V172" />
+  <path class="s-dash" d="M372 78 V172" />
+  <path class="s-dash" d="M430 78 V172" />
+  <path class="s-dash" d="M487 78 V172" />
+  <path class="s-dash" d="M545 78 V172" />
+  <path class="s-dash" d="M604 78 V172" />
+  <text class="s-soft" x="16" y="152" font-size="12">4비트 — 16칸 중 가장 가까운 눈금으로 옮겨집니다</text>
+  <line class="s-line" x1="60" y1="180" x2="660" y2="180"></line>
+  <line class="s-line" x1="60" y1="174" x2="60" y2="186"></line>
+  <line class="s-line" x1="100" y1="174" x2="100" y2="186"></line>
+  <line class="s-line" x1="140" y1="174" x2="140" y2="186"></line>
+  <line class="s-line" x1="180" y1="174" x2="180" y2="186"></line>
+  <line class="s-line" x1="220" y1="174" x2="220" y2="186"></line>
+  <line class="s-line" x1="260" y1="174" x2="260" y2="186"></line>
+  <line class="s-line" x1="300" y1="174" x2="300" y2="186"></line>
+  <line class="s-line" x1="340" y1="174" x2="340" y2="186"></line>
+  <line class="s-line" x1="380" y1="174" x2="380" y2="186"></line>
+  <line class="s-line" x1="420" y1="174" x2="420" y2="186"></line>
+  <line class="s-line" x1="460" y1="174" x2="460" y2="186"></line>
+  <line class="s-line" x1="500" y1="174" x2="500" y2="186"></line>
+  <line class="s-line" x1="540" y1="174" x2="540" y2="186"></line>
+  <line class="s-line" x1="580" y1="174" x2="580" y2="186"></line>
+  <line class="s-line" x1="620" y1="174" x2="620" y2="186"></line>
+  <line class="s-line" x1="660" y1="174" x2="660" y2="186"></line>
+  <circle class="s-accent" cx="100" cy="180" r="4"></circle>
+  <circle class="s-accent" cx="140" cy="180" r="4"></circle>
+  <circle class="s-accent" cx="200" cy="180" r="4"></circle>
+  <circle class="s-accent" cx="260" cy="180" r="4"></circle>
+  <circle class="s-accent" cx="300" cy="180" r="4"></circle>
+  <circle class="s-accent" cx="380" cy="180" r="4"></circle>
+  <circle class="s-accent" cx="420" cy="180" r="4"></circle>
+  <circle class="s-accent" cx="500" cy="180" r="4"></circle>
+  <circle class="s-accent" cx="540" cy="180" r="4"></circle>
+  <circle class="s-accent" cx="600" cy="180" r="4"></circle>
+  <rect class="s-f4" x="480" y="60" width="26" height="132" rx="4" />
+  <text class="s-t4" x="516" y="216" font-size="11.5">밀려난 거리 = 양자화 오차</text>
+  <text class="s-faint" x="60" y="244" font-size="11">눈금 개수는 4비트면 16개, 8비트면 256개입니다. 눈금이 촘촘할수록 밀려나는 거리가 짧아집니다.</text>
+</svg>
+</div>
+<figcaption>양자화는 값을 지우는 것이 아니라, 가장 가까운 눈금으로 옮기는 것입니다</figcaption>
+</figure>
+<h3 id="눈금의-간격은-어떻게-정하는가-블록과-배율">눈금의 간격은 어떻게 정하는가 — 블록과 배율</h3>
+<p>여기서 중요한 설계 선택이 하나 나옵니다. <strong>눈금을 어디부터 어디까지 펼칠 것인가.</strong></p>
+<p>가중치 전체에 눈금 16개를 펼치면, 값이 몰려 있는 구간에서는 눈금이 너무 성깁니다.
+그래서 실제 포맷들은 <strong>가중치를 작은 블록(예: 수십 개)으로 나누고, 블록마다 따로 배율(scale)을 저장</strong>합니다.
+블록 안의 값이 좁은 범위에 몰려 있으면 그 블록의 눈금도 촘촘해집니다.</p>
+<div class="note">
+<p>1단계에서 “INT4 는 이론상 0.5바이트인데 실제 4비트 포맷은 파라미터당 약 0.6바이트”라고 했던 이유가 이것입니다.
+<strong>블록마다 저장하는 배율 값이 추가 용량</strong>이기 때문입니다.
+즉 0.1바이트의 초과분은 낭비가 아니라, 오차를 줄이려고 지불한 비용입니다.</p>
+</div>
+<h3 id="왜-이것이-모델을-멍청하게-만드는가">왜 이것이 모델을 멍청하게 만드는가</h3>
+<p>가중치 하나가 조금 밀린 것은 아무 일도 아닙니다. 문제는 <strong>누적</strong>입니다.</p>
+<blockquote>
+<p>나침반이 1도 틀어진 채로 걸으면 100미터는 괜찮지만, 10킬로미터를 가면 한참 다른 곳에 도착합니다.</p>
+</blockquote>
+<p>실제로는 이렇습니다. 토큰 하나를 만들 때 가중치 전체를 통과하고(1단계),
+그 결과가 다음 토큰의 입력이 됩니다. <strong>작은 오차가 층을 지나며 커지고, 토큰을 지나며 다시 쌓입니다.</strong>
+그래서 손상은 <strong>출력이 길고 추론 사슬이 긴 과제에서 더 크게 드러납니다</strong> — 2.4절에서 두 벤치마크를
+나눠 재는 이유가 여기 있습니다.</p>
+<div class="key">
+<p>양자화 오차는 <strong>가중치 하나의 문제가 아니라 누적의 문제</strong>입니다.
+그래서 “몇 % 손실”처럼 균일하게 나타나지 않고, <strong>과제의 성격에 따라 다르게</strong> 나타납니다.</p>
+</div>
+<hr />
+<h2 id="포맷-이름-읽는-법-완전">2.8 포맷 이름 읽는 법 <span class="badge full">완전</span></h2>
+<p>비교표에 적을 태그 이름들을 읽을 수 있어야 합니다. 이름에 이미 정보가 다 들어 있습니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>표기</th>
+<th>읽는 법</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>fp16</code> / <code>bf16</code></td>
+<td>양자화하지 않은 <strong>원본급</strong>. 파라미터당 2바이트</td>
+</tr>
+<tr class="even">
+<td><code>Q8_0</code></td>
+<td>8비트, 블록마다 배율 하나(<code>_0</code>). 손실이 매우 작음</td>
+</tr>
+<tr class="odd">
+<td><code>Q4_0</code></td>
+<td>4비트, 같은 단순 방식. 같은 4비트 중에서는 품질이 낮은 편</td>
+</tr>
+<tr class="even">
+<td><code>Q4_K_M</code></td>
+<td>4비트, <strong>K-quant</strong> 방식, <strong>M</strong>edium 등급</td>
+</tr>
+<tr class="odd">
+<td><code>Q3_K_S</code></td>
+<td>3비트, K-quant, <strong>S</strong>mall 등급. 더 공격적</td>
+</tr>
+<tr class="even">
+<td><code>FP8</code></td>
+<td>FP8(Floating Point 8) — 부동소수점 8비트. <strong>Ada(4090) / Hopper 이후</strong> 하드웨어 가속</td>
+</tr>
+<tr class="odd">
+<td><code>NVFP4</code></td>
+<td>NVFP4(NVIDIA Floating Point 4) — 부동소수점 4비트. <strong>Blackwell(5090)부터</strong> 하드웨어 가속</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>K-quant</strong> 가 단순 방식과 다른 점은 두 가지입니다.</p>
+<ol type="1">
+<li>블록별 배율을 더 정교하게 저장합니다</li>
+<li><strong>모든 곳에 같은 비트를 쓰지 않습니다.</strong> 손상에 민감한 부분은 더 높은 비트로 남깁니다</li>
+</ol>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 220" role="img" aria-label="Q4_0은 모든 구간에 4비트를 균일하게 배분하고, Q4_K_M은 평균 비트 수는 비슷하지만 민감한 일부 구간에 더 많은 비트를 배분한다.">
+  <text class="s-soft" x="16" y="34" font-size="12">Q4_0 — 어디나 똑같이 4비트</text>
+  <rect class="s-f5" x="16" y="48" width="86" height="40" rx="5" />
+  <rect class="s-f5" x="106" y="48" width="86" height="40" rx="5" />
+  <rect class="s-f5" x="196" y="48" width="86" height="40" rx="5" />
+  <rect class="s-f5" x="286" y="48" width="86" height="40" rx="5" />
+  <rect class="s-f5" x="376" y="48" width="86" height="40" rx="5" />
+  <rect class="s-f5" x="466" y="48" width="86" height="40" rx="5" />
+  <rect class="s-f5" x="556" y="48" width="86" height="40" rx="5" />
+  <text class="s-faint mono" x="59" y="73" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-faint mono" x="149" y="73" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-faint mono" x="239" y="73" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-faint mono" x="329" y="73" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-faint mono" x="419" y="73" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-faint mono" x="509" y="73" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-faint mono" x="599" y="73" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-soft" x="16" y="134" font-size="12">Q4_K_M — 평균은 비슷한데, 민감한 곳에 더 씁니다</text>
+  <rect class="s-f5" x="16" y="148" width="86" height="40" rx="5" />
+  <rect class="s-f2" x="106" y="148" width="86" height="40" rx="5" />
+  <rect class="s-f5" x="196" y="148" width="86" height="40" rx="5" />
+  <rect class="s-f5" x="286" y="148" width="86" height="40" rx="5" />
+  <rect class="s-f2" x="376" y="148" width="86" height="40" rx="5" />
+  <rect class="s-f5" x="466" y="148" width="86" height="40" rx="5" />
+  <rect class="s-f5" x="556" y="148" width="86" height="40" rx="5" />
+  <text class="s-faint mono" x="59" y="173" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-t2 mono" x="149" y="173" text-anchor="middle" font-size="11.5">더 높게</text>
+  <text class="s-faint mono" x="239" y="173" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-faint mono" x="329" y="173" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-t2 mono" x="419" y="173" text-anchor="middle" font-size="11.5">더 높게</text>
+  <text class="s-faint mono" x="509" y="173" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-faint mono" x="599" y="173" text-anchor="middle" font-size="11.5">4bit</text>
+  <text class="s-faint" x="16" y="210" font-size="11">파일 크기는 비슷합니다. 달라지는 것은 같은 예산을 어디에 쓰느냐입니다.</text>
+</svg>
+</div>
+<figcaption>같은 &quot;4비트&quot;라도 비트 예산의 배분 전략이 다릅니다</figcaption>
+</figure>
+<div class="key">
+<p><strong>같은 비트 수라도 품질이 다릅니다.</strong> 비교표에 <code>Q4_0</code> 과 <code>Q4_K_M</code> 을 같이 넣어 보면
+“비트 수”가 아니라 <strong>“배분 전략”이 품질을 만든다</strong>는 것을 자기 숫자로 확인할 수 있습니다.</p>
+</div>
+<div class="later">
+<p>“어디가 민감한지”를 <strong>데이터로 측정해서</strong> 비트를 배분하는 기법이 있습니다.
+GPTQ(Generative Pre-trained Transformer Quantization), AWQ(Activation-aware Weight Quantization) 같은
+<strong>보정(calibration) 기반 양자화</strong>이고, 레이어별로 다른 비트를 주는 방식은 <strong>16단계</strong>에서 다룹니다.
+2–3단계에서는 <strong>“같은 비트 수라도 배분에 따라 품질이 다르다”</strong> 까지면 충분합니다.</p>
+</div>
+<hr />
+<h2 id="손상은-모델마다-다르게-나타난다-완전">2.9 손상은 모델마다 다르게 나타난다 <span class="badge full">완전</span></h2>
+<p>같은 <code>Q4_K_M</code> 이라도 어떤 모델은 멀쩡하고 어떤 모델은 무너집니다. 이유는 <strong>여유(redundancy)</strong> 입니다.</p>
+<blockquote>
+<p>100명이 하던 일을 95명이 하면 티가 잘 안 납니다. 3명이 하던 일을 2명이 하면 바로 티가 납니다.</p>
+</blockquote>
+<p>실제로는 이렇습니다. 파라미터가 많은 모델은 같은 정보를 여러 군데에 나눠 갖고 있어서,
+일부가 뭉개져도 나머지가 메웁니다. 작은 모델은 그 여유가 없습니다.</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th>조건</th>
+<th>손상이</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>모델이 <strong>작을수록</strong></td>
+<td>크게 나타남</td>
+</tr>
+<tr class="even">
+<td>출력이 <strong>길수록</strong> (코드 생성, 긴 추론)</td>
+<td>크게 나타남</td>
+</tr>
+<tr class="odd">
+<td>비트 수를 <strong>낮출수록</strong></td>
+<td>크게 나타남 — 다만 선형이 아닙니다</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>마지막 줄이 3단계의 관전 포인트입니다. 비트를 낮출수록 조금씩 나빠지는 게 아니라,
+<strong>어느 지점까지는 거의 티가 안 나다가 갑자기 무너지는</strong> 모양이 나옵니다.</p>
+<div class="warn">
+<p>그 “갑자기”가 <strong>어느 비트 수에서 오는지는 여기에 쓰지 않습니다.</strong>
+직접 재서 보는 것이 3단계의 체크포인트이기 때문입니다.
+미리 답을 알고 표를 채우면, 표가 예상과 다를 때 <strong>측정을 의심하는 대신 자기 눈을 의심하게</strong> 됩니다.</p>
+<p>같은 이유로, 여유가 되면 <strong>1.7B / 8B / 14B 를 같은 양자화로</strong> 재보세요.
+“파라미터 수가 곧 손상 여유”라는 감각은 직접 본 사람만 갖게 됩니다.</p>
+</div>
+<hr />
+<h2 id="정확도만-바뀌는-게-아니다-완전">2.10 정확도만 바뀌는 게 아니다 <span class="badge full">완전</span></h2>
+<p>비교표에 <code>tok/s</code> 칸이 있는 이유입니다. 양자화는 <strong>동시에 세 가지를 바꿉니다.</strong></p>
+<p>1단계의 두 어림셈을 그대로 다시 씁니다.</p>
+<div class="calc">
+<p><strong>비교표를 재기 전에 미리 채워보는 예측</strong></p>
+<pre><code>가중치 GB   ≈  파라미터 수(B) × 파라미터당 바이트
+tok/s 천장  ≈  메모리 대역폭(GB/s) ÷ 가중치 GB</code></pre>
+<p>내 장비(RTX 5090, 대역폭 약 1,792 GB/s)에서 8B 모델에 대입하면:</p>
+<pre><code>fp16    8 × 2.0 = 16.0 GB  →  1792 ÷ 16.0  ≈  112 tok/s
+q8_0    8 × 1.0 =  8.0 GB  →  1792 ÷  8.0  ≈  224 tok/s
+q4_K_M  8 × 0.6 ≈  5.0 GB  →  1792 ÷  5.0  ≈  358 tok/s</code></pre>
+<p>용량이 3분의 1이 되면 <strong>읽을 바이트도 3분의 1</strong>이므로 속도의 천장이 3배가 됩니다.
+이것이 양자화가 정확도를 대가로 사오는 것입니다.</p>
+<p><strong>이 어림셈이 틀리는 경우</strong></p>
+<ul>
+<li><strong>실측은 이 값의 60~80% 정도</strong>입니다. 이 값은 넘을 수 없는 천장이지 예상치가 아닙니다</li>
+<li><strong>실제 파일은 어림셈보다 조금 큽니다.</strong> 블록별 배율이 함께 저장되기 때문입니다(2.7절). <code>q8_0</code> 은 8 GB 가 아니라 8.5 GB 근처입니다. 정확한 값은 받은 파일 크기를 보는 게 빠릅니다</li>
+<li><strong>가중치 외에 KV cache 등이 VRAM 을 더 씁니다.</strong> 여기서는 속도만 보고 있고, 예산 전체 계산은 <strong>7단계</strong>입니다</li>
+<li><strong>레이어 일부가 CPU 로 내려가 있으면</strong> 이 계산은 통째로 무의미해집니다 (2.11절)</li>
+<li>Ollama 는 <code>llama.cpp</code> 커널을 씁니다. 같은 모델·같은 양자화라도 <strong>엔진이 바뀌면 속도가 달라집니다</strong> — 그 비교가 <strong>4단계</strong>입니다</li>
+</ul>
+</div>
+<div class="key">
+<p>3단계 비교표의 세 축은 <strong>파일 크기 · 정확도 · 속도</strong>입니다.
+셋을 같이 봐야 “무엇을 주고 무엇을 받았는지”가 보입니다. 정확도만 보면 손해만 남습니다.</p>
+</div>
+<hr />
+<h2 id="측정을-조용히-오염시키는-것들-완전">2.11 측정을 조용히 오염시키는 것들 <span class="badge full">완전</span></h2>
+<p>이 절은 실행 환경(<a href="../ollama/README.md"><code>../ollama/README.md</code></a>)이 명령으로 다루는 항목들의
+<strong>“왜”</strong> 를 설명합니다. 명령은 그쪽에 있고, 여기서는 각각이 왜 측정을 망치는지만 봅니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>오염원</th>
+<th>무슨 일이 벌어지는가</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>부분 오프로드</strong></td>
+<td>VRAM 이 모자라면 일부 레이어가 CPU 로 내려갑니다. <strong>경고 없이</strong> 그냥 느려집니다</td>
+<td><code>tok/s</code> 가 자릿수로 떨어짐. <strong>정확도는 대체로 그대로</strong></td>
+</tr>
+<tr class="even">
+<td><strong>컨텍스트 기본값</strong></td>
+<td>기본 컨텍스트가 짧으면 긴 프롬프트가 <strong>잘립니다</strong></td>
+<td>문제 자체가 훼손 → 정확도 하락을 양자화 탓으로 오해</td>
+</tr>
+<tr class="odd">
+<td><strong>모델 언로드/재로드</strong></td>
+<td>유휴 시간이 지나면 모델이 메모리에서 내려갑니다</td>
+<td>측정 중간에 로딩 시간이 섞여 속도가 튐</td>
+</tr>
+<tr class="even">
+<td><strong>여러 모델 동시 상주</strong></td>
+<td>두 모델이 같이 올라가 VRAM 을 나눠 씁니다</td>
+<td>부분 오프로드로 이어짐</td>
+</tr>
+<tr class="odd">
+<td><strong>태그가 가리키는 실체</strong></td>
+<td><code>모델:8b</code> 같은 기본 태그는 <strong>이미 양자화된 버전</strong>일 수 있습니다</td>
+<td>원본과 비교한다고 믿고 양자화끼리 비교</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="warn">
+<p>가장 흔한 사고는 첫 줄입니다. <strong>부분 오프로드는 조용합니다.</strong>
+에러도 경고도 없이 그냥 느려지므로, “로컬 LLM(Large Language Model)은 원래 이 정도구나”라고 오해하게 됩니다.</p>
+<p>측정을 시작하기 전에 <strong>모델이 100% GPU 에 올라갔는지 반드시 확인</strong>하세요.
+1단계 2.4절의 어림셈이 여기서 쓰입니다 — 계산한 천장의 60% 에도 한참 못 미치면 오프로드를 의심합니다.</p>
+</div>
+<div class="key">
+<p>측정값이 이상할 때 순서는 <strong>① 100% GPU 인가 → ② 컨텍스트가 온전한가 → ③ 문항·프롬프트가 동일한가</strong>,
+그 다음이 <strong>④ 모델 문제인가</strong> 입니다. ④부터 의심하면 대부분 틀립니다.</p>
+</div>
+<hr />
+<h2 id="내-장비-기준-정리">3. 내 장비 기준 정리</h2>
+<h3 id="gb-한-장으로-이-실험이-성립하는가">3.1 32GB 한 장으로 이 실험이 성립하는가</h3>
+<p>3단계는 <strong>원본과 양자화를 나란히 놓고 비교</strong>하는 실험입니다.
+따라서 <strong>원본이 VRAM 에 들어가야 실험이 성립합니다.</strong> 이 조건이 장비를 고르는 기준이 됩니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>대상</th>
+<th>가중치 어림</th>
+<th>32GB 에서</th>
+<th>3단계 실험</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>8B <code>fp16</code> (원본급)</td>
+<td>약 16 GB</td>
+<td>✅ 여유 있음</td>
+<td>✅ <strong>기준선 확보</strong></td>
+</tr>
+<tr class="even">
+<td>8B <code>q8_0</code></td>
+<td>약 8 GB</td>
+<td>✅</td>
+<td>✅ 비교 대상</td>
+</tr>
+<tr class="odd">
+<td>8B <code>q4_K_M</code></td>
+<td>약 5 GB</td>
+<td>✅</td>
+<td>✅ 비교 대상</td>
+</tr>
+<tr class="even">
+<td>8B <code>q3_K_S</code></td>
+<td>약 4 GB</td>
+<td>✅</td>
+<td>✅ 무너지는 지점 관찰용</td>
+</tr>
+<tr class="odd">
+<td>14B <code>fp16</code></td>
+<td>약 28 GB</td>
+<td>🔶 가중치만으로 예산 소진</td>
+<td>🔶 기준선으로는 빠듯</td>
+</tr>
+<tr class="even">
+<td>27B급 <code>fp16</code></td>
+<td>약 54 GB 이상</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr class="odd">
+<td>27B급 <code>q4_K_M</code></td>
+<td>약 18 GB</td>
+<td>✅ 돌아감</td>
+<td>❌ <strong>비교 대상이 없음</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p><strong>주력은 8B 입니다.</strong> 32GB 이므로 <code>fp16</code> 원본이 여유롭게 올라가고, 그 위에서 <code>q8_0</code> → <code>q4_K_M</code> → <code>q3_K_S</code> 로
+내려가며 같은 자로 잴 수 있습니다. <strong>원본이 들어간다는 것이 이 실험의 전제</strong>입니다.</p>
+<p>큰 모델(27B급)은 <code>q4</code> 하나만 올라가므로 <strong>비교 자체가 불가능</strong>합니다.
+잘 도는 것과 실험이 성립하는 것은 다릅니다.</p>
+</div>
+<h3 id="원문-전제와의-차이">3.2 원문 전제와의 차이</h3>
+<p>원문은 <strong>RTX 3090 24GB × 2 = 48GB</strong> 를 전제합니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>항목</th>
+<th>원문 (3090 24GB × 2)</th>
+<th>내 장비 (5090 32GB × 1)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>8B <code>fp16</code> 기준선</td>
+<td>한 장 24GB 에 16GB — 가능하지만 나머지 예산이 빠듯</td>
+<td>✅ <strong>여유 있음</strong></td>
+</tr>
+<tr class="even">
+<td>14B <code>fp16</code> 기준선</td>
+<td>두 장을 묶으면 가능</td>
+<td>🔶 한 장으로는 빠듯</td>
+</tr>
+<tr class="odd">
+<td><code>FP8</code> / <code>NVFP4</code> 하드웨어 가속</td>
+<td>❌ 없음 (Ampere 세대)</td>
+<td>✅ <strong>있음 (Blackwell)</strong></td>
+</tr>
+<tr class="even">
+<td>3단계에서 유리한 점</td>
+<td>더 큰 모델까지 기준선 확보</td>
+<td><strong>저비트 포맷을 실제 가속으로 비교 가능</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note">
+<p><code>NVFP4</code> 는 원문 3단계에도 이름이 등장하지만, 3090 에서는 하드웨어 가속 대상이 아닙니다.
+5090 은 Blackwell 세대라 <strong>가속이 실제로 걸립니다.</strong> 다만 그 이득을 보려면 엔진과 커널이
+그 포맷을 지원해야 하고, 지원 성숙도는 도구마다 다릅니다. 되면 이득, 안 되면 <code>q4_K_M</code> 으로 돌아오면 됩니다.</p>
+</div>
+<hr />
+<h2 id="확인-문제">4. 확인 문제</h2>
+<div class="quiz">
+<ol type="1">
+<li><p><strong>8B 모델을 <code>q8_0</code> 으로 돌릴 때 토큰 생성 속도의 이론적 천장은 얼마이고, <code>fp16</code> 대비 몇 배인가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<pre><code>q8_0  가중치 ≈ 8 × 1.0 =  8.0 GB  →  1,792 ÷  8.0 ≈ 224 tok/s
+fp16  가중치 = 8 × 2.0 = 16.0 GB  →  1,792 ÷ 16.0 ≈ 112 tok/s</code></pre>
+<p>약 <strong>2배</strong>입니다. 토큰마다 가중치 전체를 읽으므로, 읽을 바이트가 절반이면 천장이 두 배가 됩니다.</p>
+<p>단, 이 값은 <strong>넘을 수 없는 상한</strong>이지 기대치가 아닙니다. 실측은 보통 60~80% 수준입니다.</p>
+</details></li>
+<li><p><strong>200문항으로 재서 모델 A가 62%, 모델 B가 59%가 나왔습니다. “A가 더 정확하다”고 말할 수 있는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>그대로는 말할 수 없습니다.</p>
+<pre><code>표준오차 ≈ 100 × √(0.62 × 0.38 ÷ 200) ≈ 3.4 %p
+95% 신뢰구간 ≈ ± 6.9 %p</code></pre>
+<p>관측된 차이 3%p 는 <strong>오차 범위 안</strong>입니다. 같은 두 모델을 다시 재면 순서가 뒤집힐 수 있습니다.</p>
+<p>할 수 있는 일은 두 가지입니다.</p>
+<ul>
+<li><strong>문항 수를 늘려</strong> 오차를 줄인다 (2,000문항이면 95% 구간이 약 ±2%p 로 좁아집니다)</li>
+<li><strong>같은 문항 세트</strong>로 쟀다면 문항별 정오를 짝지어 비교한다. 두 모델이 공통으로 맞히고 틀린 문항의 흔들림이 상쇄되므로 더 작은 차이도 판별할 수 있습니다</li>
+</ul>
+</details></li>
+<li><p><strong>MMLU Pro 점수가 거의 같게 나왔다면 “이 양자화는 손상이 없다”고 결론내도 되는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>안 됩니다. 최소한 세 가지를 확인해야 합니다.</p>
+<ol type="1">
+<li><strong>문항 수</strong> — 오차 범위 안에 손상이 묻혔을 수 있습니다 (2번 문제)</li>
+<li><strong>과제 성격</strong> — MMLU Pro 는 출력이 짧은 객관식입니다. 양자화 오차는 <strong>누적</strong>되므로, 출력이 긴 과제에서 더 크게 드러납니다. HumanEval 같은 코드 생성 쪽을 함께 봐야 손상의 모양을 알 수 있습니다</li>
+<li><strong>오염</strong> — 파싱이나 컨텍스트 문제로 두 쪽 다 낮게 나와 붙어 있을 수도 있습니다</li>
+</ol>
+</details></li>
+<li><p><strong><code>Q4_0</code> 과 <code>Q4_K_M</code> 은 둘 다 4비트입니다. 어느 쪽 정확도가 높을 것으로 예상되며, 그 근거는?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p><code>Q4_K_M</code> 쪽이 높을 것으로 예상됩니다. 근거는 두 가지입니다.</p>
+<ol type="1">
+<li><strong>블록별 배율이 더 정교합니다.</strong> 값이 몰려 있는 구간에서 눈금이 촘촘해지므로 밀려나는 거리(양자화 오차)가 줄어듭니다</li>
+<li><strong>비트를 균일하게 쓰지 않습니다.</strong> 손상에 민감한 부분에 더 높은 비트를 남깁니다</li>
+</ol>
+<p>즉 품질을 만드는 것은 비트 수 자체가 아니라 <strong>같은 예산을 어디에 쓰는가</strong>입니다.
+이 아이디어를 측정 데이터로 밀고 나간 것이 16단계의 보정 기반 양자화입니다.</p>
+</details></li>
+<li><p><strong>왜 2단계에서 Ollama를 쓰고, 4단계에서는 지우는가?</strong> 두 가지 이유를 드세요.</p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p><strong>① 2단계의 목적이 엔진이 아니라 측정 도구이기 때문입니다.</strong> 이 단계에서 얻어야 할 것은
+재현 가능한 평가 루프이지 서빙 성능이 아닙니다. 설치 한 줄로 모델이 도는 도구가 가장 적합합니다.</p>
+<p><strong>② 제어권이 없어서 이후 실습이 막히기 때문입니다.</strong> 배치와 스케줄링을 조절할 수 없으므로
+7단계(배치 실험)가 성립하지 않습니다. 또한 기본 태그가 대체로 이미 양자화돼 있어,
+무엇을 재고 있는지 모르는 상태가 되기 쉽습니다.</p>
+</details></li>
+<li><p><strong><code>ollama ps</code> 의 <code>PROCESSOR</code> 가 <code>100% GPU</code> 가 아니라 <code>48%/52% CPU/GPU</code> 로 나왔습니다. 이 상태에서 잰 결과 중 무엇이 쓸 수 있고 무엇이 못 쓰는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<ul>
+<li><strong><code>tok/s</code> 는 못 씁니다.</strong> 레이어 일부가 CPU 에 있으면 그 구간은 시스템 메모리 대역폭(약 100 GB/s)에 묶입니다. VRAM 대역폭 기준으로 계산한 천장과 자릿수가 달라집니다</li>
+<li><strong>정확도 점수는 대체로 유효합니다.</strong> 어디서 계산하든 같은 가중치로 같은 연산을 하므로 결과가 크게 달라지지 않습니다. 다만 <strong>시간이 훨씬 오래 걸립니다</strong></li>
+</ul>
+<p>그래도 다시 재는 게 맞습니다. 비교표의 세 축(크기·정확도·속도) 중 한 축이 비게 되고,
+애초에 오프로드가 걸렸다는 것은 <strong>VRAM 예산 판단이 틀렸다는 신호</strong>이기 때문입니다.</p>
+</details></li>
+<li><p><strong>같은 모델·같은 양자화인데 어제와 오늘 점수가 다르게 나왔습니다. 모델 문제라고 결론내기 전에 무엇을 먼저 확인해야 하는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>평가 루프에서 <strong>모델이 아닌 칸</strong>부터 봅니다.</p>
+<ol type="1">
+<li><strong>문항 세트가 같은가</strong> — 일부만 잘라 쓸 때 잘린 범위가 달라지지 않았는지</li>
+<li><strong>샘플링 설정</strong> — 무작위성이 들어가 있으면 같은 모델도 실행마다 점수가 흔들립니다</li>
+<li><strong>프롬프트 형식과 파싱 규칙</strong> — 하나만 바뀌어도 점수가 움직입니다</li>
+<li><strong>컨텍스트 길이</strong> — 설정을 바꾼 뒤 반영이 안 됐거나, 반대로 반영돼서 프롬프트가 잘리지 않게 된 경우</li>
+<li><strong>오프로드 여부</strong> — 다른 모델이 같이 올라가 있었는지</li>
+</ol>
+<p>모델은 평가 루프의 다섯 칸 중 한 칸일 뿐입니다. 나머지 네 칸이 훨씬 자주 원인입니다.</p>
+</details></li>
+</ol>
+</div>
+<hr />
+<h2 id="다음-단계로">5. 다음 단계로</h2>
+<p>이 문서에서 <code>[씨앗]</code>으로 남긴 것들이 어디서 이어지는지 정리합니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>이 문서의 씨앗</th>
+<th>여기서 알아둔 것</th>
+<th>이어지는 단계</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>성능 축 (TTFT / TPOT / 처리량)</td>
+<td>“품질과 속도는 다른 자로 잰다”</td>
+<td><strong>6단계</strong> — 지표의 정의와 측정</td>
+</tr>
+<tr class="even">
+<td>Ollama 와 vLLM 의 차이</td>
+<td>“Ollama 는 출발점이고 제어권이 없다”</td>
+<td><strong>4단계</strong> — 엔진 교체</td>
+</tr>
+<tr class="odd">
+<td><code>llama.cpp</code> 커널 · GGUF</td>
+<td>“Ollama 아래에 이 엔진이 있다”</td>
+<td><strong>14단계</strong> — 커널 읽기</td>
+</tr>
+<tr class="even">
+<td>VRAM 예산의 나머지 항목</td>
+<td>“가중치 말고도 더 있다”</td>
+<td><strong>7단계</strong> — KV cache 계산</td>
+</tr>
+<tr class="odd">
+<td>보정 기반 양자화 (GPTQ / AWQ)</td>
+<td>“같은 비트라도 배분이 품질을 만든다”</td>
+<td><strong>16단계</strong> — 레이어별 양자화</td>
+</tr>
+<tr class="even">
+<td><code>NVFP4</code> 하드웨어 가속</td>
+<td>“Blackwell 은 가속 대상이다”</td>
+<td><strong>16단계</strong> · 3단계에서 시도 가능</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="단계로-넘어가기-전에">4단계로 넘어가기 전에</h3>
+<p>4단계는 <strong>Ollama 를 지우고 vLLM 으로 갈아타는</strong> 단계입니다.
+이 문서의 결과물이 그때 바로 쓰이는 지점은 다음과 같습니다.</p>
+<ul>
+<li><strong>비교표가 기준선이 됩니다</strong> — 엔진을 바꿔도 같은 양자화에서 같은 정확도가 나오는지 확인합니다.
+안 나온다면 엔진 설정이나 양자화 구현이 다른 것이고, 그것을 찾는 게 4단계의 일부입니다</li>
+<li><strong>평가 루프를 그대로 재사용합니다</strong> — vLLM 도 OpenAI 호환 API 를 제공하므로, 2.1절 그림의 ③만 바꾸면 됩니다.
+이게 2단계에서 평가부터 만든 이유입니다</li>
+<li><strong><code>tok/s</code> 열은 다시 재야 합니다</strong> — 엔진이 바뀌면 커널이 바뀝니다</li>
+</ul>
+<div class="key">
+<p>Phase 1 이 끝났을 때 손에 남아야 하는 것은 두 가지입니다.
+<strong>① 재현 가능한 평가 루프</strong>, <strong>② 그것으로 채운 비교표.</strong>
+모델을 돌려본 경험이 아니라 이 둘이 산출물입니다.</p>
+</div>
+<p>실행 환경과 명령은 <a href="../ollama/README.md"><code>../ollama/README.md</code></a>, 모델별 VRAM 계산 근거는
+<a href="../ollama/MODELS.md"><code>../ollama/MODELS.md</code></a> 에 있습니다.</p>
+<hr />
+<h2 id="용어표">6. 용어표</h2>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>약어 / 용어</th>
+<th>full name</th>
+<th>뜻</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>API</td>
+<td>Application Programming Interface</td>
+<td>프로그램이 다른 프로그램을 호출하는 규약</td>
+</tr>
+<tr class="even">
+<td>AWQ</td>
+<td>Activation-aware Weight Quantization</td>
+<td>활성값을 보고 중요한 가중치를 보존하는 양자화. 16단계</td>
+</tr>
+<tr class="odd">
+<td>BF16 / FP16</td>
+<td>Brain Floating Point 16 / Floating Point 16</td>
+<td>2바이트 부동소수점. 원본 모델의 표준</td>
+</tr>
+<tr class="even">
+<td>CPU</td>
+<td>Central Processing Unit</td>
+<td>중앙처리장치</td>
+</tr>
+<tr class="odd">
+<td>FP8</td>
+<td>Floating Point 8</td>
+<td>1바이트 부동소수점. Ada / Hopper 이후 하드웨어 가속</td>
+</tr>
+<tr class="even">
+<td>GGUF</td>
+<td>GPT-Generated Unified Format</td>
+<td><code>llama.cpp</code> 계열이 쓰는 모델 파일 포맷</td>
+</tr>
+<tr class="odd">
+<td>GPTQ</td>
+<td>Generative Pre-trained Transformer Quantization</td>
+<td>보정 데이터로 오차를 줄이는 양자화. 16단계</td>
+</tr>
+<tr class="even">
+<td>GPU</td>
+<td>Graphics Processing Unit</td>
+<td>대량 병렬 연산 장치</td>
+</tr>
+<tr class="odd">
+<td>HTTP</td>
+<td>HyperText Transfer Protocol</td>
+<td>웹 통신 규약. 평가 스크립트가 모델을 부르는 통로</td>
+</tr>
+<tr class="even">
+<td>HumanEval</td>
+<td>— (벤치마크 이름)</td>
+<td>164개 파이썬 함수 작성 문제. 코드를 <strong>실행해서</strong> 채점</td>
+</tr>
+<tr class="odd">
+<td>HumanEval+</td>
+<td>— (벤치마크 이름)</td>
+<td>테스트를 강화한 개선판. 허술한 통과를 줄임</td>
+</tr>
+<tr class="even">
+<td>K-quant</td>
+<td>— (GGUF 양자화 방식 이름)</td>
+<td>블록별 배율을 정교화하고 민감한 부분에 비트를 더 주는 방식</td>
+</tr>
+<tr class="odd">
+<td>KV cache</td>
+<td>Key-Value cache</td>
+<td>이전 토큰의 중간 계산 결과 저장분. 7단계</td>
+</tr>
+<tr class="even">
+<td>llama.cpp</td>
+<td>— (프로젝트 이름)</td>
+<td>C/C++ 추론 엔진. Ollama 가 내부에서 사용</td>
+</tr>
+<tr class="odd">
+<td>LLM</td>
+<td>Large Language Model</td>
+<td>대규모 언어 모델</td>
+</tr>
+<tr class="even">
+<td>MMLU</td>
+<td>Massive Multitask Language Understanding</td>
+<td>14개 분야 객관식 벤치마크</td>
+</tr>
+<tr class="odd">
+<td>MMLU Pro</td>
+<td>— (MMLU 개선판)</td>
+<td>선택지 10개, 추론 깊이 강화. 약 12,000문항</td>
+</tr>
+<tr class="even">
+<td>NVFP4</td>
+<td>NVIDIA Floating Point 4</td>
+<td>0.5바이트 부동소수점. Blackwell(5090)부터 하드웨어 가속</td>
+</tr>
+<tr class="odd">
+<td>Ollama</td>
+<td>— (제품 이름)</td>
+<td><code>llama.cpp</code> 위의 사용성 래퍼. 2–3단계의 실행 도구</td>
+</tr>
+<tr class="even">
+<td>pass@k</td>
+<td>— (지표 이름)</td>
+<td>k번 시도해 하나라도 테스트를 통과할 확률</td>
+</tr>
+<tr class="odd">
+<td>%p</td>
+<td>percentage point</td>
+<td>퍼센트끼리의 차이 단위. 62%와 59%의 차이는 3%p</td>
+</tr>
+<tr class="even">
+<td>temperature</td>
+<td>— (샘플링 파라미터)</td>
+<td>생성의 무작위성. 0이 아니면 같은 입력에도 답이 달라짐</td>
+</tr>
+<tr class="odd">
+<td>tok/s</td>
+<td>tokens per second</td>
+<td>초당 생성 토큰 수</td>
+</tr>
+<tr class="even">
+<td>TPOT</td>
+<td>Time Per Output Token</td>
+<td>토큰 하나를 더 뱉는 데 걸리는 시간. 6단계</td>
+</tr>
+<tr class="odd">
+<td>TTFT</td>
+<td>Time To First Token</td>
+<td>첫 토큰까지의 지연. 6단계</td>
+</tr>
+<tr class="even">
+<td>VRAM</td>
+<td>Video Random Access Memory</td>
+<td>GPU 전용 메모리. 32GB 고정</td>
+</tr>
+</tbody>
+</table>
+</div>
+  </main>
+
+  <footer class="doc-foot">
+    <p>상위 커리큘럼 — <a href="../README.md">../README.md</a> 2–3단계</p><p>실행 환경 — <a href="../ollama/README.md">../ollama/README.md</a></p><p>작성 기준 — <a href="GUIDE.md">GUIDE.md</a></p>
+  </footer>
+
+</div>
+
+<script>
+// ------------------------------------------------------------
+// ① 테마 토글: localStorage 에 기억, 없으면 OS 설정을 따릅니다.
+// ------------------------------------------------------------
+(function () {
+  var root = document.documentElement;
+  var KEY = 'study-theme';
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+
+  document.getElementById('theme-toggle').addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme');
+    if (!cur) {
+      cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+})();
+
+// ------------------------------------------------------------
+// ② 제목 앵커(#): 본문 h2/h3 에만 붙입니다.
+//    Lua 필터가 아니라 여기서 붙이는 이유 —
+//    필터로 제목 내용에 <a> 를 넣으면 pandoc 이 그 내용을 목차에도
+//    복사해 <a> 안에 <a> 가 중첩되고, 브라우저가 목차 링크를 끊습니다.
+// ------------------------------------------------------------
+(function () {
+  var main = document.querySelector('main');
+  if (!main) return;
+  main.querySelectorAll('h2[id], h3[id]').forEach(function (h) {
+    var a = document.createElement('a');
+    a.className = 'anchor';
+    a.href = '#' + h.id;
+    a.setAttribute('aria-hidden', 'true');
+    a.setAttribute('tabindex', '-1');
+    a.textContent = '#';
+    h.insertBefore(a, h.firstChild);
+  });
+})();
+
+// ------------------------------------------------------------
+// ③ 사이드바 목차: 모바일 드로어 + 현재 위치 표시(scrollspy)
+// ------------------------------------------------------------
+(function () {
+  var sidebar = document.getElementById('sidebar');
+  var toggle  = document.getElementById('nav-toggle');
+  var backdrop = document.getElementById('nav-backdrop');
+  if (!sidebar || !toggle) { if (toggle) toggle.hidden = true; return; }
+
+  // --- 드로어 열고 닫기 (좁은 화면에서만 의미가 있습니다) ---
+  function setOpen(open) {
+    document.body.classList.toggle('nav-open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.textContent = open ? '✕' : '☰';
+    toggle.setAttribute('title', open ? '목차 닫기' : '목차');
+    if (backdrop) backdrop.hidden = !open;
+  }
+  toggle.addEventListener('click', function () {
+    setOpen(!document.body.classList.contains('nav-open'));
+  });
+  if (backdrop) backdrop.addEventListener('click', function () { setOpen(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setOpen(false);
+  });
+
+  // 사이드바 안의 링크를 누르면 드로어를 닫습니다 (좁은 화면)
+  sidebar.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function () { setOpen(false); });
+  });
+
+  // --- 목차 링크 ↔ 제목 요소 짝짓기 ---
+  //     (사이드바 머리말의 문서 제목 링크는 제외 — 현재 위치 표시 대상이 아닙니다)
+  var links = Array.prototype.slice.call(document.querySelectorAll('#TOC a[href^="#"]'));
+  var items = [];
+  links.forEach(function (a) {
+    var raw = a.getAttribute('href').slice(1);
+    var id = raw;
+    try { id = decodeURIComponent(raw); } catch (e) {}
+    var el = document.getElementById(id) || document.getElementById(raw);
+    if (el) items.push({ link: a, el: el });
+  });
+  if (!items.length) return;
+
+  // --- 현재 읽고 있는 절 표시 ---
+  var current = null;
+  function sync() {
+    var line = 120;                       // 화면 상단에서 이 높이를 지난 마지막 제목이 '현재'
+    var found = items[0];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].el.getBoundingClientRect().top <= line) found = items[i];
+      else break;
+    }
+    // 문서 맨 아래에 닿으면 마지막 항목을 현재로
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) {
+      found = items[items.length - 1];
+    }
+    if (found === current) return;
+    if (current) current.link.classList.remove('active');
+    found.link.classList.add('active');
+    current = found;
+
+    // 활성 항목이 사이드바 밖으로 밀려나면 보이는 위치로
+    var r = found.link.getBoundingClientRect();
+    var s = sidebar.getBoundingClientRect();
+    if (r.top < s.top + 8 || r.bottom > s.bottom - 8) {
+      sidebar.scrollTop += r.top - s.top - sidebar.clientHeight / 3;
+    }
+  }
+
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () { ticking = false; sync(); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  sync();
+})();
+</script>
+
+</body>
+</html>

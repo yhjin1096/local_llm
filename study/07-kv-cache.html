@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>7단계 — 계산한 한계를 직접 터뜨려 본다</title>
+
+<style>
+
+
+:root {
+--bg: #ffffff;
+--bg-soft: #f6f7f9;
+--bg-code: #f4f5f7;
+--fg: #1f2328;
+--fg-soft: #57606a;
+--fg-faint: #8b949e;
+--border: #d8dee4;
+--border-soft: #eaeef2;
+--link: #0550ae;
+--accent-note: #0969da; 
+--accent-key: #8250df; 
+--accent-calc: #1a7f37; 
+--accent-warn: #bc4c00; 
+--accent-later: #6e7781; 
+--accent-quote: #656d76; 
+--accent-quiz: #bf3989; 
+--font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+"Noto Sans KR", "Malgun Gothic", "맑은 고딕", sans-serif;
+--font-mono: "JetBrains Mono", "D2Coding", "Cascadia Mono", "Consolas",
+"DejaVu Sans Mono", monospace;
+--maxw: 52rem;
+--sidebar-w: 19rem;
+--sidebar-break: 1100px; 
+}
+@media (prefers-color-scheme: dark) {
+:root {
+--bg: #0d1117;
+--bg-soft: #161b22;
+--bg-code: #161b22;
+--fg: #e6edf3;
+--fg-soft: #9198a1;
+--fg-faint: #6e7681;
+--border: #30363d;
+--border-soft: #21262d;
+--link: #4493f8;
+--accent-note: #4493f8;
+--accent-key: #ab7df8;
+--accent-calc: #3fb950;
+--accent-warn: #d29922;
+--accent-later: #8b949e;
+--accent-quote: #8b949e;
+--accent-quiz: #db61a2;
+}
+}
+
+:root[data-theme="light"] {
+--bg: #ffffff; --bg-soft: #f6f7f9; --bg-code: #f4f5f7;
+--fg: #1f2328; --fg-soft: #57606a; --fg-faint: #8b949e;
+--border: #d8dee4; --border-soft: #eaeef2; --link: #0550ae;
+--accent-note: #0969da; --accent-key: #8250df; --accent-calc: #1a7f37;
+--accent-warn: #bc4c00; --accent-later: #6e7781; --accent-quote: #656d76;
+--accent-quiz: #bf3989;
+}
+:root[data-theme="dark"] {
+--bg: #0d1117; --bg-soft: #161b22; --bg-code: #161b22;
+--fg: #e6edf3; --fg-soft: #9198a1; --fg-faint: #6e7681;
+--border: #30363d; --border-soft: #21262d; --link: #4493f8;
+--accent-note: #4493f8; --accent-key: #ab7df8; --accent-calc: #3fb950;
+--accent-warn: #d29922; --accent-later: #8b949e; --accent-quote: #8b949e;
+--accent-quiz: #db61a2;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+body {
+margin: 0;
+background: var(--bg);
+color: var(--fg);
+font-family: var(--font-sans);
+font-size: 16.5px;
+line-height: 1.85;
+word-break: keep-all; 
+overflow-wrap: break-word;
+-webkit-text-size-adjust: 100%;
+}
+.wrap {
+max-width: var(--maxw);
+margin: 0 auto;
+padding: 3rem 1.25rem 6rem;
+}
+
+.doc-head {
+border-bottom: 1px solid var(--border);
+padding-bottom: 1.5rem;
+margin-bottom: 2rem;
+}
+.doc-head .eyebrow {
+font-size: 0.8rem;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--accent-note);
+margin: 0 0 0.5rem;
+}
+.doc-head h1 {
+margin: 0 0 0.6rem;
+font-size: 2.1rem;
+line-height: 1.35;
+letter-spacing: -0.02em;
+border: 0;
+padding: 0;
+}
+.doc-head .subtitle {
+margin: 0;
+color: var(--fg-soft);
+font-size: 1rem;
+}
+.doc-head .meta {
+margin: 1rem 0 0;
+font-size: 0.82rem;
+color: var(--fg-faint);
+display: flex;
+flex-wrap: wrap;
+gap: 0.4rem 1.1rem;
+}
+
+h1, h2, h3, h4 {
+line-height: 1.4;
+letter-spacing: -0.01em;
+scroll-margin-top: 1.5rem;
+}
+h2 {
+margin: 3.5rem 0 1.2rem;
+font-size: 1.55rem;
+padding-bottom: 0.45rem;
+border-bottom: 1px solid var(--border);
+}
+h3 { margin: 2.5rem 0 0.9rem; font-size: 1.22rem; }
+h4 { margin: 1.9rem 0 0.7rem; font-size: 1.03rem; color: var(--fg-soft); }
+
+.anchor {
+float: left;
+margin-left: -1.1em;
+padding-right: 0.35em;
+color: var(--fg-faint);
+text-decoration: none;
+opacity: 0;
+font-weight: 400;
+}
+h2:hover .anchor, h3:hover .anchor { opacity: 1; }
+p { margin: 0 0 1.15rem; }
+a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+strong { font-weight: 700; }
+hr {
+border: 0;
+border-top: 1px solid var(--border);
+margin: 3rem 0;
+}
+
+
+#sidebar {
+position: fixed;
+top: 0;
+left: 0;
+bottom: 0;
+width: var(--sidebar-w);
+z-index: 60;
+box-sizing: border-box;
+padding: 1.6rem 0.6rem 3rem 1.1rem;
+background: var(--bg-soft);
+border-right: 1px solid var(--border);
+overflow-y: auto;
+overscroll-behavior: contain;
+font-size: 0.86rem;
+line-height: 1.5;
+}
+.sidebar-head {
+padding: 0 0.55rem 0.9rem;
+margin-bottom: 0.9rem;
+border-bottom: 1px solid var(--border-soft);
+}
+.sidebar-head .side-eyebrow {
+margin: 0 0 0.25rem;
+font-size: 0.68rem;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--accent-note);
+}
+.sidebar-head .side-title {
+display: block;
+color: var(--fg);
+font-weight: 700;
+font-size: 0.95rem;
+line-height: 1.4;
+text-decoration: none;
+}
+.sidebar-head .side-title:hover { color: var(--link); }
+#TOC::before {
+content: "목차";
+display: block;
+padding-left: 0.55rem;
+font-weight: 700;
+font-size: 0.7rem;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--fg-faint);
+margin-bottom: 0.5rem;
+}
+#TOC ul { list-style: none; margin: 0; padding-left: 0; }
+#TOC ul ul { padding-left: 0.7rem; margin: 0.1rem 0 0.4rem; }
+#TOC li { margin: 0; }
+#TOC a {
+display: block;
+padding: 0.26rem 0.55rem;
+border-left: 2px solid transparent;
+border-radius: 0 6px 6px 0;
+color: var(--fg-soft);
+text-decoration: none;
+}
+#TOC a:hover { background: var(--bg); color: var(--link); }
+#TOC > ul > li > a { color: var(--fg); font-weight: 600; margin-top: 0.35rem; }
+
+#TOC a.active {
+color: var(--link);
+background: var(--bg);
+border-left-color: var(--link);
+font-weight: 700;
+}
+#TOC .badge { font-size: 0.6rem; border: 0; padding: 0; margin-left: 0.25em; opacity: 0.85; }
+
+#nav-backdrop {
+position: fixed;
+inset: 0;
+z-index: 55;
+background: rgba(0, 0, 0, 0.45);
+}
+
+#nav-toggle {
+position: fixed;
+top: 0.9rem;
+left: 0.9rem;
+z-index: 70;
+width: 2.3rem;
+height: 2.3rem;
+border-radius: 50%;
+border: 1px solid var(--border);
+background: var(--bg-soft);
+color: var(--fg-soft);
+font-size: 1rem;
+line-height: 1;
+cursor: pointer;
+}
+#nav-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
+
+ul, ol { margin: 0 0 1.15rem; padding-left: 1.5rem; }
+li { margin: 0.3rem 0; }
+li > ul, li > ol { margin: 0.3rem 0; }
+
+code {
+font-family: var(--font-mono);
+font-size: 0.875em;
+background: var(--bg-code);
+border: 1px solid var(--border-soft);
+border-radius: 5px;
+padding: 0.12em 0.38em;
+word-break: break-all;
+}
+pre {
+background: var(--bg-code);
+border: 1px solid var(--border-soft);
+border-radius: 9px;
+padding: 1rem 1.15rem;
+overflow-x: auto; 
+margin: 0 0 1.4rem;
+line-height: 1.62;
+font-size: 0.855rem;
+}
+pre code {
+background: none;
+border: 0;
+padding: 0;
+font-size: inherit;
+word-break: normal;
+white-space: pre;
+}
+
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table {
+border-collapse: collapse;
+width: 100%;
+font-size: 0.92rem;
+line-height: 1.65;
+}
+th, td {
+border: 1px solid var(--border);
+padding: 0.52rem 0.8rem;
+text-align: left;
+vertical-align: top;
+}
+th { background: var(--bg-soft); font-weight: 700; white-space: nowrap; }
+tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--bg-soft) 45%, transparent); }
+caption { caption-side: bottom; padding-top: 0.6rem; font-size: 0.82rem; color: var(--fg-faint); text-align: left; }
+
+blockquote {
+margin: 0 0 1.4rem;
+padding: 0.15rem 0 0.15rem 1.1rem;
+border-left: 3px solid var(--border);
+color: var(--fg-soft);
+}
+blockquote > :last-child { margin-bottom: 0; }
+
+.note, .key, .calc, .warn, .later, .quote, .quiz {
+--c: var(--fg-soft);
+position: relative;
+margin: 1.8rem 0;
+padding: 1.1rem 1.25rem 1.15rem;
+border: 1px solid var(--border);
+border-left: 3px solid var(--c);
+border-radius: 0 9px 9px 0;
+background: color-mix(in srgb, var(--c) 5%, var(--bg));
+font-size: 0.965rem;
+}
+.note::before, .key::before, .calc::before, .warn::before,
+.later::before, .quote::before, .quiz::before {
+display: block;
+font-size: 0.72rem;
+font-weight: 800;
+letter-spacing: 0.09em;
+color: var(--c);
+margin-bottom: 0.55rem;
+}
+.note { --c: var(--accent-note); }
+.key { --c: var(--accent-key); }
+.calc { --c: var(--accent-calc); }
+.warn { --c: var(--accent-warn); }
+.later { --c: var(--accent-later); }
+.quote { --c: var(--accent-quote); }
+.quiz { --c: var(--accent-quiz); }
+.note::before { content: "개념 보충"; }
+.key::before { content: "핵심"; }
+.calc::before { content: "어림셈"; }
+.warn::before { content: "주의"; }
+.later::before { content: "여기까지 — 이후는 뒤 단계"; }
+.quote::before { content: "원문 인용"; }
+.quiz::before { content: "확인 문제"; }
+
+.note[data-label]::before, .key[data-label]::before, .calc[data-label]::before,
+.warn[data-label]::before, .later[data-label]::before,
+.quote[data-label]::before, .quiz[data-label]::before { content: attr(data-label); }
+.note > :last-child, .key > :last-child, .calc > :last-child,
+.warn > :last-child, .later > :last-child,
+.quote > :last-child, .quiz > :last-child { margin-bottom: 0; }
+.quote { font-style: normal; }
+.quote p { color: var(--fg-soft); }
+
+.note pre, .key pre, .calc pre, .warn pre, .later pre, .quiz pre {
+background: var(--bg);
+}
+
+.quiz ol { padding-left: 1.35rem; }
+.quiz li { margin: 0.75rem 0; }
+details {
+margin: 0.5rem 0 0;
+border: 1px dashed var(--border);
+border-radius: 7px;
+padding: 0 0.9rem;
+background: var(--bg);
+}
+details[open] { padding-bottom: 0.6rem; }
+summary {
+cursor: pointer;
+padding: 0.55rem 0;
+font-size: 0.86rem;
+font-weight: 700;
+color: var(--fg-soft);
+list-style: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before { content: "▸ "; color: var(--fg-faint); }
+details[open] summary::before { content: "▾ "; }
+/* pandoc 이 <summary> 안의 텍스트를 <p> 로 감쌉니다 → 인라인으로 되돌립니다 */
+summary > p { display: inline; margin: 0; }
+details > :not(summary) { font-size: 0.94rem; }
+details > :last-child { margin-bottom: 0; }
+
+/* ---------- 그림 / SVG ---------- */
+figure {
+  margin: 2rem 0;
+  padding: 0;
+}
+figure > .svg-scroll { overflow-x: auto; }
+figure svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.84rem;
+  color: var(--fg-faint);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* SVG 안에서 쓸 테마 연동 클래스
+   — SVG 에 색을 하드코딩하지 말고 이 클래스만 쓰세요 (GUIDE.md 8절) */
+svg text      { font-family: var(--font-sans); }
+svg .mono     { font-family: var(--font-mono); }
+
+/* 텍스트 */
+svg .s-fg     { fill: var(--fg); }
+svg .s-soft   { fill: var(--fg-soft); }
+svg .s-faint  { fill: var(--fg-faint); }
+
+/* 선 */
+svg .s-line   { stroke: var(--border); fill: none; }
+svg .s-strong { stroke: var(--fg-faint); fill: none; }
+svg .s-dash   { stroke: var(--border); fill: none; stroke-dasharray: 4 3; }
+svg .s-arrow  { fill: var(--fg-faint); stroke: none; }
+
+/* 상자 */
+svg .s-box    { fill: var(--bg-soft); stroke: var(--border); }
+svg .s-plain  { fill: none; stroke: var(--border); }
+svg .s-accent { fill: var(--accent-note); }
+
+/* 색 채움 — 옅은 배경 + 진한 테두리. 위에 s-fg 텍스트를 얹어도 두 테마에서 읽힙니다 */
+svg .s-f1 { fill: var(--accent-note);  fill-opacity: 0.16; stroke: var(--accent-note); }
+svg .s-f2 { fill: var(--accent-key);   fill-opacity: 0.16; stroke: var(--accent-key); }
+svg .s-f3 { fill: var(--accent-calc);  fill-opacity: 0.16; stroke: var(--accent-calc); }
+svg .s-f4 { fill: var(--accent-warn);  fill-opacity: 0.16; stroke: var(--accent-warn); }
+svg .s-f5 { fill: var(--fg-faint);     fill-opacity: 0.14; stroke: var(--fg-faint); }
+
+/* 색 텍스트 — 위 채움과 짝 */
+svg .s-t1 { fill: var(--accent-note); }
+svg .s-t2 { fill: var(--accent-key); }
+svg .s-t3 { fill: var(--accent-calc); }
+svg .s-t4 { fill: var(--accent-warn); }
+svg .s-t5 { fill: var(--fg-faint); }
+
+/* ---------- 배지 (깊이 표시 [완전]/[씨앗]) ---------- */
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.1em 0.5em;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  vertical-align: 0.12em;
+  margin-left: 0.3em;
+}
+.badge.full  { color: var(--accent-key); }
+.badge.seed  { color: var(--accent-later); }
+
+/* ---------- 테마 토글 버튼 ---------- */
+#theme-toggle {
+  position: fixed;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 50;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--fg-soft);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+#theme-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
+
+/* ---------- 꼬리말 ---------- */
+.doc-foot {
+  margin-top: 5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.84rem;
+  color: var(--fg-faint);
+}
+
+/* ---------- 반응형 ---------- */
+
+/* 넓은 화면 — 사이드바가 자리를 차지하고 본문은 남은 폭 가운데에 놓입니다 */
+@media (min-width: 1100px) {
+  body { padding-left: var(--sidebar-w); }
+  #nav-toggle, #nav-backdrop { display: none; }
+}
+
+/* 좁은 화면 — 사이드바를 왼쪽 바깥으로 밀어두고 ☰ 로 꺼냅니다 */
+@media (max-width: 1099.98px) {
+  #sidebar {
+    width: min(19rem, 84vw);
+    transform: translateX(-102%);
+    transition: transform 0.22s ease, visibility 0.22s;
+    box-shadow: 0 0 2rem rgba(0, 0, 0, 0.25);
+  }
+  body.nav-open #sidebar { transform: none; }
+  /* ☰ 버튼이 사이드바 머리말을 가리지 않도록 위를 비웁니다 */
+  #sidebar { padding-top: 4rem; }
+  body:not(.nav-open) #sidebar { visibility: hidden; }
+  body.nav-open { overflow: hidden; }
+  .wrap { padding-top: 4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sidebar { transition: none; }
+}
+
+@media (max-width: 640px) {
+  body { font-size: 16px; line-height: 1.8; }
+  .wrap { padding: 4rem 1rem 4rem; }
+  .doc-head h1 { font-size: 1.65rem; }
+  h2 { font-size: 1.35rem; margin-top: 2.8rem; }
+  h3 { font-size: 1.12rem; }
+  .anchor { display: none; }
+}
+
+/* ---------- 인쇄 ---------- */
+@media print {
+  :root { --bg: #fff; --fg: #000; }
+  #theme-toggle, #nav-toggle, #sidebar, #nav-backdrop { display: none !important; }
+  body { padding-left: 0; }
+  .wrap { max-width: none; padding: 0; }
+  pre, table, figure, .note, .key, .calc, .warn, .later, .quiz { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<button id="nav-toggle" type="button" aria-label="목차 열기/닫기" aria-expanded="false" aria-controls="sidebar" title="목차">☰</button>
+<button id="theme-toggle" type="button" aria-label="라이트/다크 테마 전환" title="테마 전환">◐</button>
+
+<div id="nav-backdrop" hidden></div>
+
+<aside id="sidebar">
+  <div class="sidebar-head">
+    <p class="side-eyebrow">PHASE 3 · 서빙 최적화</p>
+    <a class="side-title" href="#top">7단계 — 계산한 한계를 직접 터뜨려 본다</a>
+  </div>
+  <nav id="TOC" role="doc-toc" aria-label="목차">
+<ul>
+<li><a href="#이-단계는-무엇인가" id="toc-이-단계는-무엇인가">1. 이 단계는 무엇인가</a>
+<ul>
+<li><a href="#원문의-요지" id="toc-원문의-요지">원문의 요지</a></li>
+<li><a href="#이-단계는-새-개념을-배우는-단계가-아니다" id="toc-이-단계는-새-개념을-배우는-단계가-아니다">이 단계는 새 개념을 배우는 단계가 아니다</a></li>
+<li><a href="#이-문서를-읽고-나면-답할-수-있는-질문" id="toc-이-문서를-읽고-나면-답할-수-있는-질문">이 문서를 읽고 나면 답할 수 있는 질문</a></li>
+</ul></li>
+<li><a href="#개념" id="toc-개념">2. 개념</a></li>
+<li><a href="#배치란-무엇을-묶는-것인가-완전" id="toc-배치란-무엇을-묶는-것인가-완전">2.1 배치란 무엇을 묶는 것인가 <span class="badge full">완전</span></a></li>
+<li><a href="#한계를-사람-수로-환산하기-완전" id="toc-한계를-사람-수로-환산하기-완전">2.2 한계를 사람 수로 환산하기 <span class="badge full">완전</span></a></li>
+<li><a href="#정적으로-묶으면-왜-낭비인가-continuous-batching-완전" id="toc-정적으로-묶으면-왜-낭비인가-continuous-batching-완전">2.3 정적으로 묶으면 왜 낭비인가 — Continuous Batching <span class="badge full">완전</span></a></li>
+<li><a href="#요청마다-덩어리로-잡으면-생기는-두-가지-낭비-완전" id="toc-요청마다-덩어리로-잡으면-생기는-두-가지-낭비-완전">2.4 요청마다 덩어리로 잡으면 생기는 두 가지 낭비 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#얼마나-쓸지-미리-알-수-없다" id="toc-얼마나-쓸지-미리-알-수-없다">① 얼마나 쓸지 미리 알 수 없다</a></li>
+<li><a href="#들고-나면서-구멍이-생긴다" id="toc-들고-나면서-구멍이-생긴다">② 들고 나면서 구멍이 생긴다</a></li>
+</ul></li>
+<li><a href="#pagedattention-운영체제에서-빌려온-해법-완전" id="toc-pagedattention-운영체제에서-빌려온-해법-완전">2.5 PagedAttention — 운영체제에서 빌려온 해법 <span class="badge full">완전</span></a></li>
+<li><a href="#블록을-쪼갠-김에-얻는-것-공유-완전" id="toc-블록을-쪼갠-김에-얻는-것-공유-완전">2.6 블록을 쪼갠 김에 얻는 것 — 공유 <span class="badge full">완전</span></a></li>
+<li><a href="#한계에-닿으면-엔진은-무엇을-하는가-완전" id="toc-한계에-닿으면-엔진은-무엇을-하는가-완전">2.7 한계에 닿으면 엔진은 무엇을 하는가 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#그래서-곡선이-꺾인다" id="toc-그래서-곡선이-꺾인다">그래서 곡선이 꺾인다</a></li>
+</ul></li>
+<li><a href="#실험을-설계하는-법-완전" id="toc-실험을-설계하는-법-완전">2.8 실험을 설계하는 법 <span class="badge full">완전</span></a></li>
+<li><a href="#내-장비-기준-정리" id="toc-내-장비-기준-정리">3. 내 장비 기준 정리</a>
+<ul>
+<li><a href="#gb-한-장에서-7단계는-어떻게-되는가" id="toc-gb-한-장에서-7단계는-어떻게-되는가">3.1 32GB 한 장에서 7단계는 어떻게 되는가</a></li>
+<li><a href="#원문-전제와의-차이" id="toc-원문-전제와의-차이">3.2 원문 전제와의 차이</a></li>
+</ul></li>
+<li><a href="#확인-문제" id="toc-확인-문제">4. 확인 문제</a></li>
+<li><a href="#다음-단계로" id="toc-다음-단계로">5. 다음 단계로</a>
+<ul>
+<li><a href="#이-문서가-회수한-씨앗" id="toc-이-문서가-회수한-씨앗">이 문서가 회수한 씨앗</a></li>
+<li><a href="#이-문서가-남기는-씨앗" id="toc-이-문서가-남기는-씨앗">이 문서가 남기는 씨앗</a></li>
+<li><a href="#단계로-넘어가기-전에" id="toc-단계로-넘어가기-전에">8단계로 넘어가기 전에</a></li>
+</ul></li>
+<li><a href="#용어표" id="toc-용어표">6. 용어표</a></li>
+</ul>
+  </nav>
+</aside>
+
+<div class="wrap">
+
+  <header class="doc-head" id="top">
+    <p class="eyebrow">PHASE 3 · 서빙 최적화</p>
+    <h1>7단계 — 계산한 한계를 직접 터뜨려 본다</h1>
+    <p class="subtitle">배치를 키우면 무엇이 오르고 무엇이 무너지는가</p>
+        <div class="meta">
+      <span>대상 장비 — RTX 5090 32GB × 1 (Blackwell, sm_120)</span><span>깊이 규칙 — GUIDE.md 옵션 B</span><span>최종 수정 — 2026-09-02</span>
+    </div>
+      </header>
+
+  <main>
+<h2 id="이-단계는-무엇인가">1. 이 단계는 무엇인가</h2>
+<h3 id="원문의-요지">원문의 요지</h3>
+<div class="quote" data-label="원문 (7단계) — Batch를 1, 2, 4, 8, 16, 32 로 늘려봅니다">
+<ul>
+<li>배치 상한을 바꿔가며 서버를 띄우고, 매번 6단계 벤치마크를 돌립니다.</li>
+<li>손 계산한 KV 캐시 값과 vLLM 기동 로그의 <code>GPU KV cache size</code> 를 <strong>대조</strong>하세요.</li>
+<li>배치를 계속 키우면 <strong>preemption / swap 로그</strong>가 뜹니다 (캐시 부족으로 요청을 강제 퇴출).</li>
+</ul>
+</div>
+<div class="quote" data-label="원문 (7단계) — 체크포인트">
+<p>“이 GPU에서 컨텍스트 16K로 동시 사용자 몇 명까지 받을 수 있나?”를
+<strong>계산으로 예측하고 실측으로 검증</strong>했다.</p>
+</div>
+<h3 id="이-단계는-새-개념을-배우는-단계가-아니다">이 단계는 새 개념을 배우는 단계가 아니다</h3>
+<p>체크포인트의 문장 구조를 보면 이 단계의 성격이 드러납니다. <strong>예측하고, 검증한다.</strong></p>
+<p>지금까지 세 문서에서 예측에 필요한 것을 이미 다 만들었습니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>어디서</th>
+<th>무엇을</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1단계 2.5절</td>
+<td>KV cache 공식 — 토큰당 바이트, 그리고 <code>컨텍스트 × 요청 수</code> 로 곱해진다는 성질</td>
+</tr>
+<tr class="even">
+<td>4–6단계 2.5절</td>
+<td>배치를 키우면 처리량은 오르고 개별 지연시간은 나빠진다는 <strong>방향</strong></td>
+</tr>
+<tr class="odd">
+<td>4–6단계 2.7절</td>
+<td>엔진이 KV 자리를 미리 예약하고, 그 크기가 곧 동시 처리 능력이라는 것</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p>7단계는 <strong>앞에서 계산한 것이 맞는지 확인하는 단계</strong>입니다.
+새로운 공식을 배우는 게 아니라, 이미 가진 공식으로 <strong>한계를 예측해 두고 실제로 터뜨려 보는</strong> 것입니다.</p>
+</div>
+<p>그래서 이 문서가 하는 일은 두 가지입니다.</p>
+<ol type="1">
+<li>예측을 <strong>동시 사용자 수</strong>로 바꾸는 법 (2.2절)</li>
+<li>그 한계 근처에서 엔진이 하는 일 — <strong>Continuous Batching, PagedAttention, preemption</strong> (2.3~2.7절)</li>
+</ol>
+<p>두 번째가 필요한 이유는, 그것을 모르면 실측이 계산과 어긋났을 때 <strong>왜 어긋났는지 해석할 수 없기</strong> 때문입니다.</p>
+<h3 id="이-문서를-읽고-나면-답할-수-있는-질문">이 문서를 읽고 나면 답할 수 있는 질문</h3>
+<ol type="1">
+<li>“컨텍스트 8K 로 동시 몇 명”을 어떻게 계산하는가?</li>
+<li>요청을 묶어서 처리하는 것이 왜 이득이고, “정적으로 묶는 것”은 왜 낭비인가?</li>
+<li>KV cache 를 요청마다 연속된 덩어리로 잡으면 무엇이 문제인가?</li>
+<li>배치를 계속 키우면 결국 무엇이 먼저 무너지는가?</li>
+<li>같은 프롬프트를 반복해서 보내면 왜 첫 응답이 빨라지는가?</li>
+</ol>
+<p>4절 확인 문제가 이 다섯 가지를 다시 묻습니다.</p>
+<hr />
+<h2 id="개념">2. 개념</h2>
+<h2 id="배치란-무엇을-묶는-것인가-완전">2.1 배치란 무엇을 묶는 것인가 <span class="badge full">완전</span></h2>
+<p>용어부터 분명히 해야 합니다. <strong>배치(batch)는 “요청을 몇 개나 동시에 처리 중인가”</strong> 입니다.</p>
+<p>4–6단계에서 decode 가 memory-bound 라는 것을 봤습니다. 거기서 배치의 의미가 나옵니다.</p>
+<pre><code>요청 1개  — 가중치 16GB 를 읽어 토큰 1개 생성
+요청 8개  — 가중치 16GB 를 읽어 토큰 8개 생성    ← 읽기는 같고 결과는 8배</code></pre>
+<p>가중치를 읽는 비용은 <strong>요청 수와 무관하게 한 번</strong>입니다. 그래서 묶을수록 이득입니다.</p>
+<div class="key">
+<p>배치가 이득인 이유는 연산이 빨라져서가 아니라, <strong>읽기 비용을 여럿이 나눠 내기 때문</strong>입니다.
+decode 가 memory-bound 라는 4–6단계의 사실이 배치의 존재 이유입니다.</p>
+</div>
+<div class="note">
+<p>그런데 공짜가 아닙니다. 묶인 요청마다 <strong>자기 KV cache 를 따로</strong> 가져야 합니다.
+가중치는 공유되지만 KV cache 는 공유되지 않습니다 — 요청마다 대화 내용이 다르기 때문입니다.</p>
+<p><strong>이 비대칭이 7단계 전체의 긴장</strong>입니다.
+읽기는 공유되어 이득이 나는데, 메모리는 공유되지 않아 배치 수만큼 곱해집니다.</p>
+</div>
+<hr />
+<h2 id="한계를-사람-수로-환산하기-완전">2.2 한계를 사람 수로 환산하기 <span class="badge full">완전</span></h2>
+<p>1단계 공식을 그대로 뒤집으면 동시 사용자 수가 나옵니다. 이것이 예측의 전부입니다.</p>
+<div class="calc">
+<p><strong>동시 처리 가능 요청 수 어림셈</strong></p>
+<pre><code>KV 예산(GB)   ≈  VRAM 총량 − 가중치 − 작업 버퍼 − CUDA 컨텍스트
+동시 요청 수  ≈  KV 예산 ÷ (토큰당 KV 바이트 × 컨텍스트 길이)</code></pre>
+<p>내 장비(32GB)에서 Qwen3-8B BF16, 컨텍스트 8K 로 대입해봅니다.
+토큰당 144 KB 는 1단계 2.5절에서 계산한 값입니다.</p>
+<pre><code>KV 예산      = 32 − 16(가중치) − 2(버퍼 + 컨텍스트)  ≈ 14 GB
+요청 1개분   = 144 KB × 8,192 토큰                  ≈ 1.2 GB
+동시 요청 수 ≈ 14 ÷ 1.2                             ≈ 11 개</code></pre>
+<p><strong>이 어림셈이 틀리는 경우</strong></p>
+<ul>
+<li><strong>엔진이 예약한 양이 기준입니다.</strong> 실제로는 VRAM 의 몇 %까지 쓸지 설정값이 있고, 그 값이 KV 예산을 정합니다. 기동 로그의 <code>GPU KV cache size</code> 가 진짜 숫자입니다</li>
+<li><strong>블록 단위로 할당되므로 딱 떨어지지 않습니다</strong> (2.4절). 컨텍스트가 블록 크기의 배수가 아니면 마지막 블록이 남습니다</li>
+<li><strong>모든 요청이 컨텍스트를 꽉 채우지 않습니다.</strong> 위 계산은 <strong>최악의 경우</strong>이고, 실제로는 더 많이 받을 수 있습니다 — 그래서 엔진은 예약이 아니라 <strong>필요할 때 할당</strong>하는 쪽을 택합니다 (2.3절)</li>
+<li>컨텍스트 길이를 바꾸면 요청 1개분이 그대로 비례해 바뀝니다</li>
+</ul>
+</div>
+<div class="note">
+<p><strong>컨텍스트 16K 에서 몇 명인지는 일부러 계산하지 않았습니다.</strong>
+그것이 원문 7단계의 체크포인트입니다. 위 방법으로 직접 계산해 두고,
+서버 기동 로그의 값과 대조하는 것이 이 단계의 핵심 작업입니다.</p>
+</div>
+<hr />
+<h2 id="정적으로-묶으면-왜-낭비인가-continuous-batching-완전">2.3 정적으로 묶으면 왜 낭비인가 — Continuous Batching <span class="badge full">완전</span></h2>
+<p>요청을 묶는 게 이득이라면, 그냥 8개씩 모아서 처리하면 될 것 같습니다.
+그런데 그렇게 하면 대부분의 시간을 놀면서 보내게 됩니다. 이유는 <strong>요청마다 답변 길이가 다르기 때문</strong>입니다.</p>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 300" role="img" aria-label="정적 배치는 네 요청을 묶어 가장 긴 요청이 끝날 때까지 기다리므로 짧은 요청이 끝난 자리가 비어 있다. 연속 배치는 끝난 자리에 대기 중인 새 요청을 즉시 투입해 빈자리를 없앤다.">
+  <text class="s-t4" x="16" y="24" font-size="12.5" font-weight="700">정적 배치 — 네 개를 묶어 전부 끝날 때까지 기다림</text>
+  <text class="s-faint" x="16" y="48" font-size="11">요청 A</text>
+  <rect class="s-f1" x="76" y="36" width="420" height="18" rx="3" />
+  <text class="s-faint" x="16" y="74" font-size="11">요청 B</text>
+  <rect class="s-f1" x="76" y="62" width="96" height="18" rx="3" />
+  <rect class="s-f5" x="174" y="62" width="322" height="18" rx="3" />
+  <text class="s-faint" x="16" y="100" font-size="11">요청 C</text>
+  <rect class="s-f1" x="76" y="88" width="150" height="18" rx="3" />
+  <rect class="s-f5" x="228" y="88" width="268" height="18" rx="3" />
+  <text class="s-faint" x="16" y="126" font-size="11">요청 D</text>
+  <rect class="s-f1" x="76" y="114" width="64" height="18" rx="3" />
+  <rect class="s-f5" x="142" y="114" width="354" height="18" rx="3" />
+  <text class="s-t4" x="510" y="88" font-size="11.5">회색 = 끝났는데</text>
+  <text class="s-t4" x="510" y="104" font-size="11.5">자리를 잡고 노는 중</text>
+  <line class="s-line" x1="496" y1="30" x2="496" y2="140" stroke-dasharray="4 3"></line>
+  <text class="s-faint" x="500" y="150" font-size="10.5">여기서야 다음 묶음 시작</text>
+  <text class="s-t3" x="16" y="192" font-size="12.5" font-weight="700">연속 배치 — 끝난 자리에 대기 요청을 바로 투입</text>
+  <text class="s-faint" x="16" y="216" font-size="11">요청 A</text>
+  <rect class="s-f1" x="76" y="204" width="420" height="18" rx="3" />
+  <text class="s-faint" x="16" y="242" font-size="11">요청 B</text>
+  <rect class="s-f1" x="76" y="230" width="96" height="18" rx="3" />
+  <rect class="s-f3" x="174" y="230" width="180" height="18" rx="3" />
+  <text class="s-t3" x="360" y="244" font-size="10.5">요청 E 투입</text>
+  <text class="s-faint" x="16" y="268" font-size="11">요청 C</text>
+  <rect class="s-f1" x="76" y="256" width="150" height="18" rx="3" />
+  <rect class="s-f3" x="228" y="256" width="200" height="18" rx="3" />
+  <text class="s-t3" x="434" y="270" font-size="10.5">요청 F 투입</text>
+  <text class="s-faint" x="16" y="294" font-size="11">요청 D</text>
+  <rect class="s-f1" x="76" y="282" width="64" height="18" rx="3" />
+  <rect class="s-f3" x="142" y="282" width="150" height="18" rx="3" />
+  <text class="s-t3" x="298" y="296" font-size="10.5">요청 G 투입</text>
+</svg>
+</div>
+<figcaption>같은 GPU 인데 빈자리를 없애는 것만으로 처리량이 달라집니다</figcaption>
+</figure>
+<p>정적 배치의 문제는 <strong>가장 긴 요청에 나머지가 묶인다</strong>는 것입니다.
+짧은 답변으로 끝난 요청도 자리를 잡고 있고, 새 요청은 그 묶음이 끝날 때까지 기다립니다.</p>
+<p><strong>Continuous Batching</strong> 은 이 대기를 없앱니다. 토큰 하나를 생성할 때마다 스케줄러가
+<strong>배치 구성을 다시 짭니다.</strong> 끝난 요청은 즉시 빠지고, 대기 중이던 요청이 그 자리에 들어옵니다.</p>
+<div class="key">
+<p>Continuous Batching 이 바꾸는 것은 연산이 아니라 <strong>스케줄링의 단위</strong>입니다.
+“요청 묶음 단위”로 스케줄하던 것을 <strong>“토큰 생성 한 번 단위”로</strong> 바꿉니다.
+그래서 iteration-level scheduling 이라고도 부릅니다.</p>
+</div>
+<div class="note">
+<p>이 기법이 4–6단계에서 <strong>“Ollama 에는 제어권이 없다”</strong> 고 했던 것과 이어집니다.
+요청이 수시로 들어오고 나가는 구조가 되려면, 엔진이 <strong>KV cache 를 그때그때 붙였다 뗐다</strong> 할 수 있어야 합니다.
+그 메모리 관리가 다음 절의 주제입니다.</p>
+</div>
+<hr />
+<h2 id="요청마다-덩어리로-잡으면-생기는-두-가지-낭비-완전">2.4 요청마다 덩어리로 잡으면 생기는 두 가지 낭비 <span class="badge full">완전</span></h2>
+<p>Continuous Batching 을 하려면 메모리를 유연하게 다뤄야 합니다.
+그런데 KV cache 를 <strong>요청별로 연속된 큰 덩어리</strong>로 잡으면 두 가지 낭비가 생깁니다.</p>
+<h3 id="얼마나-쓸지-미리-알-수-없다">① 얼마나 쓸지 미리 알 수 없다</h3>
+<p>요청이 들어올 때 답변이 몇 토큰이 될지 아무도 모릅니다.
+연속된 자리를 잡으려면 <strong>최대 길이만큼 미리 예약</strong>해야 하고, 대부분은 안 쓰고 끝납니다.</p>
+<h3 id="들고-나면서-구멍이-생긴다">② 들고 나면서 구멍이 생긴다</h3>
+<p>요청이 끝나면 그 자리가 비는데, 그 구멍이 다음 요청에 맞는 크기가 아닙니다.
+전체로는 자리가 남는데 <strong>연속된 자리가 없어서</strong> 새 요청을 못 받는 상황이 생깁니다.</p>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 250" role="img" aria-label="연속 할당은 요청마다 최대 길이를 예약해 쓰지 않는 공간이 생기고 요청이 빠진 자리에 구멍이 남는다. 블록 할당은 고정 크기 블록을 필요할 때만 배정하므로 흩어져 있어도 빈틈이 거의 없다.">
+  <text class="s-t4" x="16" y="24" font-size="12.5" font-weight="700">연속 할당 — 요청마다 최대 길이를 예약</text>
+  <rect class="s-plain" x="16" y="36" width="688" height="44" rx="6" />
+  <rect class="s-f1" x="20" y="40" width="90" height="36" rx="3" />
+  <text class="s-fg" x="65" y="63" text-anchor="middle" font-size="11">A 사용</text>
+  <rect class="s-f5" x="112" y="40" width="120" height="36" rx="3" />
+  <text class="s-t4" x="172" y="63" text-anchor="middle" font-size="11">A 예약분 (안 씀)</text>
+  <rect class="s-f5" x="236" y="40" width="104" height="36" rx="3" />
+  <text class="s-t4" x="288" y="63" text-anchor="middle" font-size="11">B가 빠진 구멍</text>
+  <rect class="s-f1" x="344" y="40" width="76" height="36" rx="3" />
+  <text class="s-fg" x="382" y="63" text-anchor="middle" font-size="11">C 사용</text>
+  <rect class="s-f5" x="424" y="40" width="150" height="36" rx="3" />
+  <text class="s-t4" x="499" y="63" text-anchor="middle" font-size="11">C 예약분 (안 씀)</text>
+  <rect class="s-f5" x="578" y="40" width="122" height="36" rx="3" />
+  <text class="s-t4" x="639" y="63" text-anchor="middle" font-size="11">남은 구멍</text>
+  <text class="s-t4" x="16" y="100" font-size="11.5">전체로는 자리가 남는데, 연속된 자리가 없어 새 요청을 못 받습니다</text>
+  <text class="s-t3" x="16" y="146" font-size="12.5" font-weight="700">블록 할당 — 고정 크기 블록을 필요할 때만</text>
+  <rect class="s-plain" x="16" y="158" width="688" height="44" rx="6" />
+  <rect class="s-f1" x="20" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f3" x="72" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f1" x="124" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f2" x="176" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f3" x="228" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f1" x="280" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f2" x="332" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f3" x="384" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f1" x="436" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f2" x="488" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f3" x="540" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f5" x="592" y="162" width="48" height="36" rx="3" />
+  <rect class="s-f5" x="644" y="162" width="48" height="36" rx="3" />
+  <text class="s-faint" x="16" y="222" font-size="11">색이 요청입니다. 물리적으로 흩어져 있어도 됩니다 — 논리 순서는 표가 따로 기억합니다.</text>
+  <text class="s-t3" x="16" y="240" font-size="11.5">빈 블록은 곧바로 다음 요청에 쓰입니다</text>
+</svg>
+</div>
+<figcaption>같은 메모리를 어떻게 나누느냐가 받을 수 있는 요청 수를 바꿉니다</figcaption>
+</figure>
+<div class="quote" data-label="원문 (7단계)">
+<p>논문 보고에 따르면 이 낭비가 <strong>60~80%</strong> 에 달했습니다.</p>
+</div>
+<div class="warn">
+<p>이 낭비가 왜 중요한지 1단계 계산과 연결해 보면 선명합니다.
+2.2절에서 KV 예산 14GB 로 요청 11개를 계산했는데, 그 계산은 <strong>모든 자리를 빈틈없이 쓴다는 가정</strong>입니다.
+실제로 절반 이상이 낭비된다면 <strong>실제로 받을 수 있는 요청은 계산의 절반 이하</strong>가 됩니다.</p>
+<p>즉 이 절의 기법이 없으면 <strong>1단계에서 세운 예산 계산이 통째로 낙관적인 값</strong>이 됩니다.</p>
+</div>
+<hr />
+<h2 id="pagedattention-운영체제에서-빌려온-해법-완전">2.5 PagedAttention — 운영체제에서 빌려온 해법 <span class="badge full">완전</span></h2>
+<p>앞의 두 낭비는 컴퓨터 과학에서 오래된 문제입니다.
+<strong>메모리 단편화(fragmentation)</strong> 라고 부르고, 운영체제가 이미 푼 문제입니다.</p>
+<blockquote>
+<p>책을 서가에 꽂을 때 “이 책은 300페이지가 될 예정이니 서가 한 칸을 통째로 비워둬라”고 하면
+대부분의 칸이 빕니다. 대신 <strong>책장 한 칸 크기로 잘라서 필요할 때마다 아무 데나 꽂고,
+어디에 꽂았는지 목록만 따로 적어두면</strong> 빈틈이 거의 없어집니다.</p>
+</blockquote>
+<p>실제로는 이렇습니다. <strong>PagedAttention</strong> 은 KV cache 를 <strong>고정 크기 블록</strong>(예: 16토큰 분량)으로 쪼갭니다.
+요청이 길어지면 블록을 하나씩 더 배정하고, 끝나면 반납합니다.
+물리적으로 흩어져 있어도 <strong>블록 표(block table)</strong> 가 논리 순서를 기억합니다.</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>연속 할당</th>
+<th>PagedAttention</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>할당 단위</td>
+<td>요청마다 최대 길이</td>
+<td><strong>고정 크기 블록</strong></td>
+</tr>
+<tr class="even">
+<td>할당 시점</td>
+<td>요청 시작 시 전부</td>
+<td><strong>필요할 때마다 조금씩</strong></td>
+</tr>
+<tr class="odd">
+<td>물리적 배치</td>
+<td>연속이어야 함</td>
+<td><strong>흩어져도 됨</strong></td>
+</tr>
+<tr class="even">
+<td>낭비</td>
+<td>원문 기준 60~80%</td>
+<td>원문 기준 <strong>4% 이하</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p>PagedAttention 은 새로운 수학이 아니라 <strong>운영체제의 페이징을 KV cache 에 적용한 것</strong>입니다.
+바뀐 것은 attention 계산이 아니라 <strong>메모리를 나누는 방식</strong>입니다.</p>
+</div>
+<div class="note">
+<p>이름에 “Attention” 이 붙어 있어서 계산 방식이 바뀐 것처럼 보이지만, 바뀐 것은 저장 구조입니다.
+다만 KV 가 흩어져 있으므로 <strong>attention 커널이 블록 표를 따라가며 읽도록</strong> 고쳐져야 합니다.
+그래서 메모리 관리와 커널이 함께 묶인 기법입니다.</p>
+</div>
+<hr />
+<h2 id="블록을-쪼갠-김에-얻는-것-공유-완전">2.6 블록을 쪼갠 김에 얻는 것 — 공유 <span class="badge full">완전</span></h2>
+<p>블록으로 나누면 예상 밖의 이득이 하나 따라옵니다. <strong>같은 내용의 블록을 여러 요청이 함께 쓸 수 있습니다.</strong></p>
+<p>에이전트나 챗봇은 보통 매 요청 앞에 <strong>같은 시스템 프롬프트</strong>를 붙입니다.
+그 부분의 KV 는 요청이 100개든 내용이 같습니다. 굳이 100벌을 저장할 이유가 없습니다.</p>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 210" role="img" aria-label="세 요청이 같은 시스템 프롬프트를 공유할 때, 공통 부분의 KV 블록은 한 벌만 저장하고 각 요청은 자기 고유 부분의 블록만 따로 갖는다.">
+  <defs>
+    <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path class="s-arrow" d="M0 0 L10 5 L0 10 z" />
+    </marker>
+  </defs>
+  <text class="s-soft" x="16" y="24" font-size="12">요청 3개 — 앞부분이 동일한 시스템 프롬프트</text>
+  <rect class="s-f2" x="16" y="40" width="200" height="30" rx="4" />
+  <text class="s-fg" x="116" y="60" text-anchor="middle" font-size="11.5">공통 프롬프트</text>
+  <rect class="s-f1" x="220" y="40" width="120" height="30" rx="4" />
+  <text class="s-fg" x="280" y="60" text-anchor="middle" font-size="11.5">요청 1 고유</text>
+  <rect class="s-f2" x="16" y="78" width="200" height="30" rx="4" />
+  <text class="s-fg" x="116" y="98" text-anchor="middle" font-size="11.5">공통 프롬프트</text>
+  <rect class="s-f3" x="220" y="78" width="150" height="30" rx="4" />
+  <text class="s-fg" x="295" y="98" text-anchor="middle" font-size="11.5">요청 2 고유</text>
+  <rect class="s-f2" x="16" y="116" width="200" height="30" rx="4" />
+  <text class="s-fg" x="116" y="136" text-anchor="middle" font-size="11.5">공통 프롬프트</text>
+  <rect class="s-f4" x="220" y="116" width="96" height="30" rx="4" />
+  <text class="s-fg" x="268" y="136" text-anchor="middle" font-size="11.5">요청 3 고유</text>
+  <path class="s-strong" d="M400 93 H452" marker-end="url(#ar3)" />
+  <text class="s-faint" x="426" y="84" text-anchor="middle" font-size="10.5">저장은</text>
+  <text class="s-soft" x="470" y="24" font-size="12">실제 KV cache 점유</text>
+  <rect class="s-f2" x="470" y="40" width="120" height="30" rx="4" />
+  <text class="s-fg" x="530" y="60" text-anchor="middle" font-size="11.5">공통 — 1벌만</text>
+  <rect class="s-f1" x="470" y="78" width="72" height="30" rx="4" />
+  <rect class="s-f3" x="546" y="78" width="90" height="30" rx="4" />
+  <rect class="s-f4" x="640" y="78" width="58" height="30" rx="4" />
+  <text class="s-faint" x="470" y="128" font-size="10.5">고유 부분만 따로</text>
+  <text class="s-faint" x="16" y="176" font-size="11">공통 부분이 길수록 이득이 커집니다. 시스템 프롬프트가 긴 에이전트에서 특히 그렇습니다.</text>
+  <text class="s-faint" x="16" y="194" font-size="11">이미 계산된 KV 를 재사용하므로 그 구간의 prefill 을 건너뛸 수 있습니다.</text>
+</svg>
+</div>
+<figcaption>블록 단위로 나눠 놓으면 같은 내용을 공유할 수 있습니다</figcaption>
+</figure>
+<p>이것이 <strong>Prefix Caching</strong> 입니다. 공통 접두부(prefix)의 KV 를 재사용합니다.
+효과는 메모리 절약만이 아닙니다. <strong>이미 계산해 둔 KV 라면 그 부분의 prefill 을 다시 할 필요가 없습니다.</strong></p>
+<div class="key">
+<p>4–6단계에서 <strong>TTFT 는 prefill 이 정한다</strong>고 했습니다.
+Prefix Caching 은 prefill 의 일부를 건너뛰므로, <strong>TTFT 를 직접 줄이는 수단</strong>입니다.
+같은 프롬프트를 반복해서 쓰는 워크로드일수록 효과가 큽니다.</p>
+</div>
+<div class="warn">
+<p>효과가 나타나는 조건이 까다롭습니다. <strong>앞부분이 토큰 단위로 정확히 같아야</strong> 합니다.
+프롬프트 맨 앞에 타임스탬프나 사용자 이름처럼 매번 바뀌는 값이 들어가면
+<strong>그 뒤가 전부 달라지므로 공유가 되지 않습니다.</strong></p>
+<p>바뀌는 값은 뒤로 보내는 것이 유리합니다. 이건 설정이 아니라 <strong>프롬프트를 짜는 방식</strong>의 문제입니다.</p>
+</div>
+<div class="later">
+<p>이 공유 아이디어를 트리 구조로 일반화한 것이 <strong>Radix Attention</strong> 입니다.
+여러 요청의 공통 접두부를 트리로 관리해 더 넓게 공유합니다.
+이 기법과 그것을 쓰는 다른 엔진은 <strong>15단계</strong>(알고리즘 지도)와 <strong>20단계</strong>(엔진 비교)에서 만납니다.
+7단계에서는 <strong>“블록으로 쪼개면 공유가 가능해지고, 그게 TTFT 를 줄인다”</strong> 까지면 충분합니다.</p>
+</div>
+<hr />
+<h2 id="한계에-닿으면-엔진은-무엇을-하는가-완전">2.7 한계에 닿으면 엔진은 무엇을 하는가 <span class="badge full">완전</span></h2>
+<p>배치를 계속 키우면 결국 KV cache 자리가 모자랍니다. 이때 엔진은 그냥 죽지 않습니다.
+<strong>받아들인 요청 중 일부를 강제로 물러나게 합니다.</strong></p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>동작</th>
+<th>무슨 일인가</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>preemption</strong> (선점)</td>
+<td>처리 중이던 요청을 중단시키고 그 KV cache 자리를 회수합니다</td>
+</tr>
+<tr class="even">
+<td><strong>swap</strong></td>
+<td>회수하는 대신 그 KV 를 시스템 메모리로 잠시 옮깁니다</td>
+</tr>
+<tr class="odd">
+<td><strong>recompute</strong> (재계산)</td>
+<td>옮기지 않고 버렸다가, 차례가 오면 prefill 을 다시 합니다</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="warn">
+<p>이 로그가 뜨는 것은 <strong>고장이 아니라 한계 신호</strong>입니다.
+원문이 <em>“배치를 계속 키우면 preemption / swap 로그가 뜹니다”</em> 라고 미리 알려주는 이유가 이것입니다.</p>
+<p>다만 이 지점부터는 <strong>더 이상 배치의 이득이 나지 않습니다.</strong>
+쫓겨난 요청은 나중에 다시 처리돼야 하고, 재계산 방식이라면 <strong>prefill 을 두 번</strong> 하게 됩니다.</p>
+</div>
+<h3 id="그래서-곡선이-꺾인다">그래서 곡선이 꺾인다</h3>
+<p>배치를 키울 때 세 지표가 움직이는 모양은 이렇습니다.</p>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 240" role="img" aria-label="배치를 키우면 처리량은 처음에 빠르게 오르다가 어느 지점에서 평평해지고 한계를 넘으면 오히려 떨어진다. 개별 사용자의 지연시간은 계속 나빠지고, KV 캐시 사용량은 직선으로 증가해 예산 상한에 닿는다.">
+  <line class="s-line" x1="56" y1="180" x2="700" y2="180"></line>
+  <line class="s-line" x1="56" y1="24" x2="56" y2="180"></line>
+  <text class="s-faint" x="378" y="204" text-anchor="middle" font-size="11">배치 (동시 요청 수) →</text>
+  <path class="s-dash" d="M470 24 V180" />
+  <text class="s-t4" x="474" y="38" font-size="11">KV 예산 상한</text>
+  <path class="s-strong" d="M56 172 C 160 90, 300 58, 470 52 C 540 50, 600 62, 690 84" style="stroke-width:2" />
+  <text class="s-fg" x="86" y="44" font-size="11.5">처리량 — 오르다 평평해지고, 한계 뒤엔 떨어짐</text>
+  <path class="s-strong" d="M56 168 C 200 158, 360 140, 470 118 C 550 100, 620 72, 690 34" style="stroke-width:2;stroke-dasharray:5 3" />
+  <text class="s-fg" x="556" y="150" font-size="11.5">개별 지연시간 — 계속 나빠짐</text>
+  <path class="s-strong" d="M56 176 L470 40" style="stroke-width:1.5;stroke-dasharray:2 3" />
+  <text class="s-faint" x="336" y="98" font-size="11">KV 사용량 — 직선</text>
+  <circle class="s-accent" cx="470" cy="52" r="4.5"></circle>
+  <text class="s-t4" x="474" y="176" font-size="11">이 근처에서 preemption 이 시작됩니다</text>
+  <text class="s-faint" x="56" y="228" font-size="11">축에 눈금이 없는 것은 의도적입니다 — 꺾이는 지점이 어디인지가 이 단계에서 직접 측정할 값입니다.</text>
+</svg>
+</div>
+<figcaption>세 지표는 같은 방향으로 움직이지 않습니다</figcaption>
+</figure>
+<div class="key">
+<p>처리량은 <strong>끝없이 오르지 않습니다.</strong> 어느 지점에서 평평해지고, 한계를 넘으면 오히려 떨어집니다.
+반면 개별 사용자의 지연시간은 <strong>처음부터 계속 나빠집니다.</strong></p>
+<p>그래서 “배치는 클수록 좋다”도 “작을수록 좋다”도 틀립니다.
+<strong>꺾이는 지점을 찾는 것</strong>이 이 단계의 실습입니다.</p>
+</div>
+<div class="warn">
+<p>위 그림의 축에 숫자가 없는 것은 의도적입니다.
+<strong>내 장비에서 그 지점이 어디인지가 7단계에서 직접 측정할 값</strong>입니다.
+2.2절 방법으로 예측해 두고, 실측이 그 근처에서 꺾이는지 확인하세요.</p>
+</div>
+<hr />
+<h2 id="실험을-설계하는-법-완전">2.8 실험을 설계하는 법 <span class="badge full">완전</span></h2>
+<p>2–3단계에서 정확도를 잴 때 <strong>조건을 고정</strong>해야 했습니다. 여기서도 같습니다.
+다만 이번에는 <strong>바꾸는 변수가 배치 하나</strong>여야 합니다.</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th>고정할 것</th>
+<th>흔들리면</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>모델 · 정밀도</td>
+<td>가중치 크기가 달라져 KV 예산이 통째로 바뀜</td>
+</tr>
+<tr class="even">
+<td>컨텍스트 길이 설정</td>
+<td>요청 1개분 KV 가 바뀌어 배치 효과와 섞임</td>
+</tr>
+<tr class="odd">
+<td>입력 / 출력 길이</td>
+<td>TTFT 와 TPOT 를 각각 움직임 (4–6단계 2.6절)</td>
+</tr>
+<tr class="even">
+<td>요청 도착 속도</td>
+<td>대기 시간이 섞여 배치 효과로 오해됨</td>
+</tr>
+<tr class="odd">
+<td>워밍업</td>
+<td>첫 요청의 로딩 시간이 섞임</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note">
+<p>기록할 표는 원문이 제시합니다 — 배치 상한별로 <strong>KV cache 크기 · TTFT · TPOT · 처리량</strong>.
+여기에 한 열을 더 두면 좋습니다. <strong>손으로 계산한 예측값</strong> 열입니다.</p>
+<p>체크포인트가 “계산으로 예측하고 실측으로 검증”이므로,
+표에 예측과 실측이 나란히 있어야 검증이 됩니다.</p>
+</div>
+<div class="key">
+<p>7단계에서 볼 것은 숫자 하나가 아니라 <strong>세 곡선의 모양</strong>입니다.
+처리량이 평평해지는 지점, 지연시간이 급해지는 지점, preemption 이 시작되는 지점 —
+이 셋이 같은 곳인지 다른 곳인지가 이 실습의 관찰 대상입니다.</p>
+</div>
+<hr />
+<h2 id="내-장비-기준-정리">3. 내 장비 기준 정리</h2>
+<h3 id="gb-한-장에서-7단계는-어떻게-되는가">3.1 32GB 한 장에서 7단계는 어떻게 되는가</h3>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th>항목</th>
+<th>판정</th>
+<th>근거</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>배치 1 → 32 스윕</td>
+<td>✅ 가능</td>
+<td>배치는 GPU 대수가 아니라 KV 예산이 정함</td>
+</tr>
+<tr class="even">
+<td>8B BF16 기준선</td>
+<td>✅</td>
+<td>가중치 16GB, KV 예산 약 14GB (2.2절)</td>
+</tr>
+<tr class="odd">
+<td>preemption 관찰</td>
+<td>✅</td>
+<td>오히려 32GB 라 <strong>더 일찍 볼 수 있음</strong></td>
+</tr>
+<tr class="even">
+<td>Prefix Caching 효과</td>
+<td>✅</td>
+<td>단일 GPU 와 무관</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note">
+<p>VRAM 이 적은 것이 이 단계에서는 <strong>불리하지 않습니다.</strong>
+한계를 보는 것이 목적이므로, 예산이 작으면 그 한계에 <strong>더 빨리 닿습니다.</strong>
+48GB 라면 배치 32 로도 안 터져서 오히려 관찰이 어려울 수 있습니다.</p>
+</div>
+<h3 id="원문-전제와의-차이">3.2 원문 전제와의 차이</h3>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>항목</th>
+<th>원문 (3090 24GB × 2)</th>
+<th>내 장비 (5090 32GB × 1)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>KV 예산</td>
+<td>두 장에 나눠 배치 — 통신 비용이 섞임</td>
+<td><strong>한 장 — 변수가 적어 해석이 단순</strong></td>
+</tr>
+<tr class="even">
+<td>배치 한계 도달</td>
+<td>48GB 라 더 늦게</td>
+<td>32GB 라 <strong>더 일찍</strong></td>
+</tr>
+<tr class="odd">
+<td>대역폭</td>
+<td>약 936 GB/s</td>
+<td>약 1,792 GB/s — 배치 이득의 절대값이 다름</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p>7단계는 <strong>GPU 한 대가 오히려 유리한 단계</strong>입니다.
+9단계처럼 여러 장이 필요한 실습이 아니고, 한 장이면 병렬화 변수가 섞이지 않아
+배치의 효과만 깨끗하게 볼 수 있습니다.</p>
+</div>
+<hr />
+<h2 id="확인-문제">4. 확인 문제</h2>
+<div class="quiz">
+<ol type="1">
+<li><p><strong>컨텍스트 4K 로 동시에 몇 요청까지 받을 수 있는가?</strong> 8B BF16, 토큰당 KV 144 KB, VRAM 32GB 기준으로 계산하세요.</p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<pre><code>KV 예산      = 32 − 16(가중치) − 2(버퍼 + CUDA 컨텍스트)  ≈ 14 GB
+요청 1개분   = 144 KB × 4,096 토큰                        ≈ 0.6 GB
+동시 요청 수 ≈ 14 ÷ 0.6                                   ≈ 23 개</code></pre>
+<p>컨텍스트가 절반(8K → 4K)이 되면 요청 1개분도 절반이 되므로 <strong>받을 수 있는 요청 수가 두 배</strong>가 됩니다.
+KV cache 가 <code>컨텍스트 × 요청 수</code> 로 곱해지기 때문입니다.</p>
+<p>다만 이건 <strong>최악의 경우 계산</strong>입니다. 모든 요청이 컨텍스트를 꽉 채우지는 않으므로 실제로는 더 받을 수 있고,
+진짜 값은 기동 로그의 KV cache 크기와 대조해야 합니다.</p>
+</details></li>
+<li><p><strong>정적 배치가 낭비인 이유는 무엇이며, Continuous Batching 은 정확히 무엇을 바꾸는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p><strong>낭비의 원인은 요청마다 답변 길이가 다르다는 것</strong>입니다.
+묶음 전체가 가장 긴 요청이 끝날 때까지 기다리므로, 먼저 끝난 요청의 자리가 비어 있게 됩니다.
+그동안 대기 중인 새 요청은 들어오지 못합니다.</p>
+<p>Continuous Batching 이 바꾸는 것은 <strong>스케줄링의 단위</strong>입니다.
+“요청 묶음 단위”가 아니라 <strong>“토큰 생성 한 번 단위”</strong> 로 배치 구성을 다시 짭니다.
+끝난 요청은 즉시 빠지고 대기 요청이 그 자리에 들어갑니다.</p>
+<p>연산 방식이나 커널이 바뀌는 게 아니라는 점이 중요합니다.</p>
+</details></li>
+<li><p><strong>KV cache 를 요청마다 연속된 덩어리로 잡으면 어떤 낭비가 생기는가?</strong> 두 가지를 드세요.</p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<ol type="1">
+<li><strong>쓰지 않을 자리를 미리 예약합니다.</strong> 답변이 몇 토큰이 될지 모르므로 최대 길이로 잡아야 하는데, 대부분의 요청은 그만큼 쓰지 않습니다</li>
+<li><strong>요청이 들고 나면서 구멍이 생깁니다.</strong> 전체로는 자리가 남는데 연속된 자리가 없어서 새 요청을 못 받습니다</li>
+</ol>
+<p>원문 기준으로 이 낭비가 60~80% 에 달했습니다.</p>
+<p>이것이 중요한 이유는 <strong>1단계 예산 계산이 “빈틈없이 쓴다”는 가정 위에 있기 때문</strong>입니다.
+절반 이상이 낭비되면 계산값과 실제가 크게 어긋납니다.</p>
+</details></li>
+<li><p><strong>PagedAttention 은 attention 계산 방식을 바꾸는 기법인가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>아닙니다. 바꾸는 것은 <strong>KV cache 를 메모리에 배치하는 방식</strong>입니다.</p>
+<p>고정 크기 블록으로 쪼개 필요할 때만 할당하고, 물리적으로 흩어져 있어도 블록 표가 논리 순서를 기억합니다.
+운영체제의 페이징을 그대로 빌려온 것입니다.</p>
+<p>다만 KV 가 흩어져 있으므로 <strong>attention 커널이 블록 표를 따라가며 읽도록 고쳐져야</strong> 합니다.
+그래서 이름에 attention 이 붙어 있지만, 핵심 아이디어는 메모리 관리입니다.</p>
+</details></li>
+<li><p><strong>같은 시스템 프롬프트를 쓰는 요청을 반복해서 보냈더니 두 번째부터 첫 응답이 빨라졌습니다. 무슨 일이 일어난 것인가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p><strong>Prefix Caching</strong> 이 동작한 것입니다.</p>
+<p>공통 접두부의 KV 블록을 이미 계산해 두었으므로, 그 구간의 <strong>prefill 을 건너뜁니다.</strong>
+4–6단계에서 본 대로 TTFT 는 prefill 이 정하므로, prefill 이 줄면 TTFT 가 바로 줄어듭니다.</p>
+<p>메모리 이득도 함께 있습니다. 공통 부분의 KV 를 요청마다 따로 저장하지 않고 <strong>한 벌만</strong> 저장합니다.</p>
+<p>단, 앞부분이 <strong>토큰 단위로 정확히 같아야</strong> 합니다.
+프롬프트 맨 앞에 타임스탬프처럼 매번 바뀌는 값이 있으면 그 뒤가 전부 달라져 공유가 되지 않습니다.</p>
+</details></li>
+<li><p><strong>배치를 키우다 보니 <code>preemption</code> 로그가 뜨기 시작했습니다. 서버가 고장난 것인가? 그리고 여기서 배치를 더 키우면 어떻게 되는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>고장이 아니라 <strong>KV cache 한계에 닿았다는 신호</strong>입니다.
+엔진이 처리 중이던 요청 일부를 강제로 물러나게 하고 그 자리를 회수한 것입니다.</p>
+<p>여기서 더 키우면 <strong>처리량이 오히려 떨어집니다.</strong>
+쫓겨난 요청은 나중에 다시 처리돼야 하고, 재계산 방식이라면 prefill 을 두 번 하게 됩니다.
+즉 같은 일을 두 번 하는 데 자원을 쓰게 됩니다.</p>
+<p>그래서 이 지점이 <strong>배치를 키우는 이득이 끝나는 경계</strong>입니다.</p>
+</details></li>
+<li><p><strong>배치 실험에서 “배치만 바꾸고 나머지는 고정”해야 하는 이유를 구체적인 예로 설명하세요.</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>변수가 섞이면 원인을 분리할 수 없기 때문입니다. 예를 들어:</p>
+<ul>
+<li><strong>입력 길이를 같이 바꾸면</strong> — TTFT 가 나빠졌을 때 그것이 배치 때문인지 입력이 길어서인지 알 수 없습니다 (4–6단계 2.6절)</li>
+<li><strong>요청 도착 속도를 같이 바꾸면</strong> — 대기 시간이 늘어난 것을 배치의 효과로 오해합니다</li>
+<li><strong>컨텍스트 길이 설정을 바꾸면</strong> — 요청 1개분 KV 가 달라져 한계 지점 자체가 이동합니다</li>
+</ul>
+<p>특히 마지막이 치명적입니다. 배치 한계를 찾는 실험인데 <strong>한계를 정하는 값을 같이 움직이면</strong> 실험이 성립하지 않습니다.</p>
+</details></li>
+<li><p><strong>처리량을 올리는 것이 목적이라면 배치는 클수록 좋은가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>아닙니다. 처리량 자체가 <strong>끝없이 오르지 않습니다.</strong></p>
+<p>어느 지점부터 평평해지고, KV cache 한계를 넘으면 preemption 때문에 <strong>오히려 떨어집니다.</strong>
+게다가 개별 사용자의 지연시간은 그 전부터 계속 나빠지고 있습니다.</p>
+<p>따라서 판단하려면 두 가지가 필요합니다.</p>
+<ol type="1">
+<li><strong>누구 기준인지</strong> — 챗봇이면 개인 지연시간, 일괄 처리면 전체 처리량 (4–6단계 2.5절)</li>
+<li><strong>꺾이는 지점이 어디인지</strong> — 이건 계산으로 예측하고 실측으로 확인해야 합니다</li>
+</ol>
+</details></li>
+</ol>
+</div>
+<hr />
+<h2 id="다음-단계로">5. 다음 단계로</h2>
+<h3 id="이-문서가-회수한-씨앗">이 문서가 회수한 씨앗</h3>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>어느 문서에서</th>
+<th>무엇을</th>
+<th>이 문서의 어디에서</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1단계</td>
+<td>“엔진은 KV 자리를 블록 단위로 미리 잡는다”</td>
+<td>2.5절 — 그 블록이 무엇인지</td>
+</tr>
+<tr class="even">
+<td>1단계</td>
+<td>“동시 요청을 늘리면 어디선가 터진다”</td>
+<td>2.7절 — preemption</td>
+</tr>
+<tr class="odd">
+<td>4–6단계</td>
+<td>Continuous Batching · PagedAttention (이름만)</td>
+<td>2.3 · 2.5절</td>
+</tr>
+<tr class="even">
+<td>4–6단계</td>
+<td>“배치는 처리량과 지연시간을 반대로 움직인다”</td>
+<td>2.7절 — 곡선의 모양</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="이-문서가-남기는-씨앗">이 문서가 남기는 씨앗</h3>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>씨앗</th>
+<th>여기서 알아둔 것</th>
+<th>이어지는 단계</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Radix Attention</td>
+<td>“공유를 트리로 일반화한 것”</td>
+<td><strong>15단계</strong> 지도 · <strong>20단계</strong> 엔진 비교</td>
+</tr>
+<tr class="even">
+<td>컨텍스트를 늘렸을 때</td>
+<td>“요청 1개분 KV 가 비례해 커진다”</td>
+<td><strong>8단계</strong> — 메모리와 연산이 다르게 늘어남</td>
+</tr>
+<tr class="odd">
+<td>블록 표를 따라가는 커널</td>
+<td>“커널도 함께 고쳐져야 한다”</td>
+<td><strong>14 · 17단계</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="단계로-넘어가기-전에">8단계로 넘어가기 전에</h3>
+<p>8단계는 <strong>컨텍스트 길이를 늘려보는</strong> 단계입니다. 7단계와 짝을 이룹니다.</p>
+<pre><code>KV cache  ∝  컨텍스트 길이 × 동시 요청 수
+                  ↑ 8단계        ↑ 7단계</code></pre>
+<p>같은 곱셈의 <strong>다른 항을 각각 흔들어 보는 것</strong>입니다. 그래서 7단계에서 만든 감각이 그대로 쓰입니다.</p>
+<ul>
+<li><strong>같은 예측 방법을 씁니다</strong> — 2.2절 공식에서 이번에는 컨텍스트 쪽을 바꿉니다</li>
+<li><strong>다만 8단계에는 7단계에 없던 것이 있습니다</strong> — 컨텍스트를 늘리면 메모리만 느는 게 아니라 <strong>연산도 늡니다.</strong> 그 둘이 같은 속도로 늘지 않는다는 것이 8단계의 주제입니다</li>
+</ul>
+<div class="key">
+<p>7단계가 끝났을 때 손에 남아야 하는 것은 <strong>“예측 → 실측 → 대조”의 습관</strong>입니다.
+공식은 1단계에서 이미 받았고, 여기서 처음으로 그 공식을 <strong>틀릴 수 있는 상황에 넣어봤습니다.</strong>
+계산이 실측과 어긋났을 때 무엇을 의심해야 하는지 아는 것이 이 단계의 진짜 소득입니다.</p>
+</div>
+<hr />
+<h2 id="용어표">6. 용어표</h2>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>약어 / 용어</th>
+<th>full name</th>
+<th>뜻</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>batch</td>
+<td>— (용어)</td>
+<td>동시에 처리 중인 요청의 묶음. 이 단계에서 흔드는 변수</td>
+</tr>
+<tr class="even">
+<td>block table</td>
+<td>— (용어)</td>
+<td>흩어진 KV 블록의 논리 순서를 기억하는 표</td>
+</tr>
+<tr class="odd">
+<td>Continuous Batching</td>
+<td>— (기법 이름)</td>
+<td>토큰 생성 한 번마다 배치 구성을 다시 짜는 스케줄링</td>
+</tr>
+<tr class="even">
+<td>CoW</td>
+<td>Copy-on-Write</td>
+<td>공유하다가 수정이 생기는 순간에만 복사하는 방식. 블록 공유의 기반</td>
+</tr>
+<tr class="odd">
+<td>fragmentation</td>
+<td>— (용어)</td>
+<td>메모리에 쓸 수 없는 빈틈이 생기는 현상. 내부/외부 두 종류</td>
+</tr>
+<tr class="even">
+<td>GPU</td>
+<td>Graphics Processing Unit</td>
+<td>대량 병렬 연산 장치</td>
+</tr>
+<tr class="odd">
+<td>iteration-level scheduling</td>
+<td>— (용어)</td>
+<td>Continuous Batching 의 다른 이름. 반복 1회 단위로 스케줄링</td>
+</tr>
+<tr class="even">
+<td>KV cache</td>
+<td>Key-Value cache</td>
+<td>이전 토큰의 Key / Value 저장분. 공식은 1단계 2.5절</td>
+</tr>
+<tr class="odd">
+<td>PagedAttention</td>
+<td>— (기법 이름)</td>
+<td>KV cache 를 고정 크기 블록으로 관리해 단편화를 줄이는 방식</td>
+</tr>
+<tr class="even">
+<td>preemption</td>
+<td>— (용어)</td>
+<td>처리 중인 요청을 강제로 물러나게 하고 자리를 회수하는 것</td>
+</tr>
+<tr class="odd">
+<td>Prefix Caching</td>
+<td>— (기법 이름)</td>
+<td>공통 접두부의 KV 를 재사용해 prefill 을 건너뛰는 것</td>
+</tr>
+<tr class="even">
+<td>prefill</td>
+<td>— (용어)</td>
+<td>입력 전체를 한꺼번에 처리하는 구간. 4–6단계 2.2절</td>
+</tr>
+<tr class="odd">
+<td>Radix Attention</td>
+<td>— (기법 이름)</td>
+<td>접두부 공유를 트리로 일반화한 기법. 15 · 20단계</td>
+</tr>
+<tr class="even">
+<td>swap</td>
+<td>— (용어)</td>
+<td>회수 대신 KV 를 시스템 메모리로 잠시 옮기는 것</td>
+</tr>
+<tr class="odd">
+<td>throughput</td>
+<td>— (지표 이름)</td>
+<td>서버 전체가 처리한 초당 토큰 수</td>
+</tr>
+<tr class="even">
+<td>TPOT</td>
+<td>Time Per Output Token</td>
+<td>출력 토큰 사이 간격. 4–6단계 2.4절</td>
+</tr>
+<tr class="odd">
+<td>TTFT</td>
+<td>Time To First Token</td>
+<td>첫 토큰까지의 시간. 4–6단계 2.4절</td>
+</tr>
+<tr class="even">
+<td>VRAM</td>
+<td>Video Random Access Memory</td>
+<td>GPU 전용 메모리. 32GB 고정</td>
+</tr>
+</tbody>
+</table>
+</div>
+  </main>
+
+  <footer class="doc-foot">
+    <p>상위 커리큘럼 — <a href="../README.md">../README.md</a> 7단계</p><p>앞 문서 — <a href="04-06-vllm-serving.html">4–6단계</a></p><p>작성 기준 — <a href="GUIDE.md">GUIDE.md</a></p>
+  </footer>
+
+</div>
+
+<script>
+// ------------------------------------------------------------
+// ① 테마 토글: localStorage 에 기억, 없으면 OS 설정을 따릅니다.
+// ------------------------------------------------------------
+(function () {
+  var root = document.documentElement;
+  var KEY = 'study-theme';
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+
+  document.getElementById('theme-toggle').addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme');
+    if (!cur) {
+      cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+})();
+
+// ------------------------------------------------------------
+// ② 제목 앵커(#): 본문 h2/h3 에만 붙입니다.
+//    Lua 필터가 아니라 여기서 붙이는 이유 —
+//    필터로 제목 내용에 <a> 를 넣으면 pandoc 이 그 내용을 목차에도
+//    복사해 <a> 안에 <a> 가 중첩되고, 브라우저가 목차 링크를 끊습니다.
+// ------------------------------------------------------------
+(function () {
+  var main = document.querySelector('main');
+  if (!main) return;
+  main.querySelectorAll('h2[id], h3[id]').forEach(function (h) {
+    var a = document.createElement('a');
+    a.className = 'anchor';
+    a.href = '#' + h.id;
+    a.setAttribute('aria-hidden', 'true');
+    a.setAttribute('tabindex', '-1');
+    a.textContent = '#';
+    h.insertBefore(a, h.firstChild);
+  });
+})();
+
+// ------------------------------------------------------------
+// ③ 사이드바 목차: 모바일 드로어 + 현재 위치 표시(scrollspy)
+// ------------------------------------------------------------
+(function () {
+  var sidebar = document.getElementById('sidebar');
+  var toggle  = document.getElementById('nav-toggle');
+  var backdrop = document.getElementById('nav-backdrop');
+  if (!sidebar || !toggle) { if (toggle) toggle.hidden = true; return; }
+
+  // --- 드로어 열고 닫기 (좁은 화면에서만 의미가 있습니다) ---
+  function setOpen(open) {
+    document.body.classList.toggle('nav-open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.textContent = open ? '✕' : '☰';
+    toggle.setAttribute('title', open ? '목차 닫기' : '목차');
+    if (backdrop) backdrop.hidden = !open;
+  }
+  toggle.addEventListener('click', function () {
+    setOpen(!document.body.classList.contains('nav-open'));
+  });
+  if (backdrop) backdrop.addEventListener('click', function () { setOpen(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setOpen(false);
+  });
+
+  // 사이드바 안의 링크를 누르면 드로어를 닫습니다 (좁은 화면)
+  sidebar.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function () { setOpen(false); });
+  });
+
+  // --- 목차 링크 ↔ 제목 요소 짝짓기 ---
+  //     (사이드바 머리말의 문서 제목 링크는 제외 — 현재 위치 표시 대상이 아닙니다)
+  var links = Array.prototype.slice.call(document.querySelectorAll('#TOC a[href^="#"]'));
+  var items = [];
+  links.forEach(function (a) {
+    var raw = a.getAttribute('href').slice(1);
+    var id = raw;
+    try { id = decodeURIComponent(raw); } catch (e) {}
+    var el = document.getElementById(id) || document.getElementById(raw);
+    if (el) items.push({ link: a, el: el });
+  });
+  if (!items.length) return;
+
+  // --- 현재 읽고 있는 절 표시 ---
+  var current = null;
+  function sync() {
+    var line = 120;                       // 화면 상단에서 이 높이를 지난 마지막 제목이 '현재'
+    var found = items[0];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].el.getBoundingClientRect().top <= line) found = items[i];
+      else break;
+    }
+    // 문서 맨 아래에 닿으면 마지막 항목을 현재로
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) {
+      found = items[items.length - 1];
+    }
+    if (found === current) return;
+    if (current) current.link.classList.remove('active');
+    found.link.classList.add('active');
+    current = found;
+
+    // 활성 항목이 사이드바 밖으로 밀려나면 보이는 위치로
+    var r = found.link.getBoundingClientRect();
+    var s = sidebar.getBoundingClientRect();
+    if (r.top < s.top + 8 || r.bottom > s.bottom - 8) {
+      sidebar.scrollTop += r.top - s.top - sidebar.clientHeight / 3;
+    }
+  }
+
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () { ticking = false; sync(); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  sync();
+})();
+</script>
+
+</body>
+</html>

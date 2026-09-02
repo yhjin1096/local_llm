@@ -1329,7 +1329,7 @@ q4_K_M  8 × 0.6 ≈  5.0 GB  →  1792 ÷  5.0  ≈  358 tok/s</code></pre>
 <ul>
 <li><strong>실측은 이 값의 60~80% 정도</strong>입니다. 이 값은 넘을 수 없는 천장이지 예상치가 아닙니다</li>
 <li><strong>실제 파일은 어림셈보다 조금 큽니다.</strong> 블록별 배율이 함께 저장되기 때문입니다(2.7절). <code>q8_0</code> 은 8 GB 가 아니라 8.5 GB 근처입니다. 정확한 값은 받은 파일 크기를 보는 게 빠릅니다</li>
-<li><strong>가중치 외에 KV cache 등이 VRAM 을 더 씁니다.</strong> 여기서는 속도만 보고 있고, 예산 전체 계산은 <strong>7단계</strong>입니다</li>
+<li><strong>가중치 외에 KV cache 등이 VRAM 을 더 씁니다.</strong> 여기서는 속도만 보고 있습니다. 예산 전체 계산은 <strong>1단계 2.5절</strong>에 있고, 그 한계를 실제로 확인하는 것은 <strong>7단계</strong>입니다</li>
 <li><strong>레이어 일부가 CPU 로 내려가 있으면</strong> 이 계산은 통째로 무의미해집니다 (2.11절)</li>
 <li>Ollama 는 <code>llama.cpp</code> 커널을 씁니다. 같은 모델·같은 양자화라도 <strong>엔진이 바뀌면 속도가 달라집니다</strong> — 그 비교가 <strong>4단계</strong>입니다</li>
 </ul>
@@ -1643,7 +1643,7 @@ fp16  가중치 = 8 × 2.0 = 16.0 GB  →  1,792 ÷ 16.0 ≈ 112 tok/s</code></p
 <tr class="even">
 <td>VRAM 예산의 나머지 항목</td>
 <td>“가중치 말고도 더 있다”</td>
-<td><strong>7단계</strong> — KV cache 계산</td>
+<td><strong>1단계 2.5절</strong> 계산 · <strong>7단계</strong> 한계 확인</td>
 </tr>
 <tr class="odd">
 <td>보정 기반 양자화 (GPTQ / AWQ)</td>
@@ -1756,7 +1756,7 @@ fp16  가중치 = 8 × 2.0 = 16.0 GB  →  1,792 ÷ 16.0 ≈ 112 tok/s</code></p
 <tr class="odd">
 <td>KV cache</td>
 <td>Key-Value cache</td>
-<td>이전 토큰의 중간 계산 결과 저장분. 7단계</td>
+<td>이전 토큰의 중간 계산 결과 저장분. 공식은 1단계 2.5절</td>
 </tr>
 <tr class="even">
 <td>llama.cpp</td>

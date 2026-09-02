@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10단계 — 남의 모델에서 내 모델로</title>
+
+<style>
+
+
+:root {
+--bg: #ffffff;
+--bg-soft: #f6f7f9;
+--bg-code: #f4f5f7;
+--fg: #1f2328;
+--fg-soft: #57606a;
+--fg-faint: #8b949e;
+--border: #d8dee4;
+--border-soft: #eaeef2;
+--link: #0550ae;
+--accent-note: #0969da; 
+--accent-key: #8250df; 
+--accent-calc: #1a7f37; 
+--accent-warn: #bc4c00; 
+--accent-later: #6e7781; 
+--accent-quote: #656d76; 
+--accent-quiz: #bf3989; 
+--font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+"Noto Sans KR", "Malgun Gothic", "맑은 고딕", sans-serif;
+--font-mono: "JetBrains Mono", "D2Coding", "Cascadia Mono", "Consolas",
+"DejaVu Sans Mono", monospace;
+--maxw: 52rem;
+--sidebar-w: 19rem;
+--sidebar-break: 1100px; 
+}
+@media (prefers-color-scheme: dark) {
+:root {
+--bg: #0d1117;
+--bg-soft: #161b22;
+--bg-code: #161b22;
+--fg: #e6edf3;
+--fg-soft: #9198a1;
+--fg-faint: #6e7681;
+--border: #30363d;
+--border-soft: #21262d;
+--link: #4493f8;
+--accent-note: #4493f8;
+--accent-key: #ab7df8;
+--accent-calc: #3fb950;
+--accent-warn: #d29922;
+--accent-later: #8b949e;
+--accent-quote: #8b949e;
+--accent-quiz: #db61a2;
+}
+}
+
+:root[data-theme="light"] {
+--bg: #ffffff; --bg-soft: #f6f7f9; --bg-code: #f4f5f7;
+--fg: #1f2328; --fg-soft: #57606a; --fg-faint: #8b949e;
+--border: #d8dee4; --border-soft: #eaeef2; --link: #0550ae;
+--accent-note: #0969da; --accent-key: #8250df; --accent-calc: #1a7f37;
+--accent-warn: #bc4c00; --accent-later: #6e7781; --accent-quote: #656d76;
+--accent-quiz: #bf3989;
+}
+:root[data-theme="dark"] {
+--bg: #0d1117; --bg-soft: #161b22; --bg-code: #161b22;
+--fg: #e6edf3; --fg-soft: #9198a1; --fg-faint: #6e7681;
+--border: #30363d; --border-soft: #21262d; --link: #4493f8;
+--accent-note: #4493f8; --accent-key: #ab7df8; --accent-calc: #3fb950;
+--accent-warn: #d29922; --accent-later: #8b949e; --accent-quote: #8b949e;
+--accent-quiz: #db61a2;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+body {
+margin: 0;
+background: var(--bg);
+color: var(--fg);
+font-family: var(--font-sans);
+font-size: 16.5px;
+line-height: 1.85;
+word-break: keep-all; 
+overflow-wrap: break-word;
+-webkit-text-size-adjust: 100%;
+}
+.wrap {
+max-width: var(--maxw);
+margin: 0 auto;
+padding: 3rem 1.25rem 6rem;
+}
+
+.doc-head {
+border-bottom: 1px solid var(--border);
+padding-bottom: 1.5rem;
+margin-bottom: 2rem;
+}
+.doc-head .eyebrow {
+font-size: 0.8rem;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--accent-note);
+margin: 0 0 0.5rem;
+}
+.doc-head h1 {
+margin: 0 0 0.6rem;
+font-size: 2.1rem;
+line-height: 1.35;
+letter-spacing: -0.02em;
+border: 0;
+padding: 0;
+}
+.doc-head .subtitle {
+margin: 0;
+color: var(--fg-soft);
+font-size: 1rem;
+}
+.doc-head .meta {
+margin: 1rem 0 0;
+font-size: 0.82rem;
+color: var(--fg-faint);
+display: flex;
+flex-wrap: wrap;
+gap: 0.4rem 1.1rem;
+}
+
+h1, h2, h3, h4 {
+line-height: 1.4;
+letter-spacing: -0.01em;
+scroll-margin-top: 1.5rem;
+}
+h2 {
+margin: 3.5rem 0 1.2rem;
+font-size: 1.55rem;
+padding-bottom: 0.45rem;
+border-bottom: 1px solid var(--border);
+}
+h3 { margin: 2.5rem 0 0.9rem; font-size: 1.22rem; }
+h4 { margin: 1.9rem 0 0.7rem; font-size: 1.03rem; color: var(--fg-soft); }
+
+.anchor {
+float: left;
+margin-left: -1.1em;
+padding-right: 0.35em;
+color: var(--fg-faint);
+text-decoration: none;
+opacity: 0;
+font-weight: 400;
+}
+h2:hover .anchor, h3:hover .anchor { opacity: 1; }
+p { margin: 0 0 1.15rem; }
+a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+strong { font-weight: 700; }
+hr {
+border: 0;
+border-top: 1px solid var(--border);
+margin: 3rem 0;
+}
+
+
+#sidebar {
+position: fixed;
+top: 0;
+left: 0;
+bottom: 0;
+width: var(--sidebar-w);
+z-index: 60;
+box-sizing: border-box;
+padding: 1.6rem 0.6rem 3rem 1.1rem;
+background: var(--bg-soft);
+border-right: 1px solid var(--border);
+overflow-y: auto;
+overscroll-behavior: contain;
+font-size: 0.86rem;
+line-height: 1.5;
+}
+.sidebar-head {
+padding: 0 0.55rem 0.9rem;
+margin-bottom: 0.9rem;
+border-bottom: 1px solid var(--border-soft);
+}
+.sidebar-head .side-eyebrow {
+margin: 0 0 0.25rem;
+font-size: 0.68rem;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--accent-note);
+}
+.sidebar-head .side-title {
+display: block;
+color: var(--fg);
+font-weight: 700;
+font-size: 0.95rem;
+line-height: 1.4;
+text-decoration: none;
+}
+.sidebar-head .side-title:hover { color: var(--link); }
+#TOC::before {
+content: "목차";
+display: block;
+padding-left: 0.55rem;
+font-weight: 700;
+font-size: 0.7rem;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--fg-faint);
+margin-bottom: 0.5rem;
+}
+#TOC ul { list-style: none; margin: 0; padding-left: 0; }
+#TOC ul ul { padding-left: 0.7rem; margin: 0.1rem 0 0.4rem; }
+#TOC li { margin: 0; }
+#TOC a {
+display: block;
+padding: 0.26rem 0.55rem;
+border-left: 2px solid transparent;
+border-radius: 0 6px 6px 0;
+color: var(--fg-soft);
+text-decoration: none;
+}
+#TOC a:hover { background: var(--bg); color: var(--link); }
+#TOC > ul > li > a { color: var(--fg); font-weight: 600; margin-top: 0.35rem; }
+
+#TOC a.active {
+color: var(--link);
+background: var(--bg);
+border-left-color: var(--link);
+font-weight: 700;
+}
+#TOC .badge { font-size: 0.6rem; border: 0; padding: 0; margin-left: 0.25em; opacity: 0.85; }
+
+#nav-backdrop {
+position: fixed;
+inset: 0;
+z-index: 55;
+background: rgba(0, 0, 0, 0.45);
+}
+
+#nav-toggle {
+position: fixed;
+top: 0.9rem;
+left: 0.9rem;
+z-index: 70;
+width: 2.3rem;
+height: 2.3rem;
+border-radius: 50%;
+border: 1px solid var(--border);
+background: var(--bg-soft);
+color: var(--fg-soft);
+font-size: 1rem;
+line-height: 1;
+cursor: pointer;
+}
+#nav-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
+
+ul, ol { margin: 0 0 1.15rem; padding-left: 1.5rem; }
+li { margin: 0.3rem 0; }
+li > ul, li > ol { margin: 0.3rem 0; }
+
+code {
+font-family: var(--font-mono);
+font-size: 0.875em;
+background: var(--bg-code);
+border: 1px solid var(--border-soft);
+border-radius: 5px;
+padding: 0.12em 0.38em;
+word-break: break-all;
+}
+pre {
+background: var(--bg-code);
+border: 1px solid var(--border-soft);
+border-radius: 9px;
+padding: 1rem 1.15rem;
+overflow-x: auto; 
+margin: 0 0 1.4rem;
+line-height: 1.62;
+font-size: 0.855rem;
+}
+pre code {
+background: none;
+border: 0;
+padding: 0;
+font-size: inherit;
+word-break: normal;
+white-space: pre;
+}
+
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table {
+border-collapse: collapse;
+width: 100%;
+font-size: 0.92rem;
+line-height: 1.65;
+}
+th, td {
+border: 1px solid var(--border);
+padding: 0.52rem 0.8rem;
+text-align: left;
+vertical-align: top;
+}
+th { background: var(--bg-soft); font-weight: 700; white-space: nowrap; }
+tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--bg-soft) 45%, transparent); }
+caption { caption-side: bottom; padding-top: 0.6rem; font-size: 0.82rem; color: var(--fg-faint); text-align: left; }
+
+blockquote {
+margin: 0 0 1.4rem;
+padding: 0.15rem 0 0.15rem 1.1rem;
+border-left: 3px solid var(--border);
+color: var(--fg-soft);
+}
+blockquote > :last-child { margin-bottom: 0; }
+
+.note, .key, .calc, .warn, .later, .quote, .quiz {
+--c: var(--fg-soft);
+position: relative;
+margin: 1.8rem 0;
+padding: 1.1rem 1.25rem 1.15rem;
+border: 1px solid var(--border);
+border-left: 3px solid var(--c);
+border-radius: 0 9px 9px 0;
+background: color-mix(in srgb, var(--c) 5%, var(--bg));
+font-size: 0.965rem;
+}
+.note::before, .key::before, .calc::before, .warn::before,
+.later::before, .quote::before, .quiz::before {
+display: block;
+font-size: 0.72rem;
+font-weight: 800;
+letter-spacing: 0.09em;
+color: var(--c);
+margin-bottom: 0.55rem;
+}
+.note { --c: var(--accent-note); }
+.key { --c: var(--accent-key); }
+.calc { --c: var(--accent-calc); }
+.warn { --c: var(--accent-warn); }
+.later { --c: var(--accent-later); }
+.quote { --c: var(--accent-quote); }
+.quiz { --c: var(--accent-quiz); }
+.note::before { content: "개념 보충"; }
+.key::before { content: "핵심"; }
+.calc::before { content: "어림셈"; }
+.warn::before { content: "주의"; }
+.later::before { content: "여기까지 — 이후는 뒤 단계"; }
+.quote::before { content: "원문 인용"; }
+.quiz::before { content: "확인 문제"; }
+
+.note[data-label]::before, .key[data-label]::before, .calc[data-label]::before,
+.warn[data-label]::before, .later[data-label]::before,
+.quote[data-label]::before, .quiz[data-label]::before { content: attr(data-label); }
+.note > :last-child, .key > :last-child, .calc > :last-child,
+.warn > :last-child, .later > :last-child,
+.quote > :last-child, .quiz > :last-child { margin-bottom: 0; }
+.quote { font-style: normal; }
+.quote p { color: var(--fg-soft); }
+
+.note pre, .key pre, .calc pre, .warn pre, .later pre, .quiz pre {
+background: var(--bg);
+}
+
+.quiz ol { padding-left: 1.35rem; }
+.quiz li { margin: 0.75rem 0; }
+details {
+margin: 0.5rem 0 0;
+border: 1px dashed var(--border);
+border-radius: 7px;
+padding: 0 0.9rem;
+background: var(--bg);
+}
+details[open] { padding-bottom: 0.6rem; }
+summary {
+cursor: pointer;
+padding: 0.55rem 0;
+font-size: 0.86rem;
+font-weight: 700;
+color: var(--fg-soft);
+list-style: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before { content: "▸ "; color: var(--fg-faint); }
+details[open] summary::before { content: "▾ "; }
+/* pandoc 이 <summary> 안의 텍스트를 <p> 로 감쌉니다 → 인라인으로 되돌립니다 */
+summary > p { display: inline; margin: 0; }
+details > :not(summary) { font-size: 0.94rem; }
+details > :last-child { margin-bottom: 0; }
+
+/* ---------- 그림 / SVG ---------- */
+figure {
+  margin: 2rem 0;
+  padding: 0;
+}
+figure > .svg-scroll { overflow-x: auto; }
+figure svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.84rem;
+  color: var(--fg-faint);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* SVG 안에서 쓸 테마 연동 클래스
+   — SVG 에 색을 하드코딩하지 말고 이 클래스만 쓰세요 (GUIDE.md 8절) */
+svg text      { font-family: var(--font-sans); }
+svg .mono     { font-family: var(--font-mono); }
+
+/* 텍스트 */
+svg .s-fg     { fill: var(--fg); }
+svg .s-soft   { fill: var(--fg-soft); }
+svg .s-faint  { fill: var(--fg-faint); }
+
+/* 선 */
+svg .s-line   { stroke: var(--border); fill: none; }
+svg .s-strong { stroke: var(--fg-faint); fill: none; }
+svg .s-dash   { stroke: var(--border); fill: none; stroke-dasharray: 4 3; }
+svg .s-arrow  { fill: var(--fg-faint); stroke: none; }
+
+/* 상자 */
+svg .s-box    { fill: var(--bg-soft); stroke: var(--border); }
+svg .s-plain  { fill: none; stroke: var(--border); }
+svg .s-accent { fill: var(--accent-note); }
+
+/* 색 채움 — 옅은 배경 + 진한 테두리. 위에 s-fg 텍스트를 얹어도 두 테마에서 읽힙니다 */
+svg .s-f1 { fill: var(--accent-note);  fill-opacity: 0.16; stroke: var(--accent-note); }
+svg .s-f2 { fill: var(--accent-key);   fill-opacity: 0.16; stroke: var(--accent-key); }
+svg .s-f3 { fill: var(--accent-calc);  fill-opacity: 0.16; stroke: var(--accent-calc); }
+svg .s-f4 { fill: var(--accent-warn);  fill-opacity: 0.16; stroke: var(--accent-warn); }
+svg .s-f5 { fill: var(--fg-faint);     fill-opacity: 0.14; stroke: var(--fg-faint); }
+
+/* 색 텍스트 — 위 채움과 짝 */
+svg .s-t1 { fill: var(--accent-note); }
+svg .s-t2 { fill: var(--accent-key); }
+svg .s-t3 { fill: var(--accent-calc); }
+svg .s-t4 { fill: var(--accent-warn); }
+svg .s-t5 { fill: var(--fg-faint); }
+
+/* ---------- 배지 (깊이 표시 [완전]/[씨앗]) ---------- */
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.1em 0.5em;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  vertical-align: 0.12em;
+  margin-left: 0.3em;
+}
+.badge.full  { color: var(--accent-key); }
+.badge.seed  { color: var(--accent-later); }
+
+/* ---------- 테마 토글 버튼 ---------- */
+#theme-toggle {
+  position: fixed;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 50;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--fg-soft);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+#theme-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
+
+/* ---------- 꼬리말 ---------- */
+.doc-foot {
+  margin-top: 5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.84rem;
+  color: var(--fg-faint);
+}
+
+/* ---------- 반응형 ---------- */
+
+/* 넓은 화면 — 사이드바가 자리를 차지하고 본문은 남은 폭 가운데에 놓입니다 */
+@media (min-width: 1100px) {
+  body { padding-left: var(--sidebar-w); }
+  #nav-toggle, #nav-backdrop { display: none; }
+}
+
+/* 좁은 화면 — 사이드바를 왼쪽 바깥으로 밀어두고 ☰ 로 꺼냅니다 */
+@media (max-width: 1099.98px) {
+  #sidebar {
+    width: min(19rem, 84vw);
+    transform: translateX(-102%);
+    transition: transform 0.22s ease, visibility 0.22s;
+    box-shadow: 0 0 2rem rgba(0, 0, 0, 0.25);
+  }
+  body.nav-open #sidebar { transform: none; }
+  /* ☰ 버튼이 사이드바 머리말을 가리지 않도록 위를 비웁니다 */
+  #sidebar { padding-top: 4rem; }
+  body:not(.nav-open) #sidebar { visibility: hidden; }
+  body.nav-open { overflow: hidden; }
+  .wrap { padding-top: 4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sidebar { transition: none; }
+}
+
+@media (max-width: 640px) {
+  body { font-size: 16px; line-height: 1.8; }
+  .wrap { padding: 4rem 1rem 4rem; }
+  .doc-head h1 { font-size: 1.65rem; }
+  h2 { font-size: 1.35rem; margin-top: 2.8rem; }
+  h3 { font-size: 1.12rem; }
+  .anchor { display: none; }
+}
+
+/* ---------- 인쇄 ---------- */
+@media print {
+  :root { --bg: #fff; --fg: #000; }
+  #theme-toggle, #nav-toggle, #sidebar, #nav-backdrop { display: none !important; }
+  body { padding-left: 0; }
+  .wrap { max-width: none; padding: 0; }
+  pre, table, figure, .note, .key, .calc, .warn, .later, .quiz { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<button id="nav-toggle" type="button" aria-label="목차 열기/닫기" aria-expanded="false" aria-controls="sidebar" title="목차">☰</button>
+<button id="theme-toggle" type="button" aria-label="라이트/다크 테마 전환" title="테마 전환">◐</button>
+
+<div id="nav-backdrop" hidden></div>
+
+<aside id="sidebar">
+  <div class="sidebar-head">
+    <p class="side-eyebrow">PHASE 4 · 내 모델 만들기</p>
+    <a class="side-title" href="#top">10단계 — 남의 모델에서 내 모델로</a>
+  </div>
+  <nav id="TOC" role="doc-toc" aria-label="목차">
+<ul>
+<li><a href="#이-단계는-무엇인가" id="toc-이-단계는-무엇인가">1. 이 단계는 무엇인가</a>
+<ul>
+<li><a href="#원문의-요지" id="toc-원문의-요지">원문의 요지</a></li>
+<li><a href="#지금까지와-무엇이-다른가" id="toc-지금까지와-무엇이-다른가">지금까지와 무엇이 다른가</a></li>
+<li><a href="#이어지는-것과-끊기는-것" id="toc-이어지는-것과-끊기는-것">이어지는 것과 끊기는 것</a></li>
+<li><a href="#이-문서를-읽고-나면-답할-수-있는-질문" id="toc-이-문서를-읽고-나면-답할-수-있는-질문">이 문서를 읽고 나면 답할 수 있는 질문</a></li>
+</ul></li>
+<li><a href="#개념" id="toc-개념">2. 개념</a></li>
+<li><a href="#학습은-왜-메모리를-그렇게-많이-쓰는가-완전" id="toc-학습은-왜-메모리를-그렇게-많이-쓰는가-완전">2.1 학습은 왜 메모리를 그렇게 많이 쓰는가 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#예산의-네-항목" id="toc-예산의-네-항목">예산의 네 항목</a></li>
+</ul></li>
+<li><a href="#lora-전체를-학습하지-않는다-완전" id="toc-lora-전체를-학습하지-않는다-완전">2.2 LoRA — 전체를 학습하지 않는다 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#왜-얇은-두-장으로-되는가" id="toc-왜-얇은-두-장으로-되는가">왜 얇은 두 장으로 되는가</a></li>
+<li><a href="#결과물이-작다는-부수-효과" id="toc-결과물이-작다는-부수-효과">결과물이 작다는 부수 효과</a></li>
+</ul></li>
+<li><a href="#qlora-얼린-원본까지-눌러버린다-완전" id="toc-qlora-얼린-원본까지-눌러버린다-완전">2.3 QLoRA — 얼린 원본까지 눌러버린다 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#단계와-모순되지-않는-이유" id="toc-단계와-모순되지-않는-이유">3단계와 모순되지 않는 이유</a></li>
+<li><a href="#딸려-나오는-기법-이름들-씨앗" id="toc-딸려-나오는-기법-이름들-씨앗">딸려 나오는 기법 이름들 <span class="badge seed">씨앗</span></a></li>
+</ul></li>
+<li><a href="#학습-곡선-읽기-완전" id="toc-학습-곡선-읽기-완전">2.4 학습 곡선 읽기 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#주요-손잡이" id="toc-주요-손잡이">주요 손잡이</a></li>
+</ul></li>
+<li><a href="#잘하게-만들면-다른-걸-못하게-된다-완전" id="toc-잘하게-만들면-다른-걸-못하게-된다-완전">2.5 잘하게 만들면 다른 걸 못하게 된다 <span class="badge full">완전</span></a>
+<ul>
+<li><a href="#단계-평가-루프가-여기서-쓰인다" id="toc-단계-평가-루프가-여기서-쓰인다">2단계 평가 루프가 여기서 쓰인다</a></li>
+</ul></li>
+<li><a href="#sft-란-무엇인가-씨앗" id="toc-sft-란-무엇인가-씨앗">2.6 SFT 란 무엇인가 <span class="badge seed">씨앗</span></a></li>
+<li><a href="#내-장비-기준-정리" id="toc-내-장비-기준-정리">3. 내 장비 기준 정리</a>
+<ul>
+<li><a href="#gb-로-무엇이-되고-무엇이-안-되는가" id="toc-gb-로-무엇이-되고-무엇이-안-되는가">3.1 32GB 로 무엇이 되고 무엇이 안 되는가</a></li>
+<li><a href="#원문-전제와의-차이" id="toc-원문-전제와의-차이">3.2 원문 전제와의 차이</a></li>
+</ul></li>
+<li><a href="#확인-문제" id="toc-확인-문제">4. 확인 문제</a></li>
+<li><a href="#다음-단계로" id="toc-다음-단계로">5. 다음 단계로</a>
+<ul>
+<li><a href="#이-문서가-회수한-씨앗" id="toc-이-문서가-회수한-씨앗">이 문서가 회수한 씨앗</a></li>
+<li><a href="#이-문서가-남기는-씨앗" id="toc-이-문서가-남기는-씨앗">이 문서가 남기는 씨앗</a></li>
+<li><a href="#phase-5-로-넘어가기-전에" id="toc-phase-5-로-넘어가기-전에">Phase 5 로 넘어가기 전에</a></li>
+</ul></li>
+<li><a href="#용어표" id="toc-용어표">6. 용어표</a></li>
+</ul>
+  </nav>
+</aside>
+
+<div class="wrap">
+
+  <header class="doc-head" id="top">
+    <p class="eyebrow">PHASE 4 · 내 모델 만들기</p>
+    <h1>10단계 — 남의 모델에서 내 모델로</h1>
+    <p class="subtitle">전체를 학습하지 않고도 모델을 바꾸는 방법</p>
+        <div class="meta">
+      <span>대상 장비 — RTX 5090 32GB × 1 (Blackwell, sm_120)</span><span>깊이 규칙 — GUIDE.md 옵션 B</span><span>최종 수정 — 2026-09-02</span>
+    </div>
+      </header>
+
+  <main>
+<h2 id="이-단계는-무엇인가">1. 이 단계는 무엇인가</h2>
+<h3 id="원문의-요지">원문의 요지</h3>
+<div class="quote" data-label="원문 (10단계) — LoRA / QLoRA로 fine-tuning 해봅니다">
+<ul>
+<li>한국어 데이터셋을 받아 <strong>unsloth 또는 axolotl</strong> 을 이용해 <strong>SFT 파인튜닝</strong>을 해봅니다.</li>
+<li><strong>학습 loss curve, eval loss, overfitting</strong> 등을 직접 봅니다.</li>
+<li>이걸 직접 서빙해봄으로써 <strong>‘내 모델을 내 하드웨어에서 돌리는 사람’</strong> 으로 거듭납니다.</li>
+</ul>
+</div>
+<h3 id="지금까지와-무엇이-다른가">지금까지와 무엇이 다른가</h3>
+<p>1~9단계는 전부 <strong>추론(inference)</strong> 이었습니다. 이미 만들어진 모델을 <strong>읽어서 쓰는</strong> 일입니다.
+10단계는 처음으로 <strong>학습(training)</strong> 을 합니다. 모델의 값을 <strong>바꾸는</strong> 일입니다.</p>
+<p>1단계에서 이 차이를 표로만 보고 넘어갔습니다.</p>
+<div class="quote" data-label="1단계 2.1절에서">
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>training(학습)</th>
+<th>inference(추론)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>하는 일</td>
+<td>파라미터 값을 <strong>바꾼다</strong></td>
+<td>파라미터 값을 <strong>읽어서 쓴다</strong></td>
+</tr>
+<tr class="even">
+<td>메모리 요구량</td>
+<td>가중치의 <strong>5~6배</strong></td>
+<td>가중치 + 약간</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="key">
+<p><strong>이 문서는 그 “5~6배”가 어디서 나오는지 푸는 자리</strong>입니다.
+그리고 그 배율 때문에 32GB 로는 불가능한 일을, <strong>LoRA 가 어떻게 가능하게 만드는지</strong>를 봅니다.</p>
+</div>
+<h3 id="이어지는-것과-끊기는-것">이어지는 것과 끊기는 것</h3>
+<p>새 영역이지만 앞의 감각이 전부 버려지지는 않습니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>앞에서 만든 것</th>
+<th>10단계에서</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>VRAM(Video Random Access Memory) 예산 계산</strong> (1단계)</td>
+<td>✅ 그대로 씀 — 다만 <strong>항목이 늘어납니다</strong></td>
+</tr>
+<tr class="even">
+<td><strong>양자화의 이해</strong> (3단계)</td>
+<td>✅ QLoRA 에서 다시 만남</td>
+</tr>
+<tr class="odd">
+<td><strong>평가 루프</strong> (2단계)</td>
+<td>✅ 학습 전/후를 같은 자로 재는 데 씀</td>
+</tr>
+<tr class="even">
+<td>KV cache · 배치 · 컨텍스트 (7~9단계)</td>
+<td>🔶 학습 중에는 다른 것이 메모리를 씀</td>
+</tr>
+<tr class="odd">
+<td>prefill / decode (5단계)</td>
+<td>🔶 학습에는 그 구분이 없음</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="이-문서를-읽고-나면-답할-수-있는-질문">이 문서를 읽고 나면 답할 수 있는 질문</h3>
+<ol type="1">
+<li>학습이 추론보다 메모리를 몇 배나 더 쓰는 이유는 정확히 무엇인가?</li>
+<li>LoRA 는 그 항목 중 <strong>무엇을</strong> 없애서 메모리를 줄이는가?</li>
+<li>3단계에서 “양자화는 정확도를 깎는다”고 했는데, QLoRA 는 왜 양자화를 쓰는가?</li>
+<li>학습 곡선에서 <strong>과적합</strong>은 어떤 모양으로 나타나는가?</li>
+<li>파인튜닝한 모델이 원하는 과제는 잘하는데 <strong>다른 걸 못하게 되는</strong> 현상은 왜 생기는가?</li>
+</ol>
+<p>4절 확인 문제가 이 다섯 가지를 다시 묻습니다.</p>
+<hr />
+<h2 id="개념">2. 개념</h2>
+<h2 id="학습은-왜-메모리를-그렇게-많이-쓰는가-완전">2.1 학습은 왜 메모리를 그렇게 많이 쓰는가 <span class="badge full">완전</span></h2>
+<p>추론에서는 가중치를 <strong>읽기만</strong> 했습니다. 학습은 값을 <strong>고쳐야</strong> 하고, 고치려면 세 가지가 더 필요합니다.</p>
+<blockquote>
+<p>원고를 고치는 편집자를 생각해보세요.
+읽기만 할 때는 원고 한 부면 됩니다. 그런데 고치려면 <strong>어디를 어떻게 고칠지 적은 메모</strong>가 필요하고,
+<strong>지금까지 어떤 방향으로 고쳐왔는지 기록</strong>도 옆에 둬야 일관되게 고칠 수 있습니다.</p>
+</blockquote>
+<p>실제로는 이렇습니다. 학습 한 걸음은 <strong>“틀린 만큼을 계산해서 가중치를 조금 옮기는”</strong> 일이고,
+그 과정에서 가중치와 같은 크기의 데이터가 여러 벌 필요합니다.</p>
+<h3 id="예산의-네-항목">예산의 네 항목</h3>
+<pre><code>학습 VRAM = ① 가중치 + ② gradient + ③ optimizer 상태 + ④ 활성화값</code></pre>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>항목</th>
+<th>무엇인가</th>
+<th>크기</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>① <strong>가중치</strong></td>
+<td>모델 그 자체</td>
+<td>파라미터 × 2바이트 (BF16, Brain Floating Point 16)</td>
+</tr>
+<tr class="even">
+<td>② <strong>gradient</strong></td>
+<td>각 가중치를 <strong>어느 방향으로 얼마나</strong> 옮길지</td>
+<td><strong>가중치와 같은 크기</strong></td>
+</tr>
+<tr class="odd">
+<td>③ <strong>optimizer 상태</strong></td>
+<td>지금까지의 이동 경향 기록</td>
+<td><strong>가중치의 2배 이상</strong> (아래)</td>
+</tr>
+<tr class="even">
+<td>④ <strong>활성화값</strong></td>
+<td>중간 계산 결과 — 되돌아가며 계산할 때 필요</td>
+<td>배치·길이에 따라 수 GB</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>②가 가중치와 같은 크기인 이유는 단순합니다. <strong>가중치 하나마다 “얼마나 옮길지”가 하나씩</strong> 필요합니다.</p>
+<p>③이 가장 큽니다. 널리 쓰이는 optimizer 는 가중치마다 <strong>두 가지 값</strong>을 따로 기억하고,
+그것을 보통 <strong>FP32(Floating Point 32, 4바이트)</strong> 로 들고 있습니다. 정밀도가 낮으면 작은 변화가 누적되지 않기 때문입니다.</p>
+<div class="calc">
+<p><strong>전체 파인튜닝(full fine-tuning) VRAM 어림셈</strong></p>
+<pre><code>학습 VRAM ≈ 파라미터 수(B) × ( 2(가중치) + 2(gradient) + 8(optimizer) ) + 활성화값
+                                                          ↑ FP32 두 벌</code></pre>
+<p>8B 모델에 대입하면:</p>
+<pre><code>① 가중치 (BF16)          8 × 2 =  16 GB
+② gradient (BF16)        8 × 2 =  16 GB
+③ optimizer 상태 (FP32×2) 8 × 8 =  64 GB
+④ 활성화값                        수 GB
+───────────────────────────────────────
+합계                             약 100 GB 이상</code></pre>
+<p><strong>내 GPU(Graphics Processing Unit) 32GB 로는 8B 모델의 전체 파인튜닝이 불가능합니다.</strong> 세 배 이상 모자랍니다.</p>
+<p><strong>이 어림셈이 틀리는 경우</strong></p>
+<ul>
+<li><strong>optimizer 를 바꾸면 ③이 달라집니다.</strong> 상태를 하나만 쓰거나 낮은 정밀도로 들고 있는 방식도 있습니다</li>
+<li><strong>활성화값은 배치 크기와 시퀀스 길이에 비례합니다.</strong> 중간 결과를 버렸다 다시 계산하는 방법으로 줄일 수 있고, 대신 시간을 냅니다</li>
+<li><strong>정밀도를 섞어 쓰면</strong> 항목별 바이트 수가 달라집니다</li>
+<li>이 계산은 <strong>전체 파인튜닝</strong> 기준입니다. LoRA 는 이 구조 자체를 바꿉니다 (2.2절)</li>
+</ul>
+</div>
+<div class="key">
+<p>1단계의 “5~6배”는 이 표입니다. <code>2 + 2 + 8 = 12</code> 바이트, 가중치 대비 약 6배입니다.
+그리고 <strong>커지는 것은 ②③ 이지 ① 이 아닙니다.</strong>
+LoRA 가 공략하는 지점이 바로 여기입니다.</p>
+</div>
+<hr />
+<h2 id="lora-전체를-학습하지-않는다-완전">2.2 LoRA — 전체를 학습하지 않는다 <span class="badge full">완전</span></h2>
+<p>앞 절의 표를 다시 보면 해법의 방향이 보입니다.
+②와 ③은 <strong>학습되는 파라미터 개수에 비례</strong>합니다. 그렇다면 <strong>학습하는 파라미터를 줄이면</strong> 됩니다.</p>
+<p>LoRA(Low-Rank Adaptation)의 아이디어는 이것입니다.
+<strong>원본 가중치는 얼려두고(동결), 옆에 작은 행렬 두 개를 붙여 그것만 학습합니다.</strong></p>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 270" role="img" aria-label="전체 파인튜닝은 큰 가중치 행렬 전체를 학습해 같은 크기의 그래디언트와 그보다 큰 옵티마이저 상태가 필요하다. LoRA는 원본을 동결하고 옆에 얇은 행렬 두 개만 학습하므로 그래디언트와 옵티마이저 상태가 그 작은 부분에만 필요하다.">
+  <defs>
+    <marker id="ar5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path class="s-arrow" d="M0 0 L10 5 L0 10 z" />
+    </marker>
+  </defs>
+  <text class="s-t4" x="16" y="24" font-size="12.5" font-weight="700">전체 파인튜닝 — 큰 행렬 전체가 학습 대상</text>
+  <rect class="s-f4" x="16" y="38" width="120" height="120" rx="5" />
+  <text class="s-fg" x="76" y="94" text-anchor="middle" font-size="12">가중치 W</text>
+  <text class="s-faint" x="76" y="112" text-anchor="middle" font-size="10.5">전부 학습</text>
+  <text class="s-faint" x="76" y="176" text-anchor="middle" font-size="10.5">d × k</text>
+  <path class="s-strong" d="M146 98 H186" marker-end="url(#ar5)" />
+  <rect class="s-f4" x="192" y="38" width="120" height="120" rx="5" />
+  <text class="s-fg" x="252" y="94" text-anchor="middle" font-size="12">gradient</text>
+  <text class="s-faint" x="252" y="112" text-anchor="middle" font-size="10.5">같은 크기</text>
+  <path class="s-strong" d="M322 98 H362" marker-end="url(#ar5)" />
+  <rect class="s-f4" x="368" y="20" width="120" height="156" rx="5" />
+  <text class="s-fg" x="428" y="90" text-anchor="middle" font-size="12">optimizer 상태</text>
+  <text class="s-faint" x="428" y="108" text-anchor="middle" font-size="10.5">더 큼</text>
+  <text class="s-t4" x="520" y="98" font-size="11.5">→ 합계 100 GB 이상</text>
+  <text class="s-t3" x="16" y="214" font-size="12.5" font-weight="700">LoRA — 원본은 얼리고 얇은 두 장만 학습</text>
+  <rect class="s-f5" x="16" y="228" width="120" height="34" rx="5" />
+  <text class="s-fg" x="76" y="250" text-anchor="middle" font-size="12">가중치 W (동결)</text>
+  <text class="s-faint" x="146" y="250" font-size="14">+</text>
+  <rect class="s-f2" x="166" y="228" width="18" height="34" rx="3" />
+  <text class="s-faint" x="190" y="250" font-size="12">×</text>
+  <rect class="s-f2" x="202" y="228" width="70" height="12" rx="3" />
+  <text class="s-t2" x="284" y="242" font-size="11">얇은 두 장 = 학습 대상</text>
+  <path class="s-strong" d="M440 244 H480" marker-end="url(#ar5)" />
+  <text class="s-t3" x="488" y="248" font-size="11.5">gradient · optimizer 도 이만큼만</text>
+</svg>
+</div>
+<figcaption>학습 대상을 줄이면 딸려오는 항목도 함께 줄어듭니다</figcaption>
+</figure>
+<h3 id="왜-얇은-두-장으로-되는가">왜 얇은 두 장으로 되는가</h3>
+<p>큰 행렬 하나를 <strong>얇은 두 장의 곱</strong>으로 흉내 냅니다. 그 “얇기”를 정하는 값이 <strong>rank(<code>r</code>)</strong> 입니다.</p>
+<pre><code>원본 한 층의 가중치        4096 × 4096  = 약 1,670만 개
+LoRA 로 대신할 두 장 (r=8)  8 × (4096 + 4096) = 약 6.5만 개   →  0.4 %</code></pre>
+<div class="key">
+<p>학습 파라미터가 <strong>0.1~1% 수준</strong>으로 줄어듭니다.
+그러면 2.1절 표의 ②gradient 와 ③optimizer 상태도 <strong>그 비율만큼만</strong> 필요해집니다.
+<code>64GB</code> 짜리 항목이 수백 MB 가 되는 것이 LoRA 의 전부입니다.</p>
+</div>
+<div class="note">
+<p>원본을 얼린다는 것은 <strong>①가중치는 그대로 남는다</strong>는 뜻입니다.
+8B BF16 이면 16GB 는 여전히 필요합니다. LoRA 가 줄이는 것은 ①이 아니라 ②③입니다.
+그래서 다음 절(QLoRA)이 ①까지 건드립니다.</p>
+</div>
+<h3 id="결과물이-작다는-부수-효과">결과물이 작다는 부수 효과</h3>
+<p>학습된 것은 얇은 두 장뿐이므로, 결과물(<strong>어댑터</strong>)도 <strong>수십~수백 MB</strong> 입니다. 여기서 이득이 따라옵니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>이득</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>바꿔 끼울 수 있다</strong></td>
+<td>용도별 어댑터를 여러 개 만들어 같은 원본에 갈아 끼움</td>
+</tr>
+<tr class="even">
+<td><strong>서빙이 가볍다</strong></td>
+<td>원본 하나에 어댑터 여러 개를 얹어 동시 서빙 가능</td>
+</tr>
+<tr class="odd">
+<td><strong>합칠 수 있다</strong></td>
+<td>추론 전에 원본과 합쳐두면(merge) <strong>추가 지연시간이 없음</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note">
+<p>마지막 줄이 4–6단계와 이어집니다. 어댑터를 원본에 합쳐버리면 그냥 하나의 가중치가 되므로,
+<strong>추론 경로가 원본과 완전히 같아집니다.</strong> TTFT(Time To First Token)도 TPOT(Time Per Output Token)도 달라지지 않습니다.
+합치지 않고 얹은 채로 서빙하면 어댑터를 바꿔 끼울 수 있는 대신 약간의 비용이 붙습니다.</p>
+</div>
+<hr />
+<h2 id="qlora-얼린-원본까지-눌러버린다-완전">2.3 QLoRA — 얼린 원본까지 눌러버린다 <span class="badge full">완전</span></h2>
+<p>LoRA 로 ②③을 없앴지만 ①가중치 16GB 는 남아 있습니다.
+<strong>QLoRA(Quantized LoRA)</strong> 는 여기에 3단계에서 배운 것을 적용합니다. <strong>얼어 있는 원본을 4비트로 양자화해서 올립니다.</strong></p>
+<pre><code>LoRA   — 원본 BF16      16 GB  + 어댑터(학습)
+QLoRA  — 원본 4비트   약 5 GB  + 어댑터(학습, BF16)</code></pre>
+<h3 id="단계와-모순되지-않는-이유">3단계와 모순되지 않는 이유</h3>
+<p>3단계에서 <strong>“양자화하면 정확도가 떨어진다”</strong> 고 배웠는데 여기서는 양자화를 씁니다.
+원문이 이 점을 직접 짚습니다.</p>
+<div class="quote" data-label="원문 (10단계)">
+<p>3단계에서 “양자화는 정확도를 깎는다”고 배웠는데 여기선 양자화를 씁니다. 모순이 아닙니다.
+<strong>얼어있는 원본은 4bit로 눌러도, 학습되는 어댑터가 BF16이면 손실을 상당히 흡수</strong>합니다.</p>
+</div>
+<div class="key">
+<p>차이는 <strong>양자화된 부분이 학습되는지 여부</strong>입니다.
+3단계에서는 양자화된 가중치를 <strong>그대로 써서</strong> 답을 만들었으므로 손실이 그대로 드러났습니다.
+QLoRA 에서는 그 위에 <strong>BF16 으로 학습되는 층이 얹히므로</strong>, 학습이 그 오차를 어느 정도 보정하는 방향으로 진행됩니다.</p>
+</div>
+<h3 id="딸려-나오는-기법-이름들-씨앗">딸려 나오는 기법 이름들 <span class="badge seed">씨앗</span></h3>
+<p>QLoRA 를 설명할 때 함께 나오는 이름이 셋 있습니다. 지금은 <strong>무엇을 해결하는지만</strong> 알아둡니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>이름</th>
+<th>푸는 문제</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>NF4</strong>(4-bit NormalFloat)</td>
+<td>가중치 값의 분포에 맞춰 눈금을 배치한 4비트 형식</td>
+</tr>
+<tr class="even">
+<td><strong>이중 양자화</strong></td>
+<td>양자화에 쓰는 배율 값 자체도 양자화해서 추가로 아낌</td>
+</tr>
+<tr class="odd">
+<td><strong>페이지드 옵티마이저</strong></td>
+<td>메모리가 순간적으로 튈 때 그만큼을 시스템 메모리로 넘김</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>3단계 2.7절에서 <strong>“같은 4비트라도 눈금을 어디에 두느냐가 품질을 만든다”</strong> 고 했습니다.
+NF4 는 그 아이디어를 “가중치는 대체로 0 근처에 몰려 있다”는 성질에 맞춘 것입니다.</p>
+<div class="later">
+<p>어느 양자화 방식이 어떤 원리로 오차를 줄이는지, 그리고 레이어마다 다르게 적용하는 기법은 <strong>16단계</strong>입니다.
+10단계에서는 <strong>“얼린 원본은 눌러도 되고, 그때 쓰는 4비트 형식이 따로 있다”</strong> 까지면 충분합니다.</p>
+</div>
+<hr />
+<h2 id="학습-곡선-읽기-완전">2.4 학습 곡선 읽기 <span class="badge full">완전</span></h2>
+<div class="quote" data-label="원문 (10단계)">
+<p>이 단계의 진짜 학습 목표는 <strong>곡선을 읽는 눈</strong>입니다.</p>
+</div>
+<p>학습 중에는 <strong>loss(손실)</strong> 라는 값이 계속 출력됩니다. <strong>모델이 얼마나 틀리고 있는지</strong>를 나타내는 숫자이고,
+학습이 진행되면 내려가야 합니다.</p>
+<p>중요한 것은 <strong>두 개의 loss 를 함께 본다</strong>는 점입니다.</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th>이름</th>
+<th>무엇으로 잰 loss 인가</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>train loss</strong></td>
+<td>학습에 쓴 데이터로 잰 값</td>
+</tr>
+<tr class="even">
+<td><strong>eval loss</strong></td>
+<td><strong>학습에 쓰지 않은</strong> 데이터로 잰 값</td>
+</tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p>시험 공부를 하며 <strong>연습문제 점수</strong>와 <strong>처음 보는 모의고사 점수</strong>를 함께 보는 것과 같습니다.
+연습문제만 잘 풀리고 모의고사가 안 오르면, 문제를 외운 것이지 실력이 는 게 아닙니다.</p>
+</blockquote>
+<p>실제로는 이렇습니다. 두 값이 함께 내려가면 일반화가 되고 있는 것이고,
+<strong>train 만 내려가고 eval 이 올라가면 학습 데이터를 외우고 있는 것</strong>입니다. 이것이 <strong>과적합(overfitting)</strong> 입니다.</p>
+<figure>
+<div class="svg-scroll">
+<svg viewBox="0 0 720 220" role="img" aria-label="정상 학습은 train loss와 eval loss가 함께 내려간다. 과적합은 train loss는 내려가지만 eval loss가 다시 올라간다. 학습률이 너무 크면 loss가 요동치며 발산한다.">
+  <text class="s-t3" x="16" y="22" font-size="12" font-weight="700">정상</text>
+  <line class="s-line" x1="20" y1="180" x2="220" y2="180"></line>
+  <line class="s-line" x1="20" y1="40" x2="20" y2="180"></line>
+  <path class="s-strong" d="M24 56 C 70 120, 130 150, 214 160" style="stroke-width:2" />
+  <text class="s-faint" x="34" y="48" font-size="10.5">train</text>
+  <path class="s-strong" d="M24 68 C 70 132, 130 158, 214 170" style="stroke-width:2;stroke-dasharray:5 3" />
+  <text class="s-faint" x="40" y="116" font-size="10.5">eval</text>
+  <text class="s-t3" x="24" y="210" font-size="11">둘 다 함께 내려감 → 계속</text>
+  <text class="s-t4" x="256" y="22" font-size="12" font-weight="700">과적합</text>
+  <line class="s-line" x1="260" y1="180" x2="460" y2="180"></line>
+  <line class="s-line" x1="260" y1="40" x2="260" y2="180"></line>
+  <path class="s-strong" d="M264 56 C 310 120, 370 150, 454 162" style="stroke-width:2" />
+  <text class="s-faint" x="274" y="48" font-size="10.5">train</text>
+  <path class="s-strong" d="M264 68 C 300 130, 330 152, 360 150 C 400 148, 430 120, 454 96" style="stroke-width:2;stroke-dasharray:5 3" />
+  <text class="s-t4" x="356" y="66" font-size="10.5">eval 이 다시 올라감</text>
+  <circle class="s-accent" cx="360" cy="150" r="4"></circle>
+  <text class="s-t4" x="264" y="210" font-size="11">점 이후로는 외우는 중 → 여기서 멈춤</text>
+  <text class="s-t4" x="496" y="22" font-size="12" font-weight="700">학습률 과다</text>
+  <line class="s-line" x1="500" y1="180" x2="700" y2="180"></line>
+  <line class="s-line" x1="500" y1="40" x2="500" y2="180"></line>
+  <path class="s-strong" d="M504 60 C 530 120, 550 90, 570 140 C 590 60, 610 160, 630 70 C 650 150, 670 50, 694 120" style="stroke-width:2" />
+  <text class="s-t4" x="504" y="210" font-size="11">요동치며 발산 → 학습률을 낮춤</text>
+</svg>
+</div>
+<figcaption>같은 &quot;loss 그래프&quot;인데 읽는 법이 다릅니다</figcaption>
+</figure>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>증상</th>
+<th>해석</th>
+<th>대응 방향</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>train ↓, eval ↓</td>
+<td>정상</td>
+<td>계속</td>
+</tr>
+<tr class="even">
+<td>train ↓, <strong>eval ↑</strong></td>
+<td><strong>과적합</strong> — 데이터를 외우는 중</td>
+<td>일찍 멈추기, 데이터 늘리기, rank 낮추기</td>
+</tr>
+<tr class="odd">
+<td>둘 다 정체</td>
+<td>배우는 게 없음</td>
+<td>학습률 올리기, rank 올리기</td>
+</tr>
+<tr class="even">
+<td>요동·발산</td>
+<td>걸음이 너무 큼</td>
+<td>학습률 낮추기, 초반에 천천히 시작</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p>loss 값 자체의 절대 크기는 별로 중요하지 않습니다. <strong>두 곡선의 관계와 방향</strong>을 봅니다.
+2–3단계에서 <em>“절대 점수가 아니라 차이를 본다”</em> 고 했던 것과 같은 태도입니다.</p>
+</div>
+<h3 id="주요-손잡이">주요 손잡이</h3>
+<div class="note">
+<p>처음 돌릴 때 만지게 되는 값들입니다. <strong>정답이 아니라 출발점</strong>입니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>손잡이</th>
+<th>의미</th>
+<th>시작점</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>r</code> (rank)</td>
+<td>어댑터의 표현력 — 얇은 두 장의 두께</td>
+<td>16 (작게는 8, 크게는 64)</td>
+</tr>
+<tr class="even">
+<td><code>lora_alpha</code></td>
+<td>어댑터를 얼마나 세게 반영할지</td>
+<td>보통 <code>r</code> 또는 <code>2r</code></td>
+</tr>
+<tr class="odd">
+<td><code>target_modules</code></td>
+<td>어댑터를 어느 층에 붙일지</td>
+<td>전 linear 층 권장</td>
+</tr>
+<tr class="even">
+<td><code>learning_rate</code></td>
+<td>한 걸음의 크기</td>
+<td>1e-4 ~ 2e-4</td>
+</tr>
+<tr class="odd">
+<td><code>epochs</code></td>
+<td>데이터를 몇 번 반복할지</td>
+<td>1~3 (많으면 과적합)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code>r</code> 을 키우면 표현력이 늘지만 <strong>과적합도 쉬워지고 메모리도 늡니다.</strong>
+곡선을 보고 조절하라는 것이 이 단계의 요구입니다.</p>
+</div>
+<hr />
+<h2 id="잘하게-만들면-다른-걸-못하게-된다-완전">2.5 잘하게 만들면 다른 걸 못하게 된다 <span class="badge full">완전</span></h2>
+<p>파인튜닝을 마치면 원하는 과제는 좋아집니다. 그런데 <strong>원래 잘하던 다른 것이 나빠질 수 있습니다.</strong></p>
+<blockquote>
+<p>한 분야만 몇 달 집중해서 공부하면 그 분야는 밝아지지만,
+그동안 안 쓴 다른 지식은 흐려집니다.</p>
+</blockquote>
+<p>실제로는 이렇습니다. 학습은 가중치를 <strong>새 데이터에 맞는 방향으로 옮기는</strong> 일이고,
+그 이동은 기존 능력을 지탱하던 값도 함께 움직입니다.
+이 현상을 <strong>catastrophic forgetting(파국적 망각)</strong> 이라고 부릅니다.</p>
+<div class="key">
+<p>그래서 파인튜닝의 결과는 <strong>한 축으로 판단할 수 없습니다.</strong>
+“목표 과제가 좋아졌는가”와 <strong>“원래 능력을 잃지 않았는가”</strong> 를 함께 봐야 합니다.</p>
+</div>
+<h3 id="단계-평가-루프가-여기서-쓰인다">2단계 평가 루프가 여기서 쓰인다</h3>
+<p>원문이 파인튜닝 후 <strong>반드시 세 가지를 하라</strong>고 요구하는 이유가 이것입니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>확인</th>
+<th>무엇을 보는가</th>
+<th>어디서 온 도구인가</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>정확도 재측정</strong></td>
+<td>일반 능력이 떨어지지 않았는지</td>
+<td><strong>2단계 평가 루프</strong></td>
+</tr>
+<tr class="even">
+<td><strong>어댑터 서빙</strong></td>
+<td>만든 것이 실제로 돌아가는지</td>
+<td><strong>4단계 vLLM</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>전/후 정성 비교</strong></td>
+<td>답변 스타일이 어떻게 바뀌었는지</td>
+<td>눈</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note">
+<p>첫 줄이 이 커리큘럼 설계의 회수 지점입니다.
+2단계에서 <em>“측정 도구를 먼저 손에 쥔다”</em> 고 했고, 그 이유가 <em>“이후 모든 실습이 바꾸고 비교하기”</em> 였습니다.
+<strong>내가 모델을 바꾼 지금이 그 도구가 가장 필요한 순간</strong>입니다.</p>
+<p>조건 고정 규칙(2–3단계 2.5절)도 그대로 적용됩니다.
+같은 문항, 같은 프롬프트 형식, 같은 샘플링으로 재야 전/후 비교가 성립합니다.</p>
+</div>
+<div class="warn">
+<p>정성 비교(같은 질문 20개를 던져 눈으로 보기)를 <strong>생략하지 마세요.</strong>
+벤치마크 점수는 비슷한데 답변 스타일이 크게 달라지는 경우가 있고, 그 반대도 있습니다.
+숫자가 잡아내지 못하는 변화를 보는 것이 이 확인의 목적입니다.</p>
+</div>
+<hr />
+<h2 id="sft-란-무엇인가-씨앗">2.6 SFT 란 무엇인가 <span class="badge seed">씨앗</span></h2>
+<p>원문이 <strong>SFT 파인튜닝</strong>이라고 지정합니다. 무엇을 지정한 것인지 한 줄로 잡아둡니다.</p>
+<p><strong>SFT(Supervised Fine-Tuning, 지도 파인튜닝)</strong> 는 <strong>“이런 질문에는 이렇게 답한다”는 예시 쌍</strong>을 모아
+그대로 따라 하도록 가르치는 방식입니다. 정답이 주어져 있으므로 “지도(supervised)”입니다.</p>
+<p>이 단계에서 필요한 것은 여기까지입니다. <strong>데이터의 형태가 곧 결과의 형태</strong>라는 점만 기억하면 됩니다 —
+짧고 딱딱한 답변만 모아 학습시키면 모델도 짧고 딱딱하게 답합니다.</p>
+<div class="later">
+<p>사람의 선호를 반영해 더 다듬는 방식(선호 학습 계열)이나 강화학습을 쓰는 방식은
+<strong>이 커리큘럼의 범위 밖</strong>입니다. 원문 21단계 어디에도 나오지 않습니다.
+10단계에서는 <strong>“예시 쌍을 모아 따라 하게 만드는 것이 SFT”</strong> 까지면 충분합니다.</p>
+</div>
+<hr />
+<h2 id="내-장비-기준-정리">3. 내 장비 기준 정리</h2>
+<h3 id="gb-로-무엇이-되고-무엇이-안-되는가">3.1 32GB 로 무엇이 되고 무엇이 안 되는가</h3>
+<p>방식별로 8B 모델 기준의 예산을 나란히 놓으면 이렇습니다.</p>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>방식</th>
+<th>① 가중치</th>
+<th>②③ gradient · optimizer</th>
+<th>32GB 판정</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>전체 파인튜닝</strong></td>
+<td>16 GB</td>
+<td>약 80 GB</td>
+<td>❌ <strong>불가</strong> — 세 배 이상 모자람</td>
+</tr>
+<tr class="even">
+<td><strong>LoRA</strong> (BF16 원본)</td>
+<td>16 GB</td>
+<td>수백 MB 수준</td>
+<td>✅ 가능 — 활성화값 여유도 있음</td>
+</tr>
+<tr class="odd">
+<td><strong>QLoRA</strong> (4비트 원본)</td>
+<td>약 5 GB</td>
+<td>수백 MB 수준</td>
+<td>✅ <strong>여유 있음</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p><strong>32GB 한 장에서 8B LoRA 는 여유롭게 됩니다.</strong>
+2.1절에서 본 100GB 라는 벽이 LoRA 로 ②③을 잘라내면 사라지기 때문입니다.</p>
+<p>QLoRA 까지 쓰면 ①도 5GB 로 줄어 여유가 훨씬 커집니다.
+그 여유는 <strong>더 큰 모델</strong>이나 <strong>더 긴 학습 시퀀스</strong>에 쓸 수 있습니다.</p>
+</div>
+<div class="note">
+<p>학습에서는 <strong>활성화값</strong>이 예산의 변수입니다.
+추론에서 KV cache 가 <code>컨텍스트 × 요청 수</code> 로 곱해졌듯이, 학습에서는 활성화값이
+<strong>배치 크기 × 시퀀스 길이</strong>로 늘어납니다. 7·8단계에서 익힌 감각이 대상만 바뀌어 다시 쓰입니다.</p>
+</div>
+<h3 id="원문-전제와의-차이">3.2 원문 전제와의 차이</h3>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th>항목</th>
+<th>원문 (3090 24GB × 2)</th>
+<th>내 장비 (5090 32GB × 1)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>8B 전체 파인튜닝</td>
+<td>❌ 48GB 로도 불가</td>
+<td>❌ 불가</td>
+</tr>
+<tr class="even">
+<td>8B LoRA (BF16)</td>
+<td>🔶 한 장 24GB 에는 빠듯</td>
+<td>✅ <strong>한 장에서 여유</strong></td>
+</tr>
+<tr class="odd">
+<td>8B QLoRA</td>
+<td>✅ 가능</td>
+<td>✅ 여유</td>
+</tr>
+<tr class="even">
+<td>학습 속도</td>
+<td>약 142 TFLOPS/장</td>
+<td><strong>약 419 TFLOPS</strong> — 유리</td>
+</tr>
+<tr class="odd">
+<td>어댑터 서빙</td>
+<td>가능</td>
+<td>✅ 가능</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p>10단계는 <strong>내 장비가 원문보다 유리한 단계</strong>입니다.
+학습은 prefill 처럼 <strong>연산 성능이 중요한 작업</strong>이고(4–6단계 2.3절), 5090 은 그쪽이 강합니다.
+게다가 32GB 한 장이면 LoRA 를 <strong>병렬화 없이</strong> 돌릴 수 있어 9단계의 제약도 걸리지 않습니다.</p>
+</div>
+<hr />
+<h2 id="확인-문제">4. 확인 문제</h2>
+<div class="quiz">
+<ol type="1">
+<li><p><strong>8B 모델의 전체 파인튜닝에 100GB 넘는 VRAM 이 필요한 이유를 항목별로 설명하세요.</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<pre><code>① 가중치 (BF16)           8 × 2 =  16 GB
+② gradient (BF16)         8 × 2 =  16 GB   ← 가중치마다 &quot;얼마나 옮길지&quot; 하나씩
+③ optimizer 상태 (FP32×2) 8 × 8 =  64 GB   ← 가중치마다 두 값을, 높은 정밀도로
+④ 활성화값                        수 GB
+─────────────────────────────────────────
+합계                             약 100 GB 이상</code></pre>
+<p>핵심은 <strong>커지는 것이 ②③ 이지 ① 이 아니라는 점</strong>입니다.
+가중치는 16GB 인데 그것을 고치기 위한 부속이 80GB 입니다.
+그래서 LoRA 는 ①을 건드리지 않고 ②③을 공략합니다.</p>
+</details></li>
+<li><p><strong>LoRA 는 위 네 항목 중 무엇을 줄이고, 무엇은 그대로 두는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<ul>
+<li><strong>줄이는 것: ②gradient 와 ③optimizer 상태.</strong> 이 둘은 <strong>학습되는 파라미터 개수에 비례</strong>하는데, LoRA 는 학습 대상을 전체의 0.1~1% 로 줄입니다. 따라서 이 항목들도 그 비율만큼만 필요해집니다</li>
+<li><strong>그대로 두는 것: ①가중치.</strong> 원본은 얼려둘 뿐 여전히 메모리에 올라가 있어야 합니다. 8B BF16 이면 16GB 그대로입니다</li>
+</ul>
+<p>①까지 줄이려면 원본을 양자화해야 하고, 그것이 QLoRA 입니다.</p>
+</details></li>
+<li><p><strong>3단계에서 “양자화는 정확도를 깎는다”고 배웠는데, QLoRA 는 왜 양자화된 원본을 써도 되는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p><strong>양자화된 부분이 학습되지 않기 때문</strong>입니다.</p>
+<p>3단계에서는 양자화된 가중치를 <strong>그대로 써서 답을 만들었으므로</strong> 손실이 결과에 그대로 드러났습니다.
+QLoRA 에서는 얼어 있는 4비트 원본 <strong>위에 BF16 으로 학습되는 어댑터가 얹힙니다.</strong>
+학습이 진행되면서 어댑터가 그 오차를 어느 정도 보정하는 방향으로 맞춰집니다.</p>
+<p>즉 “양자화는 손해다”가 틀린 게 아니라, <strong>그 손해를 흡수할 층이 위에 있느냐</strong>가 다릅니다.</p>
+</details></li>
+<li><p><strong>학습 중 train loss 는 계속 내려가는데 eval loss 가 올라가기 시작했습니다. 무슨 일이며 어떻게 대응하는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p><strong>과적합(overfitting)</strong> 입니다. 모델이 일반적인 규칙을 배우는 대신 <strong>학습 데이터를 외우기 시작</strong>한 것입니다.</p>
+<p>두 loss 를 나눠 보는 이유가 이것입니다. train loss 는 학습에 쓴 데이터로,
+eval loss 는 <strong>쓰지 않은 데이터</strong>로 잰 값이므로, 둘이 갈라지는 지점이 외우기 시작한 지점입니다.</p>
+<p>대응 방향:</p>
+<ul>
+<li><strong>eval 이 돌아서는 지점에서 학습을 멈춥니다</strong></li>
+<li>데이터를 늘리거나 다양하게 만듭니다</li>
+<li><code>r</code>(rank)을 낮춰 표현력을 줄입니다</li>
+<li>epoch 수를 줄입니다</li>
+</ul>
+</details></li>
+<li><p><strong>파인튜닝 후 목표 과제 성능은 올랐는데 MMLU Pro 점수가 떨어졌습니다. 실패인가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>실패가 아니라 <strong>catastrophic forgetting 이라는 알려진 현상</strong>이고, 직접 확인해봐야 하는 내용입니다.</p>
+<p>학습은 가중치를 새 데이터에 맞는 방향으로 옮기는 일이고, 그 이동이 <strong>기존 능력을 지탱하던 값도 함께 움직입니다.</strong></p>
+<p>그래서 파인튜닝 결과는 두 축으로 판단합니다.</p>
+<ol type="1">
+<li>목표 과제가 좋아졌는가</li>
+<li><strong>원래 능력을 얼마나 잃었는가</strong></li>
+</ol>
+<p>이 두 번째를 재려면 2단계에서 만든 평가 루프가 필요합니다.
+맞바꿈이 감당할 만한지는 용도가 정합니다 — 특정 업무 전용이면 감수할 수 있고, 범용으로 쓸 거라면 문제입니다.</p>
+</details></li>
+<li><p><strong>LoRA 어댑터를 원본에 합쳐서(merge) 서빙하는 것과 얹은 채로 서빙하는 것의 차이는?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>합쳐서 서빙</th>
+<th>얹은 채로 서빙</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>추론 경로</td>
+<td>원본과 <strong>완전히 동일</strong></td>
+<td>어댑터 계산이 추가됨</td>
+</tr>
+<tr class="even">
+<td>지연시간</td>
+<td><strong>추가 비용 없음</strong></td>
+<td>약간의 비용</td>
+</tr>
+<tr class="odd">
+<td>유연성</td>
+<td>어댑터를 바꾸려면 다시 합쳐야 함</td>
+<td><strong>여러 어댑터를 바꿔 끼울 수 있음</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>합치면 그냥 하나의 가중치가 되므로 TTFT 도 TPOT 도 원본과 같아집니다.
+용도별 어댑터를 여러 개 운용할 계획이면 얹은 채로 서빙하는 쪽이 맞습니다.</p>
+</details></li>
+<li><p><strong><code>r</code>(rank)을 키우면 무엇이 좋아지고 무엇이 나빠지는가?</strong></p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p><code>r</code> 은 원본을 대신하는 얇은 두 장의 <strong>두께</strong>이고, 곧 학습 대상 파라미터 수를 정합니다.</p>
+<ul>
+<li><strong>좋아지는 것</strong> — 표현력이 늘어 더 복잡한 변화를 배울 수 있습니다. 곡선이 정체돼 있을 때 올려볼 손잡이입니다</li>
+<li><strong>나빠지는 것</strong> — 학습 파라미터가 늘므로 <strong>gradient · optimizer 메모리가 함께 늘고</strong>, <strong>과적합도 쉬워집니다</strong></li>
+</ul>
+<p>즉 <code>r</code> 은 2.1절 예산표와 2.4절 곡선을 <strong>동시에 움직이는 손잡이</strong>입니다.
+어느 쪽이 먼저 문제가 되는지 보고 조절합니다.</p>
+</details></li>
+<li><p><strong>8B 모델을 LoRA 로 학습할 때 내 32GB 는 충분한가?</strong> 항목별로 근거를 드세요.</p>
+<details>
+<summary>
+<p>답</p>
+</summary>
+<p>충분합니다.</p>
+<pre><code>① 가중치 (BF16, 동결)     16 GB
+②③ gradient + optimizer   수백 MB 수준   ← 학습 대상이 0.1~1% 뿐
+④ 활성화값                수 GB (배치·시퀀스 길이에 따라)
+────────────────────────────────────────
+합계                      약 20 GB 안팎  →  32GB 안에 들어감</code></pre>
+<p>②③이 80GB 에서 수백 MB 로 줄어든 것이 결정적입니다.</p>
+<p>여유가 부족하면 두 방향이 있습니다.</p>
+<ul>
+<li><strong>QLoRA</strong> — ①을 4비트로 눌러 약 5GB 로 (총 10GB 안팎)</li>
+<li><strong>활성화값 줄이기</strong> — 배치 크기나 시퀀스 길이를 낮춤</li>
+</ul>
+</details></li>
+</ol>
+</div>
+<hr />
+<h2 id="다음-단계로">5. 다음 단계로</h2>
+<h3 id="이-문서가-회수한-씨앗">이 문서가 회수한 씨앗</h3>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>어느 문서에서</th>
+<th>무엇을</th>
+<th>이 문서의 어디에서</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1단계</td>
+<td>“학습은 추론보다 메모리를 5~6배 쓴다”</td>
+<td>2.1절 — 그 배율의 정체</td>
+</tr>
+<tr class="even">
+<td>1단계</td>
+<td>VRAM 예산 계산 습관</td>
+<td>2.1 · 3.1절 — 항목만 바뀜</td>
+</tr>
+<tr class="odd">
+<td>2–3단계</td>
+<td>“양자화는 정확도를 깎는다”</td>
+<td>2.3절 — 그런데도 쓰는 경우</td>
+</tr>
+<tr class="even">
+<td>2–3단계</td>
+<td>평가 루프와 조건 고정</td>
+<td>2.5절 — 전/후 비교의 도구</td>
+</tr>
+<tr class="odd">
+<td>4–6단계</td>
+<td>어댑터 서빙, 지연시간</td>
+<td>2.2절 — merge 하면 비용 없음</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="이-문서가-남기는-씨앗">이 문서가 남기는 씨앗</h3>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>씨앗</th>
+<th>여기서 알아둔 것</th>
+<th>이어지는 단계</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NF4 · 이중 양자화</td>
+<td>“가중치 분포에 맞춘 4비트 형식이 있다”</td>
+<td><strong>16단계</strong> — 양자화 방식의 원리</td>
+</tr>
+<tr class="even">
+<td>SFT 이후의 학습 방식</td>
+<td>“예시를 따라 하게 만드는 것이 SFT”</td>
+<td>커리큘럼 범위 밖</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="phase-5-로-넘어가기-전에">Phase 5 로 넘어가기 전에</h3>
+<p>여기까지가 <strong>모델을 다루는 기술</strong>이었습니다. 11단계부터는 성격이 바뀝니다.</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>1~10단계</th>
+<th>11~13단계</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>다루는 것</td>
+<td>모델 하나</td>
+<td><strong>여러 모델을 조합한 시스템</strong></td>
+</tr>
+<tr class="even">
+<td>판단 기준</td>
+<td>VRAM · 속도 · 정확도</td>
+<td>어떤 일에 어떤 모델을 쓸 것인가</td>
+</tr>
+<tr class="odd">
+<td>성격</td>
+<td>개념과 측정</td>
+<td><strong>설계와 도구 선택</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note">
+<p>그래서 11단계 이후에는 이런 형태의 개념 이해서를 따로 만들지 않습니다.
+개념보다 <strong>구성과 판단</strong>이 본체이고, 그것은 실행 환경 디렉터리에서 다루는 것이 맞습니다
+(작성 범위는 <a href="GUIDE.md"><code>GUIDE.md</code></a> 11절).</p>
+<p>다음으로 개념 자료가 필요해지는 지점은 <strong>16단계(레이어별 양자화)</strong> 입니다.
+3단계에서 씨앗으로 남긴 GPTQ · AWQ 와, 이 문서에서 남긴 NF4 가 거기서 만납니다.</p>
+</div>
+<div class="key">
+<p>10단계가 끝났을 때 달라지는 것은 기술만이 아닙니다.
+지금까지는 <strong>남이 만든 모델을 돌리는 사람</strong>이었고, 이제 <strong>내가 바꾼 모델을 내 장비에서 서빙하는 사람</strong>입니다.
+원문이 이 단계를 <em>“거듭납니다”</em> 라고 표현한 이유입니다.</p>
+</div>
+<hr />
+<h2 id="용어표">6. 용어표</h2>
+<div class="table-scroll">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>약어 / 용어</th>
+<th>full name</th>
+<th>뜻</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>adapter</td>
+<td>— (용어)</td>
+<td>LoRA 로 학습된 결과물. 수십~수백 MB 의 작은 파일</td>
+</tr>
+<tr class="even">
+<td>BF16</td>
+<td>Brain Floating Point 16</td>
+<td>2바이트 부동소수점. 학습에서 가중치·어댑터의 기본 정밀도</td>
+</tr>
+<tr class="odd">
+<td>catastrophic forgetting</td>
+<td>— (현상 이름)</td>
+<td>새로 학습하면서 원래 능력을 잃는 현상</td>
+</tr>
+<tr class="even">
+<td>epoch</td>
+<td>— (용어)</td>
+<td>학습 데이터 전체를 한 번 훑는 단위</td>
+</tr>
+<tr class="odd">
+<td>eval loss</td>
+<td>— (용어)</td>
+<td>학습에 쓰지 않은 데이터로 잰 loss. 과적합 판단의 기준</td>
+</tr>
+<tr class="even">
+<td>FP32</td>
+<td>Floating Point 32</td>
+<td>4바이트 부동소수점. optimizer 상태가 보통 이 정밀도</td>
+</tr>
+<tr class="odd">
+<td>full fine-tuning</td>
+<td>— (용어)</td>
+<td>모델 전체를 학습하는 방식. 8B 기준 100GB 이상 필요</td>
+</tr>
+<tr class="even">
+<td>gradient</td>
+<td>— (용어)</td>
+<td>각 가중치를 어느 방향으로 얼마나 옮길지 나타내는 값</td>
+</tr>
+<tr class="odd">
+<td>GPU</td>
+<td>Graphics Processing Unit</td>
+<td>대량 병렬 연산 장치</td>
+</tr>
+<tr class="even">
+<td>learning rate</td>
+<td>— (용어)</td>
+<td>한 번에 가중치를 옮기는 걸음의 크기</td>
+</tr>
+<tr class="odd">
+<td>LoRA</td>
+<td>Low-Rank Adaptation</td>
+<td>원본을 동결하고 작은 행렬 두 개만 학습하는 방식</td>
+</tr>
+<tr class="even">
+<td>loss</td>
+<td>— (용어)</td>
+<td>모델이 얼마나 틀리고 있는지를 나타내는 값</td>
+</tr>
+<tr class="odd">
+<td>merge</td>
+<td>— (용어)</td>
+<td>어댑터를 원본 가중치에 합쳐 하나로 만드는 것</td>
+</tr>
+<tr class="even">
+<td>NF4</td>
+<td>4-bit NormalFloat</td>
+<td>가중치 분포에 맞춰 눈금을 배치한 4비트 형식. QLoRA 에서 사용</td>
+</tr>
+<tr class="odd">
+<td>optimizer</td>
+<td>— (용어)</td>
+<td>gradient 를 받아 가중치를 실제로 어떻게 옮길지 정하는 알고리즘</td>
+</tr>
+<tr class="even">
+<td>overfitting</td>
+<td>— (현상 이름)</td>
+<td>학습 데이터를 외워 새 데이터에서 성능이 떨어지는 상태</td>
+</tr>
+<tr class="odd">
+<td>QLoRA</td>
+<td>Quantized LoRA</td>
+<td>동결한 원본을 4비트로 양자화해 올리는 LoRA</td>
+</tr>
+<tr class="even">
+<td>rank (<code>r</code>)</td>
+<td>— (용어)</td>
+<td>LoRA 어댑터의 두께. 표현력과 메모리를 함께 정함</td>
+</tr>
+<tr class="odd">
+<td>SFT</td>
+<td>Supervised Fine-Tuning</td>
+<td>질문·답변 예시 쌍으로 따라 하게 가르치는 학습 방식</td>
+</tr>
+<tr class="even">
+<td>train loss</td>
+<td>— (용어)</td>
+<td>학습에 쓴 데이터로 잰 loss</td>
+</tr>
+<tr class="odd">
+<td>TPOT</td>
+<td>Time Per Output Token</td>
+<td>출력 토큰 사이 간격. 4–6단계 2.4절</td>
+</tr>
+<tr class="even">
+<td>TTFT</td>
+<td>Time To First Token</td>
+<td>첫 토큰까지의 시간. 4–6단계 2.4절</td>
+</tr>
+<tr class="odd">
+<td>VRAM</td>
+<td>Video Random Access Memory</td>
+<td>GPU 전용 메모리. 32GB 고정</td>
+</tr>
+</tbody>
+</table>
+</div>
+  </main>
+
+  <footer class="doc-foot">
+    <p>상위 커리큘럼 — <a href="../README.md">../README.md</a> 10단계</p><p>앞 문서 — <a href="08-09-context-parallel.html">8–9단계</a></p><p>작성 기준 — <a href="GUIDE.md">GUIDE.md</a></p>
+  </footer>
+
+</div>
+
+<script>
+// ------------------------------------------------------------
+// ① 테마 토글: localStorage 에 기억, 없으면 OS 설정을 따릅니다.
+// ------------------------------------------------------------
+(function () {
+  var root = document.documentElement;
+  var KEY = 'study-theme';
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+
+  document.getElementById('theme-toggle').addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme');
+    if (!cur) {
+      cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+})();
+
+// ------------------------------------------------------------
+// ② 제목 앵커(#): 본문 h2/h3 에만 붙입니다.
+//    Lua 필터가 아니라 여기서 붙이는 이유 —
+//    필터로 제목 내용에 <a> 를 넣으면 pandoc 이 그 내용을 목차에도
+//    복사해 <a> 안에 <a> 가 중첩되고, 브라우저가 목차 링크를 끊습니다.
+// ------------------------------------------------------------
+(function () {
+  var main = document.querySelector('main');
+  if (!main) return;
+  main.querySelectorAll('h2[id], h3[id]').forEach(function (h) {
+    var a = document.createElement('a');
+    a.className = 'anchor';
+    a.href = '#' + h.id;
+    a.setAttribute('aria-hidden', 'true');
+    a.setAttribute('tabindex', '-1');
+    a.textContent = '#';
+    h.insertBefore(a, h.firstChild);
+  });
+})();
+
+// ------------------------------------------------------------
+// ③ 사이드바 목차: 모바일 드로어 + 현재 위치 표시(scrollspy)
+// ------------------------------------------------------------
+(function () {
+  var sidebar = document.getElementById('sidebar');
+  var toggle  = document.getElementById('nav-toggle');
+  var backdrop = document.getElementById('nav-backdrop');
+  if (!sidebar || !toggle) { if (toggle) toggle.hidden = true; return; }
+
+  // --- 드로어 열고 닫기 (좁은 화면에서만 의미가 있습니다) ---
+  function setOpen(open) {
+    document.body.classList.toggle('nav-open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.textContent = open ? '✕' : '☰';
+    toggle.setAttribute('title', open ? '목차 닫기' : '목차');
+    if (backdrop) backdrop.hidden = !open;
+  }
+  toggle.addEventListener('click', function () {
+    setOpen(!document.body.classList.contains('nav-open'));
+  });
+  if (backdrop) backdrop.addEventListener('click', function () { setOpen(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setOpen(false);
+  });
+
+  // 사이드바 안의 링크를 누르면 드로어를 닫습니다 (좁은 화면)
+  sidebar.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function () { setOpen(false); });
+  });
+
+  // --- 목차 링크 ↔ 제목 요소 짝짓기 ---
+  //     (사이드바 머리말의 문서 제목 링크는 제외 — 현재 위치 표시 대상이 아닙니다)
+  var links = Array.prototype.slice.call(document.querySelectorAll('#TOC a[href^="#"]'));
+  var items = [];
+  links.forEach(function (a) {
+    var raw = a.getAttribute('href').slice(1);
+    var id = raw;
+    try { id = decodeURIComponent(raw); } catch (e) {}
+    var el = document.getElementById(id) || document.getElementById(raw);
+    if (el) items.push({ link: a, el: el });
+  });
+  if (!items.length) return;
+
+  // --- 현재 읽고 있는 절 표시 ---
+  var current = null;
+  function sync() {
+    var line = 120;                       // 화면 상단에서 이 높이를 지난 마지막 제목이 '현재'
+    var found = items[0];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].el.getBoundingClientRect().top <= line) found = items[i];
+      else break;
+    }
+    // 문서 맨 아래에 닿으면 마지막 항목을 현재로
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) {
+      found = items[items.length - 1];
+    }
+    if (found === current) return;
+    if (current) current.link.classList.remove('active');
+    found.link.classList.add('active');
+    current = found;
+
+    // 활성 항목이 사이드바 밖으로 밀려나면 보이는 위치로
+    var r = found.link.getBoundingClientRect();
+    var s = sidebar.getBoundingClientRect();
+    if (r.top < s.top + 8 || r.bottom > s.bottom - 8) {
+      sidebar.scrollTop += r.top - s.top - sidebar.clientHeight / 3;
+    }
+  }
+
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () { ticking = false; sync(); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  sync();
+})();
+</script>
+
+</body>
+</html>

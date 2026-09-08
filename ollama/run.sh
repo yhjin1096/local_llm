@@ -19,17 +19,87 @@ DEFAULT_MODEL="qwen3.8:27b"
 NEED_DISK_GB=25          # 18GB 모델 + 여유
 WAIT_SECONDS=90          # 서버 응답 대기 상한
 
+# ── 도움말 ───────────────────────────────────────────────────
+usage() {
+cat <<'HELP'
+run.sh — Phase 1 (커리큘럼 2~3단계) 기동 스크립트
+
+사용법
+  ./run.sh                       기본 모델(qwen3.8:27b) 준비까지
+  ./run.sh qwen3:8b              다른 모델 지정
+  ./run.sh qwen3.8:27b --chat    준비 후 바로 대화 진입
+  ./run.sh --help                이 도움말
+
+  여러 번 실행해도 안전합니다. 이미 떠 있으면 그대로 쓰고,
+  이미 받은 모델은 다시 받지 않습니다.
+
+하는 일 (순서대로)
+  1. 사전 점검      docker / compose / GPU / 디스크 여유
+  2. .env 정합성    OLLAMA_MAX_LOADED_MODELS 를 1로 고정
+                    (18GB 모델을 2개 올리면 32GB를 넘김. 고치면 .env.bak 백업)
+  3. 컨테이너 기동  docker compose up -d ollama
+                    .env 를 고쳤을 때만 --force-recreate 를 붙임
+  4. 응답 대기      ollama list 가 성공할 때까지 최대 90초 폴링
+  5. GPU 인식 확인  로그에서 "inference compute" 를 찾음
+  6. 모델 pull      이미 있으면 건너뜀
+  7. VRAM 확인      짧은 호출로 로드를 유도한 뒤 ollama ps
+
+  수동 명령과 다른 곳
+    docker compose logs -f  → 폴링 + 로그 grep  (-f 는 Ctrl+C 로만 끝나서
+                                                 스크립트가 멈춤)
+    ollama ps 바로 호출     → 로드 유도 후 호출  (pull 만으로는 VRAM 에
+                                                 올라가지 않아 빈 표가 나옴)
+    ollama run (대화형)     → 기본은 안내만, --chat 일 때만 진입
+
+docker compose 명령 빠른 참고
+  docker compose ps                            컨테이너 상태
+  docker compose logs -f ollama                로그 (Ctrl+C 로 나옴)
+  docker compose exec -it ollama ollama run M  대화 (/bye 로 나옴)
+  docker compose exec -T ollama ollama ps      로드된 모델
+  docker compose stop ollama                   정지 (컨테이너는 남음)
+  docker compose down                          컨테이너 삭제
+  docker compose pull ollama                   이미지 갱신
+
+  ※ exec 의 두 번째 ollama 는 컨테이너 속 CLI 이고,
+    첫 번째는 docker-compose.yml 의 서비스 이름입니다.
+
+설정을 바꿀 때
+  .env (컨텍스트, KV 타입 등)   docker compose up -d --force-recreate ollama
+  docker-compose.yml (구조)     docker compose up -d ollama
+  eval/requirements.txt         docker compose build eval
+
+  환경변수는 컨테이너를 만들 때 주입되므로 restart 로는 반영되지 않습니다.
+
+데이터는 어디 남는가
+  ./models        받아둔 모델      bind mount — 컨테이너를 지워도 남습니다
+  ./results       측정 결과        bind mount — 남습니다
+  ./eval/scripts  평가 스크립트    bind mount — 남습니다
+  hf_cache        데이터셋 캐시    named volume — 남습니다 (down -v 는 지움)
+
+  컨테이너 안에서 apt/pip install 한 것은 컨테이너를 지우면 사라집니다.
+  남아야 하는 것은 Dockerfile 이나 requirements.txt 에 적으세요.
+
+자주 나는 오류
+  no kernel image is available    Blackwell(sm_120) 미지원 이미지
+                                  → docker compose pull ollama
+  GPU 대신 CPU 로 추론 (매우 느림) → docker compose logs ollama | grep -i gpu
+  컨텍스트가 4096 으로 고정        → .env 수정 후 --force-recreate
+  VRAM OOM                        → ollama ps 로 상주 모델 확인
+
+자세한 설명은 README.md, VRAM 예산 계산은 ../study/01-hardware.md 2.5절.
+HELP
+}
+
 # ── 인수 파싱 ────────────────────────────────────────────────
 MODEL=""
 CHAT=0
 for arg in "$@"; do
   case "$arg" in
-    --chat)   CHAT=1 ;;
-    -h|--help)
-      sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
-      exit 0 ;;
-    -*)       echo "알 수 없는 옵션: $arg" >&2; exit 1 ;;
-    *)        MODEL="$arg" ;;
+    --chat)     CHAT=1 ;;
+    -h|--help)  usage; exit 0 ;;
+    -*)         echo "알 수 없는 옵션: $arg" >&2
+                echo "도움말: ./run.sh --help" >&2; exit 1 ;;
+    *)          MODEL="$arg" ;;
   esac
 done
 MODEL="${MODEL:-$DEFAULT_MODEL}"

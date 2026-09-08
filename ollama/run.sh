@@ -28,10 +28,22 @@ run.sh — Phase 1 (커리큘럼 2~3단계) 기동 스크립트
   ./run.sh                       기본 모델(qwen3.8:27b) 준비까지
   ./run.sh qwen3:8b              다른 모델 지정
   ./run.sh qwen3.8:27b --chat    준비 후 바로 대화 진입
+  ./run.sh --ui                  웹 UI(open-webui)까지 함께 띄움
   ./run.sh --help                이 도움말
 
   여러 번 실행해도 안전합니다. 이미 떠 있으면 그대로 쓰고,
   이미 받은 모델은 다시 받지 않습니다.
+
+서비스는 따로 뜹니다
+  이 스크립트는 docker compose 에 서비스명을 명시하므로 서로 간섭하지 않습니다.
+
+    ./run.sh                  ollama 만
+    ./run.sh --ui             ollama + open-webui
+    docker compose up -d open-webui    UI 만 (의존성으로 ollama 도 함께)
+    docker compose stop open-webui     UI 만 정지 (ollama 는 계속)
+
+  compose 서비스: ollama(GPU) · eval(평가, CPU) · open-webui(웹 UI, CPU)
+  eval 과 open-webui 는 GPU 를 쓰지 않고 Ollama 의 HTTP API 만 호출합니다.
 
 하는 일 (순서대로)
   1. 사전 점검      docker / compose / GPU / 디스크 여유
@@ -43,6 +55,7 @@ run.sh — Phase 1 (커리큘럼 2~3단계) 기동 스크립트
   5. GPU 인식 확인  로그에서 "inference compute" 를 찾음
   6. 모델 pull      이미 있으면 건너뜀
   7. VRAM 확인      짧은 호출로 로드를 유도한 뒤 ollama ps
+  8. 웹 UI          --ui 일 때만. open-webui 를 띄우고 응답을 기다림
 
   수동 명령과 다른 곳
     docker compose logs -f  → 폴링 + 로그 grep  (-f 는 Ctrl+C 로만 끝나서
@@ -99,9 +112,11 @@ HELP
 # ── 인수 파싱 ────────────────────────────────────────────────
 MODEL=""
 CHAT=0
+UI=0
 for arg in "$@"; do
   case "$arg" in
     --chat)     CHAT=1 ;;
+    --ui)       UI=1 ;;
     -h|--help)  usage; exit 0 ;;
     -*)         echo "알 수 없는 옵션: $arg" >&2
                 echo "도움말: ./run.sh --help" >&2; exit 1 ;;
@@ -287,6 +302,42 @@ if [ "$loaded" = "1" ]; then
   info "위 SIZE 를 ../study/01-hardware.md 2.5절 예산 계산과 대조해 보세요"
 fi
 
+# ── 8. 웹 UI (--ui 일 때만) ──────────────────────────────────
+# ollama 서비스와 독립입니다. 여기까지 왔다면 모델은 이미 적재됐으므로
+# UI 를 띄우는 즉시 쓸 수 있습니다.
+webui_port=""
+if [ "$UI" = "1" ]; then
+  step "웹 UI 기동"
+  webui_port=$(read_env WEBUI_PORT); webui_port="${webui_port:-3000}"
+
+  if ss -tln 2>/dev/null | grep -q ":${webui_port} " \
+     && ! docker compose ps --status running --services 2>/dev/null | grep -qx open-webui; then
+    warn "포트 ${webui_port} 를 다른 프로세스가 쓰고 있습니다"
+    info ".env 의 WEBUI_PORT 를 바꾸세요"
+  else
+    info "첫 실행이면 이미지를 받습니다 (1~4GB)"
+    if docker compose up -d open-webui; then
+      # 초기화에 시간이 걸립니다. HTTP 응답이 올 때까지 기다립니다.
+      ready=0
+      for i in $(seq 1 120); do
+        if curl -sf -o /dev/null "http://localhost:${webui_port}/" 2>/dev/null; then
+          ok "응답함 (${i}초)  →  http://localhost:${webui_port}"
+          ready=1
+          break
+        fi
+        sleep 1
+      done
+      if [ "$ready" = "0" ]; then
+        warn "120초 안에 응답이 없습니다 (초기화가 더 걸릴 수 있습니다)"
+        info "확인: docker compose logs -f open-webui"
+      fi
+    else
+      warn "기동 실패 — docker compose logs open-webui 를 확인하세요"
+      webui_port=""
+    fi
+  fi
+fi
+
 cat <<EOF
 
 ${C_STEP}▶ 다음${C_OFF}
@@ -297,6 +348,18 @@ ${C_STEP}▶ 다음${C_OFF}
   로그 보기   : docker compose logs -f ollama                        ($C_DIM Ctrl+C 로 나옴$C_OFF)
   정지        : docker compose stop ollama
 EOF
+
+if [ -n "$webui_port" ]; then
+cat <<EOF
+  ${C_STEP}웹 UI${C_OFF}       : http://localhost:${webui_port}
+                 ${C_DIM}이미지는 드래그앤드롭으로 넣습니다 (base64·마운트 불필요)${C_OFF}
+  UI 만 정지   : docker compose stop open-webui
+EOF
+elif [ "$UI" = "0" ]; then
+cat <<EOF
+  ${C_DIM}웹 UI 가 필요하면 ./run.sh --ui (또는 docker compose up -d open-webui)${C_OFF}
+EOF
+fi
 
 if [ "$CHAT" = "1" ]; then
   step "대화 진입 (/bye 로 나옴)"

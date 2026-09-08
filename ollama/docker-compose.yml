@@ -80,5 +80,35 @@ services:
     # 바로 종료되지 않게. `docker compose run --rm eval bash` 로 들어가 쓰세요.
     entrypoint: ["sleep", "infinity"]
 
+  # ── 웹 UI ────────────────────────────────────────────────────
+  # 브라우저에서 쓰는 채팅 인터페이스. 이미지 드래그앤드롭이 됩니다.
+  # GPU 불필요: Ollama 의 HTTP API 만 호출합니다 (eval 과 같은 성격).
+  #
+  # 기본으로 뜨지 않습니다. 필요할 때만:
+  #   docker compose up -d open-webui     또는     ./run.sh --ui
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+    ports:
+      # 호스트 3000 → 컨테이너 8080
+      - "${WEBUI_PORT:-3000}:8080"
+
+    volumes:
+      # 대화 기록·계정·설정. 이게 없으면 컨테이너를 다시 만들 때 전부 사라집니다.
+      - webui_data:/app/backend/data
+
+    environment:
+      # 같은 compose network 안이므로 localhost 가 아니라 서비스명으로 접근합니다.
+      OLLAMA_BASE_URL: http://ollama:11434
+      # 혼자 쓰면 로그인 생략. 외부에 노출할 때는 반드시 true 로 바꾸세요.
+      WEBUI_AUTH: ${WEBUI_AUTH:-false}
+
 volumes:
   hf_cache:
+  webui_data:

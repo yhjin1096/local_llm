@@ -14,22 +14,37 @@
 
 ## 구성
 
-| 서비스 | 이미지 | 역할 |
-|---|---|---|
-| `ollama` | `ollama/ollama:latest` (공식) | 모델 서빙. **Dockerfile 없음** — 빌드할 것이 없습니다 |
-| `eval` | `./eval/Dockerfile` | 평가 하네스. GPU 불필요 (HTTP API만 호출) |
+| 서비스 | 이미지 | 역할 | GPU |
+|---|---|---|---|
+| `ollama` | `ollama/ollama:latest` (공식) | 모델 서빙. **Dockerfile 없음** — 빌드할 것이 없습니다 | ✅ |
+| `eval` | `./eval/Dockerfile` | 평가 하네스 (HTTP API만 호출) | ❌ |
+| `open-webui` | `ghcr.io/open-webui/open-webui:main` | 브라우저 채팅 UI. **기본으로 뜨지 않습니다** | ❌ |
 
 ```
 ollama/
 ├── docker-compose.yml
-├── .env                  ← 튜닝 값 (컨텍스트, KEEP_ALIVE 등)
+├── .env                  ← 튜닝 값 (컨텍스트, KEEP_ALIVE, WEBUI_PORT 등)
+├── run.sh                ← 기동 스크립트 (./run.sh --help)
 ├── eval/
 │   ├── Dockerfile        ← Dockerfile 이 필요한 유일한 자리
 │   ├── requirements.txt
 │   └── scripts/          ← 직접 작성한 평가 스크립트
 ├── models/               ← 모델 저장 (bind mount, gitignore)
+├── mount/                ← 컨테이너에 넘길 파일 (이미지 등) → /root/mount
 └── results/              ← 측정 결과 (gitignore)
 ```
+
+### 서비스는 따로 뜹니다
+
+compose 명령에 **서비스명을 명시**하므로 서로 간섭하지 않습니다.
+
+| 명령 | 뜨는 것 |
+|---|---|
+| `./run.sh` | `ollama` 만 |
+| `./run.sh --ui` | `ollama` + `open-webui` |
+| `docker compose up -d open-webui` | `open-webui` (의존성으로 `ollama` 도 함께) |
+| `docker compose stop open-webui` | UI 만 정지. **`ollama` 는 계속 돕니다** |
+| `docker compose up -d` | 서비스명을 빼면 **전부** 뜹니다 |
 
 ## 이 환경의 하드웨어 전제
 
@@ -273,6 +288,49 @@ docker compose build eval
 
 ---
 
+## 웹 UI (open-webui)
+
+브라우저에서 ChatGPT처럼 쓰는 인터페이스입니다. **Ollama 자체에는 웹 UI가 없습니다.**
+`localhost:11434` 를 브라우저로 열면 `Ollama is running` 한 줄만 나옵니다. 그 포트는
+사람이 보는 화면이 아니라 API 엔드포인트입니다.
+
+```bash
+./run.sh --ui                        # 모델 준비 + 웹 UI 까지
+docker compose up -d open-webui      # UI 만 (ollama 는 의존성으로 함께 뜸)
+```
+
+브라우저에서 `http://localhost:3000` 을 엽니다. 포트는 `.env` 의 `WEBUI_PORT` 로 바꿉니다.
+
+### 터미널과 비교하면
+
+| | 터미널 (`ollama run`) | 웹 UI |
+|---|---|---|
+| **이미지 입력** | 컨테이너 경로 필요 (`mount/` 활용) | **드래그앤드롭** |
+| 대화 기록 | 세션이 끝나면 사라짐 | 저장되고 검색됨 |
+| 여러 모델 비교 | 각각 다시 실행 | 드롭다운 전환, 나란히 비교 |
+| thinking 표시 | 텍스트로 섞여 나옴 | 접었다 펼 수 있음 |
+| 마크다운·코드 | 원문 그대로 | 렌더링 |
+
+### 설정에서 짚어둘 것
+
+| 설정 | 이유 |
+|---|---|
+| `OLLAMA_BASE_URL: http://ollama:11434` | 컨테이너끼리는 `localhost` 가 아니라 **서비스명**으로 부릅니다 |
+| `webui_data:/app/backend/data` | named volume. **이게 없으면 컨테이너를 다시 만들 때 대화 기록이 전부 사라집니다** |
+| `ports: "3000:8080"` | 컨테이너 내부는 8080, 호스트에서는 3000 |
+| `depends_on` + `service_healthy` | `ollama` 가 healthy 가 된 뒤에 뜹니다 |
+| GPU 설정 없음 | HTTP 만 호출하므로 **VRAM 을 쓰지 않습니다** (실측으로 확인) |
+
+> ⚠️ `WEBUI_AUTH=false` 는 **브라우저 로그인만** 건너뜁니다.
+> `/ollama/api/...` 같은 API 엔드포인트는 여전히 토큰을 요구합니다
+> (`{"detail":"Not authenticated"}`).
+> 외부에 노출할 때는 반드시 `.env` 에서 `WEBUI_AUTH=true` 로 바꾸세요.
+
+> 💡 `docker compose down -v` 는 `webui_data` 를 지웁니다. 대화 기록이 날아갑니다.
+> 컨테이너만 정리할 때는 `-v` 를 빼세요.
+
+---
+
 ## 실행
 
 > 💡 아래 ①~⑤ 를 한 번에 처리하는 `./run.sh` 가 있습니다.
@@ -400,6 +458,9 @@ du -sh ./models        # 디스크 사용량 추적
 | 벤치마크 중간에 속도가 급변 | 모델 언로드/재로드. `OLLAMA_KEEP_ALIVE=-1` 확인 |
 | `eval` 에서 ollama 연결 실패 | 컨테이너 내부에서는 `localhost` 가 아니라 **`http://ollama:11434`** |
 | VRAM OOM | `ollama ps` 로 상주 모델 확인 → `OLLAMA_MAX_LOADED_MODELS=1` 로 낮추기 |
+| 웹 UI 에 모델이 안 보임 | `OLLAMA_BASE_URL` 이 `http://ollama:11434` 인지 확인. `localhost` 면 컨테이너 자신을 가리켜 실패합니다 |
+| 웹 UI 포트 충돌 | `.env` 의 `WEBUI_PORT` 를 바꾸고 `docker compose up -d --force-recreate open-webui` |
+| 웹 UI 대화 기록이 사라짐 | `webui_data` 볼륨이 지워진 것입니다 (`down -v` 등) |
 | 컨테이너를 다시 만들었더니 작업이 사라짐 | 마운트되지 않은 경로에 있던 파일입니다. 남아야 할 것은 `Dockerfile` · `requirements.txt` · bind mount 경로에 두세요 (위 [환경 변경](#환경을-바꾸거나-컨테이너를-다시-만들-때) 절) |
 | 쓰지 않는 볼륨이 디스크를 먹음 | 프로젝트명이나 볼륨 방식을 바꿀 때 생기는 고아 볼륨입니다. `docker volume ls` 로 확인 후 `docker volume rm <이름>` |
 | 포트 11434 가 이미 사용 중 | 다른 방식으로 띄운 Ollama 가 있습니다. `docker ps -a --filter name=ollama` 와 `ss -tlnp \| grep 11434` 로 확인 |

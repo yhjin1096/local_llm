@@ -24,6 +24,7 @@ services:
       # 모델 저장소. bind mount 이므로 호스트에서 직접 용량 확인이 됩니다:
       #   du -sh ./models
       - ${OLLAMA_MODELS_DIR:-./models}:/root/.ollama
+      - ./mount:/root/mount
 
     environment:
       # 컨테이너 내부 전체 인터페이스에 바인딩 (포트 매핑이 동작하려면 필수)

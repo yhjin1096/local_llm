@@ -51,6 +51,12 @@ run.sh — Phase 1 (커리큘럼 2~3단계) 기동 스크립트
                                                  올라가지 않아 빈 표가 나옴)
     ollama run (대화형)     → 기본은 안내만, --chat 일 때만 진입
 
+    로드 유도에 ollama run 대신 /api/generate 빈 프롬프트를 씁니다.
+      · exec -T 는 stdin 을 파이프로 연결하므로 ollama run 이 프롬프트를
+        인수로 받았는데도 stdin 을 기다리며 멈춥니다 (wchan: anon_pipe_read)
+      · 이 모델은 thinking mode 가 기본이라 생성까지 기다리면 오래 걸립니다
+      · 빈 프롬프트는 적재만 하고 done_reason: "load" 로 즉시 반환됩니다
+
 docker compose 명령 빠른 참고
   docker compose ps                            컨테이너 상태
   docker compose logs -f ollama                로그 (Ctrl+C 로 나옴)
@@ -167,9 +173,11 @@ else
 fi
 
 ctx=$(read_env OLLAMA_CONTEXT_LENGTH)
+port=$(read_env OLLAMA_PORT); port="${port:-11434}"
 ok "OLLAMA_CONTEXT_LENGTH=${ctx:-8192}"
 ok "OLLAMA_KV_CACHE_TYPE=$(read_env OLLAMA_KV_CACHE_TYPE)"
 ok "OLLAMA_KEEP_ALIVE=$(read_env OLLAMA_KEEP_ALIVE)  (-1 = 언로드 안 함)"
+ok "OLLAMA_PORT=$port"
 
 # ── 3. 컨테이너 기동 ─────────────────────────────────────────
 # .env 를 고쳤으면 재시작만으로는 반영되지 않습니다. 컨테이너를 다시 만듭니다.
@@ -231,10 +239,40 @@ fi
 info "디스크 사용량: $(du -sh ./models 2>/dev/null | cut -f1 || echo '확인 불가')"
 
 # ── 7. VRAM 점유 확인 ────────────────────────────────────────
-# pull 만으로는 VRAM에 올라가지 않습니다. 짧은 호출로 로드를 유도합니다.
+# pull 만으로는 VRAM 에 올라가지 않으므로 로드를 유도해야 합니다.
+#
+# 'ollama run MODEL "hi"' 를 쓰면 안 됩니다. 두 가지 문제가 있습니다.
+#   ① docker compose exec -T 는 stdin 을 파이프로 연결하므로, ollama run 이
+#      프롬프트를 인수로 받았는데도 stdin 에서 추가 입력을 기다리며 멈춥니다
+#      (State: S / wchan: anon_pipe_read).
+#   ② 이 모델은 thinking mode 가 기본이라 실제 생성까지 기다리면 오래 걸립니다.
+#
+# 대신 /api/generate 에 빈 프롬프트를 보냅니다. Ollama 는 모델만 VRAM 에 올리고
+# 생성 없이 즉시 응답합니다 (done_reason: "load").
 step "VRAM 점유 확인"
-info "모델을 올리는 중 (첫 로드는 수십 초 걸릴 수 있습니다)"
-docker compose exec -T ollama ollama run "$MODEL" "hi" >/dev/null 2>&1 || true
+info "모델을 VRAM 에 올리는 중 (17GB 라 첫 로드는 수십 초 걸립니다)"
+
+loaded=0
+if command -v curl >/dev/null 2>&1; then
+  resp=$(curl -sS --max-time 300 "http://localhost:${port}/api/generate" \
+           -H 'Content-Type: application/json' \
+           -d "{\"model\":\"${MODEL}\",\"prompt\":\"\",\"keep_alive\":-1}" 2>&1) || true
+  if grep -q '"done_reason":"load"' <<<"$resp"; then
+    ok "로드 완료 (생성 없이 적재만)"
+    loaded=1
+  elif grep -q '"done":true' <<<"$resp"; then
+    ok "로드 완료"
+    loaded=1
+  else
+    warn "예상과 다른 응답입니다"
+    info "$(head -c 300 <<<"$resp")"
+  fi
+else
+  # curl 이 없을 때의 대비책. stdin 을 닫아 ①번 문제를 막습니다.
+  warn "curl 이 없어 ollama run 으로 대체합니다 (생성까지 기다립니다)"
+  docker compose exec -T ollama ollama run "$MODEL" "hi" </dev/null >/dev/null 2>&1 || true
+  loaded=1
+fi
 
 echo
 docker compose exec -T ollama ollama ps || true
@@ -245,17 +283,19 @@ if command -v nvidia-smi >/dev/null 2>&1; then
         --format=csv,noheader | head -1)"
 fi
 
+if [ "$loaded" = "1" ]; then
+  info "위 SIZE 를 ../study/01-hardware.md 2.5절 예산 계산과 대조해 보세요"
+fi
+
 cat <<EOF
 
 ${C_STEP}▶ 다음${C_OFF}
   대화 시작   : docker compose exec -it ollama ollama run $MODEL     ($C_DIM/bye 로 나옴$C_OFF)
-  API 호출    : curl http://localhost:${OLLAMA_PORT:-11434}/v1/chat/completions \\
+  API 호출    : curl http://localhost:${port}/v1/chat/completions \\
                   -H 'Content-Type: application/json' \\
                   -d '{"model":"$MODEL","messages":[{"role":"user","content":"안녕"}]}'
   로그 보기   : docker compose logs -f ollama                        ($C_DIM Ctrl+C 로 나옴$C_OFF)
   정지        : docker compose stop ollama
-
-  ${C_DIM}위 'ollama ps' 의 SIZE 를 study/01-hardware.md 2.5절 예산 계산과 대조해 보세요.${C_OFF}
 EOF
 
 if [ "$CHAT" = "1" ]; then
